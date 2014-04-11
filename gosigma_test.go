@@ -1,10 +1,12 @@
-// Copyright 2014 CLOUDSIGMA AG
+// Copyright 2014 ALTOROS
 // Licensed under the AGPLv3, see LICENSE file for details.
 
 package gosigma
 
 import "testing"
 
-func TestStub(t *testing.T) {
-
+func TestVersionStringMatches(t *testing.T) {
+	if vs, vns := Version(), VersionNumber().String(); vs != vns {
+		t.Errorf("Version() != VersionNumber().String(): '%s' != '%s'")
+	}
 }
