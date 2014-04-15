@@ -41,12 +41,9 @@ func NewClient(c Configuration) (*Client, error) {
 		return nil, errors.New("endpoint are not allowed to be empty")
 	}
 
-	endpoint := c.Endpoint
-	switch endpoint {
-	case "zrh":
-		endpoint = "https://zrh.cloudsigma.com/api/2.0/"
-	case "lvs":
-		endpoint = "https://lvs.cloudsigma.com/api/2.0/"
+	endpoint, err := GetRegionEndpoint(c.Endpoint)
+	if err != nil {
+		endpoint = c.Endpoint
 	}
 
 	u, err := url.Parse(endpoint)
