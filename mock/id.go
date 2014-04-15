@@ -48,5 +48,5 @@ func GetIDFromResponse(r *http.Response) int {
 }
 
 func SetID(h http.Header, id int) {
-	h[goSigmaId] = append(h[goSigmaId], strconv.Itoa(id))
+	h.Add(goSigmaId, strconv.Itoa(id))
 }

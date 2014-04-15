@@ -12,7 +12,7 @@ func init() {
 	Start()
 }
 
-func testEq(a, b []byte) bool {
+func testEqByteSlice(a, b []byte) bool {
 	if len(a) != len(b) {
 		return false
 	}
@@ -26,7 +26,7 @@ func testEq(a, b []byte) bool {
 	return true
 }
 
-func TestServerMockSections(t *testing.T) {
+func TestSections(t *testing.T) {
 
 	ch := make(chan int)
 
@@ -54,7 +54,7 @@ func TestServerMockSections(t *testing.T) {
 		var buf bytes.Buffer
 		buf.ReadFrom(resp.Body)
 
-		if !testEq(j.Response.Body.Bytes(), buf.Bytes()) {
+		if !testEqByteSlice(j.Response.Body.Bytes(), buf.Bytes()) {
 			t.Errorf("Section: body error")
 		}
 
@@ -70,3 +70,26 @@ func TestServerMockSections(t *testing.T) {
 		s += <-ch
 	}
 }
+
+/*
+func TestHeaders(t *testing.T) {
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+	client := &http.Client{Transport: tr}
+
+	url := "https://localhost/headers.php"
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		t.Error(err)
+	}
+
+	req.SetBasicAuth("test@example.com", "test")
+	s := req.Header.Get("Authorization")
+	t.Log("Auth:", s)
+
+	resp, _ := client.Do(req)
+	body, err := httputil.DumpResponse(resp, true)
+	t.Log(string(body))
+}
+*/

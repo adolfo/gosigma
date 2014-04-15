@@ -4,14 +4,17 @@
 package mock
 
 import (
-	"bytes"
 	"crypto/tls"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 )
 
 //
 // Implementation of CloudSigma server mock object for testing purposes.
+//
+//	Username: test@example.com
+//	Password: test
 //
 
 const serverBase = "/api/2.0/"
@@ -82,13 +85,26 @@ func Request(s string) (*http.Response, error) {
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
-	client := &http.Client{Transport: tr}
+
+	redirectChecker := func(req *http.Request, via []*http.Request) error {
+		if len(via) >= 10 {
+			return errors.New("stopped after 10 redirects")
+		}
+		lastReq := via[len(via)-1]
+		if auth := lastReq.Header.Get("Authorization"); len(auth) > 0 {
+			req.Header.Add("Authorization", auth)
+		}
+		return nil
+	}
+	client := &http.Client{Transport: tr, CheckRedirect: redirectChecker}
 
 	url := Endpoint() + s
-	req, err := http.NewRequest("GET", url, bytes.NewBufferString(""))
+	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, err
 	}
+
+	req.SetBasicAuth("test@example.com", "test")
 
 	return client.Do(req)
 }
