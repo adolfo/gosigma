@@ -52,8 +52,13 @@ func (c *Client) Endpoint() string {
 	return c.endpoint
 }
 
-func (c *Client) Instances() (ii []data.Server, err error) {
-	return
+func (c *Client) Instances() ([]data.Server, error) {
+	r, err := c.query("servers", url.Values{"limit": {"0"}})
+	if err != nil {
+		return nil, err
+	}
+	defer r.Body.Close()
+	return data.ReadServers(r.Body)
 }
 
 func (c *Client) get(url string) (*http.Response, error) {

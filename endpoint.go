@@ -8,14 +8,16 @@ import (
 	"net/url"
 )
 
+// Default CloudSigma region
 const DefaultRegion string = "zrh"
 
-var errUnknownRegion error = errors.New("unknown CloudSigma region")
-var errEmptyEndpoint error = errors.New("endpoint are not allowed to be empty")
-var errHttpsRequired error = errors.New("endpoint must use https scheme")
-var errInvalidAuth error = errors.New("auth information is not allowed in the endpoint string")
-var errEndpointWithQuery error = errors.New("query information is not allowed in the endpoint string")
+var errUnknownRegion = errors.New("unknown CloudSigma region")
+var errEmptyEndpoint = errors.New("endpoint are not allowed to be empty")
+var errHttpsRequired = errors.New("endpoint must use https scheme")
+var errInvalidAuth = errors.New("auth information is not allowed in the endpoint string")
+var errEndpointWithQuery = errors.New("query information is not allowed in the endpoint string")
 
+// GetRegionEndpoint returns endpoint for given region code
 func GetRegionEndpoint(region string) (string, error) {
 	switch region {
 	case "zrh":
@@ -27,6 +29,7 @@ func GetRegionEndpoint(region string) (string, error) {
 	}
 }
 
+// VerifyEndpoint verifies CloudSigma endpoint URL
 func VerifyEndpoint(e string) error {
 	if len(e) == 0 {
 		return errEmptyEndpoint

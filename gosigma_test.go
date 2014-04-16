@@ -7,7 +7,7 @@ import "testing"
 
 func TestVersionStringMatches(t *testing.T) {
 	if vs, vns := Version(), VersionNumber().String(); vs != vns {
-		t.Errorf("Version() != VersionNumber().String(): '%s' != '%s'")
+		t.Errorf("Version() != VersionNumber().String(): '%s' != '%s'", vs, vns)
 	}
 }
 
