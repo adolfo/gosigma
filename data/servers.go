@@ -32,14 +32,29 @@ type NIC struct {
 	} `json:"ip_v4_conf"`
 }
 
-// Server contains properties of cloud server instance
+// ServerShort contains main properties of cloud server instance
+type ServerShort struct {
+	Name   string `json:"name"`
+	URI    string `json:"resource_uri"`
+	Status string `json:"status"`
+	UUID   string `json:"uuid"`
+}
+
+// Server contains detail properties of cloud server instance
 type Server struct {
-	Name   string            `json:"name"`
-	URI    string            `json:"resource_uri"`
-	Status string            `json:"status"`
-	UUID   string            `json:"uuid"`
-	Meta   map[string]string `json:"meta"`
-	NICs   []NIC             `json:"nics"`
+	ServerShort
+	Meta map[string]string `json:"meta"`
+	NICs []NIC             `json:"nics"`
+}
+
+// ServersShort holds collection of cloud server instances
+type ServersShort struct {
+	Meta struct {
+		Limit      int `json:"limit"`
+		Offset     int `json:"offset"`
+		TotalCount int `json:"total_count"`
+	} `json:"meta"`
+	Objects []ServerShort `json:"objects"`
 }
 
 // Servers holds collection of cloud server instances
