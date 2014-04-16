@@ -88,7 +88,7 @@ func TestReadServersHalf(t *testing.T) {
 	verifyServerObjects(t, servers)
 }
 
-func verifyNIC(t *testing.T, i int, n Nic, conf, uri, uuid string) {
+func verifyNIC(t *testing.T, i int, n NIC, conf, uri, uuid string) {
 	if n.IPv4.Conf != conf {
 		t.Errorf("nic.IPv4.Conf for (idx: %d) %+v", i, n)
 	}

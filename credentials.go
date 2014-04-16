@@ -8,17 +8,21 @@ import (
 	"net/http"
 )
 
+// Authtype defines authentication type for CloudSigma client connection
 type Authtype int
 
 const (
+	// AuthtypeBasic defins HTTP basic authentication type
 	AuthtypeBasic Authtype = iota
+	// AuthtypeDigest defins HTTP digest authentication type
 	AuthtypeDigest
+	// AuthtypeCookie defins cookie authentication schema (CloudSigma specific)
 	AuthtypeCookie
 )
 
-var errAuthTypeNotSupported error = errors.New("authentication type is not supported")
-var errEmptyUsername error = errors.New("username is not allowed to be empty")
-var errEmptyPassword error = errors.New("password is not allowed to be empty")
+var errAuthTypeNotSupported = errors.New("authentication type is not supported")
+var errEmptyUsername = errors.New("username is not allowed to be empty")
+var errEmptyPassword = errors.New("password is not allowed to be empty")
 
 // A Credentials is used to initialize new CloudSigma client
 type Credentials struct {
@@ -27,6 +31,7 @@ type Credentials struct {
 	Password string   // Password of CloudSigma account
 }
 
+// Apply authentication credentials to HTTP request object
 func (c Credentials) Apply(req *http.Request) error {
 	switch c.Type {
 	case AuthtypeBasic:
@@ -37,6 +42,7 @@ func (c Credentials) Apply(req *http.Request) error {
 	return nil
 }
 
+// Verify authentication credentials are valid
 func (c Credentials) Verify() error {
 	switch c.Type {
 	case AuthtypeBasic:

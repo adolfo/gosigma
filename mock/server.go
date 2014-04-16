@@ -9,7 +9,7 @@ import (
 	"net/http/httptest"
 	"strings"
 
-	"github.com/Altoros/gosigma/comm"
+	"github.com/Altoros/gosigma/https"
 )
 
 //
@@ -22,7 +22,9 @@ import (
 const serverBase = "/api/2.0/"
 
 const (
-	TestUser     = "test@example.com"
+	// TestUser contains account name for log into mock server
+	TestUser = "test@example.com"
+	// TestPassword contains password for log into mock server
 	TestPassword = "test"
 )
 
@@ -109,7 +111,7 @@ func isValidDigestAuth(auth string) bool {
 	return false
 }
 
-// Check the mock server is started
+// IsStarted checks the mock server is running
 func IsStarted() bool {
 	if pServer == nil {
 		return false
@@ -143,7 +145,7 @@ func Request(s string) (*http.Response, error) {
 
 	req.SetBasicAuth(TestUser, TestPassword)
 
-	client := comm.NewHttpsClient(nil)
+	client := https.NewClient(nil)
 
 	return client.Do(req)
 }

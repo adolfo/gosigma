@@ -8,15 +8,15 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/Altoros/gosigma/comm"
 	"github.com/Altoros/gosigma/data"
+	"github.com/Altoros/gosigma/https"
 )
 
 // A Client sends and receives requests to CloudSigma endpoint
 type Client struct {
 	endpoint string
 	cred     Credentials
-	https    *http.Client
+	https    *https.Client
 }
 
 // NewClient returns new CloudSigma client object
@@ -42,16 +42,18 @@ func NewClient(endpoint string, credentials Credentials,
 	client := &Client{
 		endpoint: endpoint,
 		cred:     credentials,
-		https:    comm.NewHttpsClient(tlsConfig),
+		https:    https.NewClient(tlsConfig),
 	}
 
 	return client, nil
 }
 
+// Endpoint of CloudSigma cloud
 func (c *Client) Endpoint() string {
 	return c.endpoint
 }
 
+// Instances of all servers in current account
 func (c *Client) Instances() ([]data.Server, error) {
 	r, err := c.query("servers", url.Values{"limit": {"0"}})
 	if err != nil {
@@ -61,6 +63,7 @@ func (c *Client) Instances() ([]data.Server, error) {
 	return data.ReadServers(r.Body)
 }
 
+// Instance description for given server uuid
 func (c *Client) Instance(uuid string) (*data.Server, error) {
 	r, err := c.query("servers/"+uuid, nil)
 	if err != nil {

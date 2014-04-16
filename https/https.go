@@ -1,7 +1,7 @@
 // Copyright 2014 ALTOROS
 // Licensed under the AGPLv3, see LICENSE file for details.
 
-package comm
+package https
 
 import (
 	"crypto/tls"
@@ -9,8 +9,13 @@ import (
 	"net/http"
 )
 
-// NewHttpsClient returns http.Client object with configured https transport
-func NewHttpsClient(tlsConfig *tls.Config) *http.Client {
+// Client represents HTTPS client connection
+type Client struct {
+	*http.Client
+}
+
+// NewClient returns http.Client object with configured https transport
+func NewClient(tlsConfig *tls.Config) *Client {
 	if tlsConfig == nil {
 		tlsConfig = &tls.Config{InsecureSkipVerify: true}
 	}
@@ -30,10 +35,10 @@ func NewHttpsClient(tlsConfig *tls.Config) *http.Client {
 		return nil
 	}
 
-	https := &http.Client{
+	https := &Client{&http.Client{
 		Transport:     tr,
 		CheckRedirect: redirectChecker,
-	}
+	}}
 
 	return https
 }

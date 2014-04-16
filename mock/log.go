@@ -10,7 +10,7 @@ import (
 	"testing"
 )
 
-var logFlag *string = flag.String("log.mock", "n", "log mock server requests: none|n, url|u, detail|d")
+var logFlag = flag.String("log.mock", "n", "log mock server requests: none|n, url|u, detail|d")
 
 type severity int
 
@@ -40,6 +40,7 @@ func log() severity {
 	return parseLogSeverity(logFlag)
 }
 
+// Log journal entry to testing log
 func Log(t *testing.T, jj []JournalEntry) {
 	for _, j := range jj {
 		switch log() {
@@ -51,10 +52,12 @@ func Log(t *testing.T, jj []JournalEntry) {
 	}
 }
 
+// LogURL writes URL from journal entry to testing log
 func LogURL(t *testing.T, j JournalEntry) {
 	t.Log(j.Request.RequestURI)
 }
 
+// LogDetail writes detailed information about journal entry to testing log
 func LogDetail(t *testing.T, j JournalEntry) {
 	req := j.Request
 	buf, err := httputil.DumpRequest(req, true)

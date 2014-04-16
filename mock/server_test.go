@@ -8,7 +8,8 @@ import (
 	"net/http"
 	"runtime"
 	"testing"
-	"github.com/Altoros/gosigma/comm"
+
+	"github.com/Altoros/gosigma/https"
 )
 
 func init() {
@@ -28,7 +29,7 @@ func TestAuth(t *testing.T) {
 		if u != "" {
 			req.SetBasicAuth(u, p)
 		}
-		client := comm.NewHttpsClient(nil)
+		client := https.NewClient(nil)
 		resp, err := client.Do(req)
 		if err != nil {
 			t.Error(err)
@@ -69,7 +70,7 @@ func TestSections(t *testing.T) {
 		}
 
 		if len(jj) == 0 {
-			t.Errorf("Section %s: journal length is zero")
+			t.Errorf("Section %s: journal length is zero", s)
 		}
 
 		j := jj[0]
@@ -89,7 +90,7 @@ func TestSections(t *testing.T) {
 	go check("drives")
 	go check("servers")
 
-	var s int = 0
+	var s int
 	for s < sectionCount {
 		s += <-ch
 	}

@@ -5,7 +5,7 @@ package mock
 
 import "net/http"
 
-var response string = `{
+var response = `{
     "drives": {
         "dssd": {
             "max_size": 4391067795456,

@@ -9,14 +9,20 @@ import (
 )
 
 const (
-	ServerStopped     = "stopped"
-	ServerStarting    = "starting"
-	ServerRunning     = "running"
-	ServerStopping    = "stopping"
+	// ServerStopped defines constant for stopped instance state
+	ServerStopped = "stopped"
+	// ServerStarting defines constant for starting instance state
+	ServerStarting = "starting"
+	// ServerRunning defines constant for running instance state
+	ServerRunning = "running"
+	// ServerStopping defines constant for stopping instance state
+	ServerStopping = "stopping"
+	// ServerUnavailable defines constant for unavailable instance state
 	ServerUnavailable = "unavailable"
 )
 
-type Nic struct {
+// NIC describes properties of network interface card
+type NIC struct {
 	IPv4 struct {
 		Conf string `json:"conf"`
 		IP   struct {
@@ -26,15 +32,17 @@ type Nic struct {
 	} `json:"ip_v4_conf"`
 }
 
+// Server contains properties of cloud server instance
 type Server struct {
 	Name   string            `json:"name"`
 	URI    string            `json:"resource_uri"`
 	Status string            `json:"status"`
 	UUID   string            `json:"uuid"`
 	Meta   map[string]string `json:"meta"`
-	NICs   []Nic             `json:"nics"`
+	NICs   []NIC             `json:"nics"`
 }
 
+// Servers holds collection of cloud server instances
 type Servers struct {
 	Meta struct {
 		Limit      int `json:"limit"`
@@ -44,6 +52,7 @@ type Servers struct {
 	Objects []Server `json:"objects"`
 }
 
+// ReadServers reads and unmarshalls information about cloud server instances from JSON stream
 func ReadServers(r io.Reader) ([]Server, error) {
 	var servers Servers
 	dec := json.NewDecoder(r)
@@ -59,6 +68,7 @@ func ReadServers(r io.Reader) ([]Server, error) {
 	return servers.Objects, nil
 }
 
+// ReadServer reads and unmarshalls information about single cloud server instance from JSON stream
 func ReadServer(r io.Reader) (*Server, error) {
 	var server Server
 	dec := json.NewDecoder(r)

@@ -5,10 +5,11 @@ package mock
 
 import (
 	"net/http"
+
 	"github.com/Altoros/gosigma/data"
 )
 
-var servers []data.Server = nil
+var servers []data.Server
 
 func serversHandler(w http.ResponseWriter, r *http.Request) {
 

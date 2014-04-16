@@ -20,8 +20,8 @@ func TestClientQuery(t *testing.T) {
 
 }
 
-var cloud *string = flag.String("cloud", "", "run tests against CloudSigma endpoint, specify credentials in form user:pass as parameter")
-var uuid *string = flag.String("uuid", "", "uuid of server at CloudSigma to run server specific tests")
+var cloud = flag.String("cloud", "", "run tests against CloudSigma endpoint, specify credentials in form user:pass as parameter")
+var uuid = flag.String("uuid", "", "uuid of server at CloudSigma to run server specific tests")
 
 func getCloudCredentials() (*Credentials, error) {
 	if cloud == nil || *cloud == "" {

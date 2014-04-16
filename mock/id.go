@@ -9,30 +9,32 @@ import (
 	"strconv"
 )
 
-var chId chan int = make(chan int)
+var chID = make(chan int)
 
 func init() {
 	go func() {
 		for i := 0; ; i++ {
-			chId <- i
+			chID <- i
 		}
 	}()
 }
 
 func genID() int {
-	return <-chId
+	return <-chID
 }
 
-var goSigmaId string = http.CanonicalHeaderKey("gosigma-id")
-var errorNotFound error = errors.New("Gosigma-Id not found")
+var goSigmaID = http.CanonicalHeaderKey("gosigma-id")
+var errorNotFound = errors.New("gosigma-id not found")
 
+// GetID returns journal ID from HTTP header
 func GetID(h http.Header) (int, error) {
-	if v, ok := h[goSigmaId]; ok && len(v) > 0 {
+	if v, ok := h[goSigmaID]; ok && len(v) > 0 {
 		return strconv.Atoi(v[0])
 	}
 	return -1, errorNotFound
 }
 
+// GetIDFromRequest returns journal ID from HTTP request
 func GetIDFromRequest(r *http.Request) int {
 	if id, err := GetID(r.Header); err == nil {
 		return id
@@ -40,6 +42,7 @@ func GetIDFromRequest(r *http.Request) int {
 	return genID()
 }
 
+// GetIDFromResponse returns journal ID from HTTP response
 func GetIDFromResponse(r *http.Response) int {
 	if id, err := GetID(r.Header); err == nil {
 		return id
@@ -47,6 +50,7 @@ func GetIDFromResponse(r *http.Response) int {
 	return genID()
 }
 
+// SetID adds specified journal ID to HTTP header
 func SetID(h http.Header, id int) {
-	h.Add(goSigmaId, strconv.Itoa(id))
+	h.Add(goSigmaID, strconv.Itoa(id))
 }
