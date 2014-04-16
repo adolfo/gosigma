@@ -76,6 +76,9 @@ const jsonServers = `
 `
 
 func TestJsonUnmarshal(t *testing.T) {
+
+	t.Parallel()
+
 	var ii Instances
 	ii.Meta.Limit = 12345
 	ii.Meta.Offset = 12345

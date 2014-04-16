@@ -7,6 +7,8 @@ import "testing"
 
 func TestSetupShortEndpoints(t *testing.T) {
 
+	t.Parallel()
+
 	check := func(ep string, url string) {
 		c := Configuration{Credentials{AuthtypeBasic, "user", "pwd"}, ep}
 

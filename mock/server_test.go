@@ -34,6 +34,7 @@ func TestAuth(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
+		defer resp.Body.Close()
 		if resp.StatusCode != wants {
 			t.Errorf("Status = %d, wants %d", resp.StatusCode, wants)
 		}

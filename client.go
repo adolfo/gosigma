@@ -18,11 +18,29 @@ const (
 	AuthtypeCookie
 )
 
+var errAuthTypeNotSupported error = errors.New("authentication type is not supported")
+var errEmptyEndpoint error = errors.New("endpoint are not allowed to be empty")
+var errHttpsRequired error = errors.New("endpoint must use https scheme")
+var errInvalidAuth error = errors.New("auth information is not allowed in the endpoint string")
+var errEndpointWithQuery error = errors.New("query information is not allowed in the endpoint string")
+var errEmptyUsername error = errors.New("username is not allowed to be empty")
+var errEmptyPassword error = errors.New("password is not allowed to be empty")
+
 // A Credentials is used to initialize new CloudSigma client
 type Credentials struct {
 	Type     Authtype // Authentication type
 	User     string   // Username of CloudSigma account
 	Password string   // Password of CloudSigma account
+}
+
+func (c *Credentials) Set(req *http.Request) error {
+	switch c.Type {
+	case AuthtypeBasic:
+		req.SetBasicAuth(c.User, c.Password)
+	case AuthtypeDigest, AuthtypeCookie:
+		return errAuthTypeNotSupported
+	}
+	return nil
 }
 
 // A Configuration is used to initialize new CloudSigma client
@@ -41,7 +59,7 @@ type Client struct {
 // NewClient returns new CloudSigma client object
 func NewClient(c Configuration, tlsConfig *tls.Config) (*Client, error) {
 	if len(c.Endpoint) == 0 {
-		return nil, errors.New("endpoint are not allowed to be empty")
+		return nil, errEmptyEndpoint
 	}
 
 	endpoint, err := GetRegionEndpoint(c.Endpoint)
@@ -54,27 +72,27 @@ func NewClient(c Configuration, tlsConfig *tls.Config) (*Client, error) {
 		return nil, err
 	}
 	if u.Scheme != "https" {
-		return nil, errors.New("endpoint must use https scheme")
+		return nil, errHttpsRequired
 	}
 	if u.User != nil {
-		return nil, errors.New("user information is not allowed in the endpoint string")
+		return nil, errInvalidAuth
 	}
 	if len(u.RawQuery) > 0 || len(u.Fragment) > 0 {
-		return nil, errors.New("query information is not allowed in the endpoint string")
+		return nil, errEndpointWithQuery
 	}
 
 	if len(c.User) == 0 {
-		return nil, errors.New("username are not allowed to be empty")
+		return nil, errEmptyUsername
 	}
 
 	if len(c.Password) == 0 {
-		return nil, errors.New("password are not allowed to be empty")
+		return nil, errEmptyPassword
 	}
 
 	switch c.Type {
 	case AuthtypeBasic:
 	case AuthtypeDigest, AuthtypeCookie:
-		return nil, errors.New("authentication type is not supported now")
+		return nil, errAuthTypeNotSupported
 	}
 
 	client := &Client{
@@ -121,4 +139,18 @@ func (c *Client) Endpoint() string {
 
 func (c *Client) Instances() (ii []Instance, err error) {
 	return
+}
+
+func (c *Client) get(url string) (*http.Response, error) {
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	err = c.credentials.Set(req)
+	if err != nil {
+		return nil, err
+	}
+
+	return c.https.Do(req)
 }
