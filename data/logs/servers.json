@@ -1,0 +1,20 @@
+{
+    "meta": {
+        "limit": 0,
+        "offset": 0,
+        "total_count": 1
+    },
+    "objects": [
+        {
+            "name": "trusty-server-cloudimg-amd64",
+            "owner": {
+                "resource_uri": "/api/2.0/user/c25eb0ed-161f-44f4-ac1d-d584ce3a5312/",
+                "uuid": "c25eb0ed-161f-44f4-ac1d-d584ce3a5312"
+            },
+            "resource_uri": "/api/2.0/servers/472835d5-2bbb-4d87-9d08-7364bc373691/",
+            "runtime": null,
+            "status": "starting",
+            "uuid": "472835d5-2bbb-4d87-9d08-7364bc373691"
+        }
+    ]
+}

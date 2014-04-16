@@ -1,0 +1,80 @@
+{
+    "meta": {
+        "limit": 0,
+        "offset": 0,
+        "total_count": 1
+    },
+    "objects": [
+        {
+            "context": true,
+            "cpu": 2000,
+            "cpu_model": null,
+            "cpus_instead_of_cores": false,
+            "drives": [
+                {
+                    "boot_order": 1,
+                    "dev_channel": "0:0",
+                    "device": "virtio",
+                    "drive": {
+                        "resource_uri": "/api/2.0/drives/ddce5beb-6cfe-4a80-81bd-3ae5f71e0c00/",
+                        "uuid": "ddce5beb-6cfe-4a80-81bd-3ae5f71e0c00"
+                    },
+                    "runtime": null
+                }
+            ],
+            "enable_numa": false,
+            "hv_relaxed": false,
+            "hv_tsc": false,
+            "jobs": [],
+            "mem": 2147483648,
+            "meta": {
+                "description": "trusty-server-cloudimg-amd64",
+                "ssh_public_key": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDDiwTGBsmFKBYHcKaVy5IgsYBR4XVYLS6KP/NKClE7gONlIGURE3+/45BX8TfHJHM5WTN8NBqJejKDHqwfyueR1f2VGoPkJxODGt/X/ZDNftLZLYwPd2DfDBs27ahOadZCk4Cl5l7mU0aoE74UnIcQoNPl6w7axkIFTIXr8+0HMk8DFB0iviBSJK118p1RGwhsoA1Hudn1CsgqARGPmNn6mxwvmQfQY7hZxZoOH9WMcvkNZ7rAFrwS/BuvEpEXkoC95K/JDPvmQVVJk7we+WeHfTYSmApkDFcSaypyjL2HOV8pvE+VntcIIhZccHiOubyjsBAx5aoTI+ueCsoz5AL1 maxim.perenesenko@altoros.com"
+            },
+            "name": "trusty-server-cloudimg-amd64",
+            "nics": [
+                {
+                    "boot_order": null,
+                    "firewall_policy": null,
+                    "ip_v4_conf": {
+                        "conf": "static",
+                        "ip": {
+                            "resource_uri": "/api/2.0/ips/31.171.246.37/",
+                            "uuid": "31.171.246.37"
+                        }
+                    },
+                    "ip_v6_conf": null,
+                    "mac": "22:40:85:4f:d3:ce",
+                    "model": "virtio",
+                    "runtime": null,
+                    "vlan": null
+                },
+                {
+                    "boot_order": null,
+                    "firewall_policy": null,
+                    "ip_v4_conf": null,
+                    "ip_v6_conf": null,
+                    "mac": "22:aa:fe:07:48:3b",
+                    "model": "virtio",
+                    "runtime": null,
+                    "vlan": {
+                        "resource_uri": "/api/2.0/vlans/5bc05e7e-6555-4f40-add8-3b8e91447702/",
+                        "uuid": "5bc05e7e-6555-4f40-add8-3b8e91447702"
+                    }
+                }
+            ],
+            "owner": {
+                "resource_uri": "/api/2.0/user/c25eb0ed-161f-44f4-ac1d-d584ce3a5312/",
+                "uuid": "c25eb0ed-161f-44f4-ac1d-d584ce3a5312"
+            },
+            "requirements": [],
+            "resource_uri": "/api/2.0/servers/472835d5-2bbb-4d87-9d08-7364bc373691/",
+            "runtime": null,
+            "smp": 1,
+            "status": "starting",
+            "tags": [],
+            "uuid": "472835d5-2bbb-4d87-9d08-7364bc373691",
+            "vnc_password": "Pim3UkEc"
+        }
+    ]
+}

@@ -10,72 +10,20 @@ import (
 	"testing/iotest"
 )
 
-const jsonServers = `
-{
-    "meta": {
-        "limit": 0,
-        "offset": 0,
-        "total_count": 5
-    },
-    "objects": [
-        {
-            "name": "test_server_4",
-            "owner": {
-                "resource_uri": "/api/2.0/user/80cb30fb-0ea3-43db-b27b-a125752cc0bf/",
-                "uuid": "80cb30fb-0ea3-43db-b27b-a125752cc0bf"
-            },
-            "resource_uri": "/api/2.0/servers/43b1110a-31c5-41cc-a3e7-0b806076a913/",
-            "runtime": null,
-            "status": "stopped",
-            "uuid": "43b1110a-31c5-41cc-a3e7-0b806076a913"
-        },
-        {
-            "name": "test_server_2",
-            "owner": {
-                "resource_uri": "/api/2.0/user/80cb30fb-0ea3-43db-b27b-a125752cc0bf/",
-                "uuid": "80cb30fb-0ea3-43db-b27b-a125752cc0bf"
-            },
-            "resource_uri": "/api/2.0/servers/3be1ebc6-1d03-4c4b-88ff-02557b940d19/",
-            "runtime": null,
-            "status": "stopped",
-            "uuid": "3be1ebc6-1d03-4c4b-88ff-02557b940d19"
-        },
-        {
-            "name": "test_server_0",
-            "owner": {
-                "resource_uri": "/api/2.0/user/80cb30fb-0ea3-43db-b27b-a125752cc0bf/",
-                "uuid": "80cb30fb-0ea3-43db-b27b-a125752cc0bf"
-            },
-            "resource_uri": "/api/2.0/servers/b1defe23-e725-474d-acba-e46baa232611/",
-            "runtime": null,
-            "status": "stopped",
-            "uuid": "b1defe23-e725-474d-acba-e46baa232611"
-        },
-        {
-            "name": "test_server_3",
-            "owner": {
-                "resource_uri": "/api/2.0/user/80cb30fb-0ea3-43db-b27b-a125752cc0bf/",
-                "uuid": "80cb30fb-0ea3-43db-b27b-a125752cc0bf"
-            },
-            "resource_uri": "/api/2.0/servers/cff0f338-2b84-4846-a028-3ec9e1b86184/",
-            "runtime": null,
-            "status": "stopped",
-            "uuid": "cff0f338-2b84-4846-a028-3ec9e1b86184"
-        },
-        {
-            "name": "test_server_1",
-            "owner": {
-                "resource_uri": "/api/2.0/user/80cb30fb-0ea3-43db-b27b-a125752cc0bf/",
-                "uuid": "80cb30fb-0ea3-43db-b27b-a125752cc0bf"
-            },
-            "resource_uri": "/api/2.0/servers/93a04cd5-84cb-41fc-af17-683e3868ee95/",
-            "runtime": null,
-            "status": "stopped",
-            "uuid": "93a04cd5-84cb-41fc-af17-683e3868ee95"
-        }
-    ]
+func verifyServerObject(t *testing.T, i int, s Server, name, uri, status, uuid string) {
+	if s.Name != name {
+		t.Errorf("Object %d, Name = '%s', wants '%s'", i, s.Name, name)
+	}
+	if s.URI != uri {
+		t.Errorf("Object %d, URI = '%s', wants '%s'", i, s.URI, uri)
+	}
+	if s.Status != status {
+		t.Errorf("Object %d, Status = '%s', wants '%s'", i, s.Status, status)
+	}
+	if s.UUID != uuid {
+		t.Errorf("Object %d, UUID = '%s', wants '%s'", i, s.UUID, uuid)
+	}
 }
-`
 
 func verifyServerObjects(t *testing.T, ii []Server) {
 	if len(ii) != 5 {
@@ -83,19 +31,7 @@ func verifyServerObjects(t *testing.T, ii []Server) {
 	}
 
 	verify := func(i int, name, uri, status, uuid string) {
-		obj := ii[i]
-		if obj.Name != name {
-			t.Errorf("Object %d, Name = '%s', wants '%s'", i, obj.Name, name)
-		}
-		if obj.URI != uri {
-			t.Errorf("Object %d, URI = '%s', wants '%s'", i, obj.URI, uri)
-		}
-		if obj.Status != status {
-			t.Errorf("Object %d, Status = '%s', wants '%s'", i, obj.Status, status)
-		}
-		if obj.UUID != uuid {
-			t.Errorf("Object %d, UUID = '%s', wants '%s'", i, obj.UUID, uuid)
-		}
+		verifyServerObject(t, i, ii[i], name, uri, status, uuid)
 	}
 
 	verify(0, "test_server_4", "/api/2.0/servers/43b1110a-31c5-41cc-a3e7-0b806076a913/",
@@ -128,7 +64,7 @@ func TestUnmarshal(t *testing.T) {
 	ii.Meta.Limit = 12345
 	ii.Meta.Offset = 12345
 	ii.Meta.TotalCount = 12345
-	err := json.Unmarshal([]byte(jsonServers), &ii)
+	err := json.Unmarshal([]byte(jsonServersData), &ii)
 	if err != nil {
 		t.Error(err)
 	}
@@ -136,7 +72,7 @@ func TestUnmarshal(t *testing.T) {
 }
 
 func TestReadServers(t *testing.T) {
-	servers, err := ReadServers(strings.NewReader(jsonServers))
+	servers, err := ReadServers(strings.NewReader(jsonServersData))
 	if err != nil {
 		t.Error(err)
 	}
@@ -144,10 +80,50 @@ func TestReadServers(t *testing.T) {
 }
 
 func TestReadServersHalf(t *testing.T) {
-	r := strings.NewReader(jsonServers)
+	r := strings.NewReader(jsonServersData)
 	servers, err := ReadServers(iotest.HalfReader(r))
 	if err != nil {
 		t.Error(err)
 	}
 	verifyServerObjects(t, servers)
+}
+
+func verifyNIC(t *testing.T, i int, n Nic, conf, uri, uuid string) {
+	if n.IPv4.Conf != conf {
+		t.Errorf("nic.IPv4.Conf for (idx: %d) %+v", i, n)
+	}
+	if n.IPv4.IP.URI != uri {
+		t.Errorf("nic.IPv4.URI for (idx: %d) %+v", i, n)
+	}
+	if n.IPv4.IP.UUID != uuid {
+		t.Errorf("nic.IPv4.UUID for (idx: %d) %+v", i, n)
+	}
+}
+
+func TestReadServersDetail(t *testing.T) {
+	servers, err := ReadServers(strings.NewReader(jsonServersDetailData))
+	if err != nil {
+		t.Error(err)
+	}
+	verifyServerObjects(t, servers)
+
+	// # verify NICs
+	server := servers[0]
+
+	verifyNIC(t, 0, server.NICs[0], "static", "/api/2.0/ips/31.171.246.37/", "31.171.246.37")
+	verifyNIC(t, 1, server.NICs[1], "", "", "")
+}
+
+func TestReadServerDetail(t *testing.T) {
+	server, err := ReadServer(strings.NewReader(jsonServerData))
+	if err != nil {
+		t.Error(err)
+	}
+	verifyServerObject(t, 0, *server, "trusty-server-cloudimg-amd64",
+		"/api/2.0/servers/472835d5-2bbb-4d87-9d08-7364bc373691/",
+		"starting", "472835d5-2bbb-4d87-9d08-7364bc373691")
+
+	// # verify NICs
+	verifyNIC(t, 0, server.NICs[0], "static", "/api/2.0/ips/31.171.246.37/", "31.171.246.37")
+	verifyNIC(t, 1, server.NICs[1], "", "", "")
 }

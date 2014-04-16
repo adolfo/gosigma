@@ -21,6 +21,7 @@ func TestClientQuery(t *testing.T) {
 }
 
 var cloud *string = flag.String("cloud", "", "run tests against CloudSigma endpoint, specify credentials in form user:pass as parameter")
+var uuid *string = flag.String("uuid", "", "uuid of server at CloudSigma to run server specific tests")
 
 func getCloudCredentials() (*Credentials, error) {
 	if cloud == nil || *cloud == "" {
@@ -54,6 +55,29 @@ func TestCloudServers(t *testing.T) {
 	}
 
 	ii, err := cli.Instances()
+	if err != nil {
+		t.Error(err)
+	}
+	t.Logf("%+v", ii)
+}
+
+func TestCloudServer(t *testing.T) {
+	cr, err := getCloudCredentials()
+	if cr == nil {
+		if err == nil {
+			t.SkipNow()
+		} else {
+			t.Error(err)
+		}
+		return
+	}
+
+	cli, err := NewClient(DefaultRegion, *cr, nil)
+	if err != nil {
+		t.Error(err)
+	}
+
+	ii, err := cli.Instance(*uuid)
 	if err != nil {
 		t.Error(err)
 	}

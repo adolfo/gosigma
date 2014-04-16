@@ -61,6 +61,15 @@ func (c *Client) Instances() ([]data.Server, error) {
 	return data.ReadServers(r.Body)
 }
 
+func (c *Client) Instance(uuid string) (*data.Server, error) {
+	r, err := c.query("servers/"+uuid, nil)
+	if err != nil {
+		return nil, err
+	}
+	defer r.Body.Close()
+	return data.ReadServer(r.Body)
+}
+
 func (c *Client) get(url string) (*http.Response, error) {
 	url = c.Endpoint() + url
 
