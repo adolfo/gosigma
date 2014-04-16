@@ -3,10 +3,7 @@
 
 package gosigma
 
-import (
-	"errors"
-	"fmt"
-)
+import "fmt"
 
 type VersionNum struct {
 	Major int
@@ -24,17 +21,4 @@ func VersionNumber() VersionNum {
 
 func Version() string {
 	return VersionNumber().String()
-}
-
-const DefaultRegion string = "zrh"
-
-func GetRegionEndpoint(r string) (string, error) {
-	switch r {
-	case "zrh":
-		return "https://zrh.cloudsigma.com/api/2.0/", nil
-	case "lvs":
-		return "https://lvs.cloudsigma.com/api/2.0/", nil
-	default:
-		return "", errors.New("unknown CloudSigma region")
-	}
 }

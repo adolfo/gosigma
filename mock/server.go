@@ -9,7 +9,7 @@ import (
 	"net/http/httptest"
 	"strings"
 
-	"github.com/Altoros/gosigma"
+	"github.com/Altoros/gosigma/comm"
 )
 
 //
@@ -143,7 +143,7 @@ func Request(s string) (*http.Response, error) {
 
 	req.SetBasicAuth(TestUser, TestPassword)
 
-	client := gosigma.NewHttpsClient(nil)
+	client := comm.NewHttpsClient(nil)
 
 	return client.Do(req)
 }

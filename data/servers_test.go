@@ -1,7 +1,7 @@
 // Copyright 2014 ALTOROS
 // Licensed under the AGPLv3, see LICENSE file for details.
 
-package gosigma
+package data
 
 import (
 	"encoding/json"
@@ -76,10 +76,7 @@ const jsonServers = `
 `
 
 func TestJsonUnmarshal(t *testing.T) {
-
-	t.Parallel()
-
-	var ii Instances
+	var ii Servers
 	ii.Meta.Limit = 12345
 	ii.Meta.Offset = 12345
 	ii.Meta.TotalCount = 12345

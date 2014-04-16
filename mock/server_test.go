@@ -8,8 +8,7 @@ import (
 	"net/http"
 	"runtime"
 	"testing"
-
-	"github.com/Altoros/gosigma"
+	"github.com/Altoros/gosigma/comm"
 )
 
 func init() {
@@ -29,7 +28,7 @@ func TestAuth(t *testing.T) {
 		if u != "" {
 			req.SetBasicAuth(u, p)
 		}
-		client := gosigma.NewHttpsClient(nil)
+		client := comm.NewHttpsClient(nil)
 		resp, err := client.Do(req)
 		if err != nil {
 			t.Error(err)

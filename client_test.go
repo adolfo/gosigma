@@ -3,25 +3,16 @@
 
 package gosigma
 
-import "testing"
+import (
+	"testing"
 
-func TestSetupShortEndpoints(t *testing.T) {
+	"github.com/Altoros/gosigma/mock"
+)
 
-	t.Parallel()
+func init() {
+	mock.Start()
+}
 
-	check := func(ep string, url string) {
-		c := Configuration{Credentials{AuthtypeBasic, "user", "pwd"}, ep}
+func TestClientQuery(t *testing.T) {
 
-		client, err := NewClient(c, nil)
-		if err != nil {
-			t.Error(err)
-		}
-
-		if ep := client.Endpoint(); ep != url {
-			t.Errorf("ep value = '%s', wants '%s'", ep, url)
-		}
-	}
-
-	check("zrh", "https://zrh.cloudsigma.com/api/2.0/")
-	check("lvs", "https://lvs.cloudsigma.com/api/2.0/")
 }
