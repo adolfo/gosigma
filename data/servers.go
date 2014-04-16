@@ -3,6 +3,11 @@
 
 package data
 
+import (
+	"encoding/json"
+	"io"
+)
+
 type Server struct {
 	Name   string `json:"name"`
 	URI    string `json:"resource_uri"`
@@ -17,4 +22,19 @@ type Servers struct {
 		TotalCount int `json:"total_count"`
 	} `json:"meta"`
 	Objects []Server `json:"objects"`
+}
+
+func ReadServers(r io.Reader) ([]Server, error) {
+	var servers Servers
+	dec := json.NewDecoder(r)
+	for {
+		err := dec.Decode(&servers)
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return nil, err
+		}
+	}
+	return servers.Objects, nil
 }

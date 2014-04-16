@@ -5,7 +5,9 @@ package data
 
 import (
 	"encoding/json"
+	"strings"
 	"testing"
+	"testing/iotest"
 )
 
 const jsonServers = `
@@ -75,31 +77,13 @@ const jsonServers = `
 }
 `
 
-func TestJsonUnmarshal(t *testing.T) {
-	var ii Servers
-	ii.Meta.Limit = 12345
-	ii.Meta.Offset = 12345
-	ii.Meta.TotalCount = 12345
-	err := json.Unmarshal([]byte(jsonServers), &ii)
-	if err != nil {
-		t.Error(err)
-	}
-
-	if ii.Meta.Limit != 0 {
-		t.Errorf("Meta.Limit = %d, wants 0", ii.Meta.Limit)
-	}
-	if ii.Meta.Offset != 0 {
-		t.Errorf("Meta.Offset = %d, wants 0", ii.Meta.Offset)
-	}
-	if ii.Meta.TotalCount != 5 {
-		t.Errorf("Meta.TotalCount = %d, wants 5", ii.Meta.TotalCount)
-	}
-	if len(ii.Objects) != 5 {
-		t.Errorf("Meta.Objects.len = %d, wants 5", len(ii.Objects))
+func verifyServerObjects(t *testing.T, ii []Server) {
+	if len(ii) != 5 {
+		t.Errorf("Meta.Objects.len = %d, wants 5", len(ii))
 	}
 
 	verify := func(i int, name, uri, status, uuid string) {
-		obj := ii.Objects[i]
+		obj := ii[i]
 		if obj.Name != name {
 			t.Errorf("Object %d, Name = '%s', wants '%s'", i, obj.Name, name)
 		}
@@ -124,4 +108,46 @@ func TestJsonUnmarshal(t *testing.T) {
 		"stopped", "cff0f338-2b84-4846-a028-3ec9e1b86184")
 	verify(4, "test_server_1", "/api/2.0/servers/93a04cd5-84cb-41fc-af17-683e3868ee95/",
 		"stopped", "93a04cd5-84cb-41fc-af17-683e3868ee95")
+}
+
+func verifyServers(t *testing.T, ii *Servers) {
+	if ii.Meta.Limit != 0 {
+		t.Errorf("Meta.Limit = %d, wants 0", ii.Meta.Limit)
+	}
+	if ii.Meta.Offset != 0 {
+		t.Errorf("Meta.Offset = %d, wants 0", ii.Meta.Offset)
+	}
+	if ii.Meta.TotalCount != 5 {
+		t.Errorf("Meta.TotalCount = %d, wants 5", ii.Meta.TotalCount)
+	}
+	verifyServerObjects(t, ii.Objects)
+}
+
+func TestUnmarshal(t *testing.T) {
+	var ii Servers
+	ii.Meta.Limit = 12345
+	ii.Meta.Offset = 12345
+	ii.Meta.TotalCount = 12345
+	err := json.Unmarshal([]byte(jsonServers), &ii)
+	if err != nil {
+		t.Error(err)
+	}
+	verifyServers(t, &ii)
+}
+
+func TestReadServers(t *testing.T) {
+	servers, err := ReadServers(strings.NewReader(jsonServers))
+	if err != nil {
+		t.Error(err)
+	}
+	verifyServerObjects(t, servers)
+}
+
+func TestReadServersHalf(t *testing.T) {
+	r := strings.NewReader(jsonServers)
+	servers, err := ReadServers(iotest.HalfReader(r))
+	if err != nil {
+		t.Error(err)
+	}
+	verifyServerObjects(t, servers)
 }
