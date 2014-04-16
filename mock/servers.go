@@ -3,7 +3,13 @@
 
 package mock
 
-import "net/http"
+import (
+	"net/http"
+
+	"github.com/Altoros/gosigma"
+)
+
+var servers []gosigma.Instance = nil
 
 func serversHandler(w http.ResponseWriter, r *http.Request) {
 
