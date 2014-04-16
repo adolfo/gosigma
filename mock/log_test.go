@@ -7,6 +7,8 @@ import "testing"
 
 func TestLogSeverity(t *testing.T) {
 
+	t.Parallel()
+
 	if v := parseLogSeverity(nil); v != logNone {
 		t.Errorf("Severity of nil == %d, wants logNone", v)
 	}

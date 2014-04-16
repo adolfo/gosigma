@@ -5,28 +5,51 @@ package mock
 
 import (
 	"bytes"
+	"net/http"
+	"runtime"
 	"testing"
+
+	"github.com/Altoros/gosigma"
 )
 
 func init() {
+	runtime.GOMAXPROCS(runtime.NumCPU())
 	Start()
 }
 
-func testEqByteSlice(a, b []byte) bool {
-	if len(a) != len(b) {
-		return false
-	}
+func TestAuth(t *testing.T) {
 
-	for i := range a {
-		if a[i] != b[i] {
-			return false
+	t.Parallel()
+
+	check := func(u, p string, wants int) {
+		req, err := http.NewRequest("GET", Endpoint()+"capabilities", nil)
+		if err != nil {
+			t.Error(err)
+		}
+		if u != "" {
+			req.SetBasicAuth(u, p)
+		}
+		client := gosigma.NewHttpsClient(nil)
+		resp, err := client.Do(req)
+		if err != nil {
+			t.Error(err)
+		}
+		if resp.StatusCode != wants {
+			t.Errorf("Status = %d, wants %d", resp.StatusCode, wants)
 		}
 	}
 
-	return true
+	go check("", "", 401)
+	go check(TestUser, "", 401)
+	go check(TestUser, "1", 401)
+	go check(TestUser+"1", TestPassword, 401)
+	go check(TestUser, TestPassword+"1", 401)
+	go check(TestUser, TestPassword, 200)
 }
 
 func TestSections(t *testing.T) {
+
+	t.Parallel()
 
 	ch := make(chan int)
 
@@ -54,16 +77,17 @@ func TestSections(t *testing.T) {
 		var buf bytes.Buffer
 		buf.ReadFrom(resp.Body)
 
-		if !testEqByteSlice(j.Response.Body.Bytes(), buf.Bytes()) {
+		if !bytes.Equal(j.Response.Body.Bytes(), buf.Bytes()) {
 			t.Errorf("Section: body error")
 		}
 
 		ch <- 1
 	}
 
-	const sectionCount = 2
+	const sectionCount = 3
 	go check("capabilities")
 	go check("drives")
+	go check("servers")
 
 	var s int = 0
 	for s < sectionCount {

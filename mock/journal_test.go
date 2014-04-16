@@ -10,6 +10,9 @@ import (
 )
 
 func TestJournalExternalID(t *testing.T) {
+
+	t.Parallel()
+
 	req, err := http.NewRequest("GET", "https://localhost/test", nil)
 	if err != nil {
 		t.Error(err)
@@ -38,6 +41,9 @@ func TestJournalExternalID(t *testing.T) {
 }
 
 func TestJournalAutoID(t *testing.T) {
+
+	t.Parallel()
+
 	req, err := http.NewRequest("GET", "https://localhost/test", nil)
 	if err != nil {
 		t.Error(err)

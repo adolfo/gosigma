@@ -10,7 +10,7 @@ func TestSetupShortEndpoints(t *testing.T) {
 	check := func(ep string, url string) {
 		c := Configuration{Credentials{AuthtypeBasic, "user", "pwd"}, ep}
 
-		client, err := NewClient(c)
+		client, err := NewClient(c, nil)
 		if err != nil {
 			t.Error(err)
 		}

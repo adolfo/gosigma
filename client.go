@@ -4,7 +4,9 @@
 package gosigma
 
 import (
+	"crypto/tls"
 	"errors"
+	"net/http"
 	"net/url"
 )
 
@@ -19,8 +21,8 @@ const (
 // A Credentials is used to initialize new CloudSigma client
 type Credentials struct {
 	Type     Authtype // Authentication type
-	User     string   // CloudSigma account username
-	Password string   // CloudSigma account password
+	User     string   // Username of CloudSigma account
+	Password string   // Password of CloudSigma account
 }
 
 // A Configuration is used to initialize new CloudSigma client
@@ -33,10 +35,11 @@ type Configuration struct {
 type Client struct {
 	endpoint    string
 	credentials Credentials
+	https       *http.Client
 }
 
 // NewClient returns new CloudSigma client object
-func NewClient(c Configuration) (*Client, error) {
+func NewClient(c Configuration, tlsConfig *tls.Config) (*Client, error) {
 	if len(c.Endpoint) == 0 {
 		return nil, errors.New("endpoint are not allowed to be empty")
 	}
@@ -77,11 +80,45 @@ func NewClient(c Configuration) (*Client, error) {
 	client := &Client{
 		endpoint:    endpoint,
 		credentials: c.Credentials,
+		https:       NewHttpsClient(tlsConfig),
 	}
 
 	return client, nil
 }
 
-func (c Client) Endpoint() string {
+// NewHttpsClient returns http.Client object with configured https transport
+func NewHttpsClient(tlsConfig *tls.Config) *http.Client {
+	if tlsConfig == nil {
+		tlsConfig = &tls.Config{InsecureSkipVerify: true}
+	}
+
+	tr := &http.Transport{
+		TLSClientConfig: tlsConfig,
+	}
+
+	redirectChecker := func(req *http.Request, via []*http.Request) error {
+		if len(via) >= 10 {
+			return errors.New("stopped after 10 redirects")
+		}
+		lastReq := via[len(via)-1]
+		if auth := lastReq.Header.Get("Authorization"); len(auth) > 0 {
+			req.Header.Add("Authorization", auth)
+		}
+		return nil
+	}
+
+	https := &http.Client{
+		Transport:     tr,
+		CheckRedirect: redirectChecker,
+	}
+
+	return https
+}
+
+func (c *Client) Endpoint() string {
 	return c.endpoint
+}
+
+func (c *Client) Instances() (ii []Instance, err error) {
+	return
 }

@@ -4,10 +4,12 @@
 package mock
 
 import (
-	"crypto/tls"
-	"errors"
+	"encoding/base64"
 	"net/http"
 	"net/http/httptest"
+	"strings"
+
+	"github.com/Altoros/gosigma"
 )
 
 //
@@ -18,6 +20,11 @@ import (
 //
 
 const serverBase = "/api/2.0/"
+
+const (
+	TestUser     = "test@example.com"
+	TestPassword = "test"
+)
 
 var pServer *httptest.Server
 
@@ -32,6 +39,7 @@ func Start() {
 
 	mux.HandleFunc(makeHandler("capabilities", capsHandler))
 	mux.HandleFunc(makeHandler("drives", drivesHandler))
+	mux.HandleFunc(makeHandler("servers", serversHandler))
 
 	pServer = httptest.NewUnstartedServer(mux)
 	pServer.StartTLS()
@@ -43,7 +51,13 @@ func makeHandler(name string, f handlerType) (string, handlerType) {
 	url := serverBase + name + "/"
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		rec := httptest.NewRecorder()
-		f(rec, r)
+
+		if isValidAuth(r) {
+			f(rec, r)
+		} else {
+			rec.WriteHeader(401)
+			rec.Write([]byte("401 Unauthorized\n"))
+		}
 
 		recordJournal(name, r, rec)
 
@@ -56,6 +70,43 @@ func makeHandler(name string, f handlerType) (string, handlerType) {
 		w.Write(rec.Body.Bytes())
 	}
 	return url, handler
+}
+
+func isValidAuth(r *http.Request) bool {
+	s := strings.SplitN(r.Header.Get("Authorization"), " ", 2)
+	if len(s) < 2 {
+		return false
+	}
+	switch s[0] {
+	case "Basic":
+		return isValidBasicAuth(s[1])
+	case "Digest":
+		return isValidDigestAuth(s[1])
+	}
+
+	return false
+}
+
+func isValidBasicAuth(auth string) bool {
+	b, err := base64.StdEncoding.DecodeString(auth)
+	if err != nil {
+		return false
+	}
+	pair := strings.SplitN(string(b), ":", 2)
+	if len(pair) != 2 {
+		return false
+	}
+	if pair[0] != TestUser {
+		return false
+	}
+	if pair[1] != TestPassword {
+		return false
+	}
+	return true
+}
+
+func isValidDigestAuth(auth string) bool {
+	return false
 }
 
 // Check the mock server is started
@@ -82,29 +133,17 @@ func Endpoint() string {
 
 // Request mock server for given URL
 func Request(s string) (*http.Response, error) {
-	tr := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-	}
-
-	redirectChecker := func(req *http.Request, via []*http.Request) error {
-		if len(via) >= 10 {
-			return errors.New("stopped after 10 redirects")
-		}
-		lastReq := via[len(via)-1]
-		if auth := lastReq.Header.Get("Authorization"); len(auth) > 0 {
-			req.Header.Add("Authorization", auth)
-		}
-		return nil
-	}
-	client := &http.Client{Transport: tr, CheckRedirect: redirectChecker}
 
 	url := Endpoint() + s
+
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	req.SetBasicAuth("test@example.com", "test")
+	req.SetBasicAuth(TestUser, TestPassword)
+
+	client := gosigma.NewHttpsClient(nil)
 
 	return client.Do(req)
 }
