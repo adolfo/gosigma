@@ -21,6 +21,13 @@ const (
 	ServerUnavailable = "unavailable"
 )
 
+// Meta describes properties of dataset
+type Meta struct {
+	Limit      int `json:"limit"`
+	Offset     int `json:"offset"`
+	TotalCount int `json:"total_count"`
+}
+
 // NIC describes properties of network interface card
 type NIC struct {
 	IPv4 struct {
@@ -49,21 +56,13 @@ type Server struct {
 
 // ServersShort holds collection of cloud server instances
 type ServersShort struct {
-	Meta struct {
-		Limit      int `json:"limit"`
-		Offset     int `json:"offset"`
-		TotalCount int `json:"total_count"`
-	} `json:"meta"`
+	Meta    Meta          `json:"meta"`
 	Objects []ServerShort `json:"objects"`
 }
 
 // Servers holds collection of cloud server instances
 type Servers struct {
-	Meta struct {
-		Limit      int `json:"limit"`
-		Offset     int `json:"offset"`
-		TotalCount int `json:"total_count"`
-	} `json:"meta"`
+	Meta    Meta     `json:"meta"`
 	Objects []Server `json:"objects"`
 }
 

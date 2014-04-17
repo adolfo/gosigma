@@ -46,16 +46,20 @@ func verifyServerObjects(t *testing.T, ii []Server) {
 		"stopped", "93a04cd5-84cb-41fc-af17-683e3868ee95")
 }
 
+func verifyMeta(t *testing.T, m *Meta, limit, offset, count int) {
+	if m.Limit != limit {
+		t.Errorf("Meta.Limit = %d, wants %d", m.Limit, limit)
+	}
+	if m.Offset != offset {
+		t.Errorf("Meta.Offset = %d, wants %d", m.Offset, offset)
+	}
+	if m.TotalCount != count {
+		t.Errorf("Meta.TotalCount = %d, wants %d", m.TotalCount, count)
+	}
+}
+
 func verifyServers(t *testing.T, ii *Servers) {
-	if ii.Meta.Limit != 0 {
-		t.Errorf("Meta.Limit = %d, wants 0", ii.Meta.Limit)
-	}
-	if ii.Meta.Offset != 0 {
-		t.Errorf("Meta.Offset = %d, wants 0", ii.Meta.Offset)
-	}
-	if ii.Meta.TotalCount != 5 {
-		t.Errorf("Meta.TotalCount = %d, wants 5", ii.Meta.TotalCount)
-	}
+	verifyMeta(t, &ii.Meta, 0, 0, 5)
 	verifyServerObjects(t, ii.Objects)
 }
 
