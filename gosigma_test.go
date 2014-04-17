@@ -12,8 +12,8 @@ func TestVersionStringMatches(t *testing.T) {
 }
 
 func TestGetRegionEndpoint(t *testing.T) {
-	check := func(r string, url string) {
-		ep, err := GetRegionEndpoint(r)
+	check := func(ep string, url string) {
+		ep, err := ResolveEndpoint(ep)
 		if err != nil {
 			t.Error(err)
 		}

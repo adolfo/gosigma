@@ -30,6 +30,8 @@ install:
 
 clean:
 	go clean $(PROJECT)/...
+	find -name "*.test" | xargs rm -f
+	find -name "*.out" | xargs rm -f
 
 else # --------------------------------
 

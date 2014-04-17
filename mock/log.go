@@ -5,6 +5,7 @@ package mock
 
 import (
 	"flag"
+	"net/http"
 	"net/http/httputil"
 	"strings"
 	"testing"
@@ -38,6 +39,13 @@ func parseLogSeverity(s *string) severity {
 
 func log() severity {
 	return parseLogSeverity(logFlag)
+}
+
+// LogResponse log journal entries associated with response to testing log
+func LogResponse(t *testing.T, r *http.Response) {
+	id := GetIDFromResponse(r)
+	jj := GetJournal(id)
+	Log(t, jj)
 }
 
 // Log journal entry to testing log

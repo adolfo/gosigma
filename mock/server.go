@@ -127,25 +127,20 @@ func Stop() {
 	pServer = nil
 }
 
-// Endpoint of mock server, represented as string in form 'https://host:port/api/{version}/'.
-// Panic if server is not started.
-func Endpoint() string {
-	return pServer.URL + serverBase
+// Endpoint of mock server, represented as string in form
+// 'https://host:port/api/{version}/{section}'. Panic if server is not started.
+func Endpoint(section string) string {
+	return pServer.URL + serverBase + section
 }
 
-// Request mock server for given URL
-func Request(s string) (*http.Response, error) {
+// GetAuth performs Get request to the given section of mock server with authentication
+func GetAuth(section, username, password string) (*http.Response, error) {
+	client := https.NewAuthClient(username, password, nil)
+	url := Endpoint(section)
+	return client.Get(url)
+}
 
-	url := Endpoint() + s
-
-	req, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	req.SetBasicAuth(TestUser, TestPassword)
-
-	client := https.NewClient(nil)
-
-	return client.Do(req)
+// Get performs Get request to the given section of mock server with default authentication
+func Get(section string) (*http.Response, error) {
+	return GetAuth(section, TestUser, TestPassword)
 }

@@ -6,26 +6,36 @@ package gosigma
 import (
 	"errors"
 	"net/url"
+	"strings"
 )
 
 // Default CloudSigma region
 const DefaultRegion string = "zrh"
 
-var errUnknownRegion = errors.New("unknown CloudSigma region")
 var errEmptyEndpoint = errors.New("endpoint are not allowed to be empty")
 var errHttpsRequired = errors.New("endpoint must use https scheme")
 var errInvalidAuth = errors.New("auth information is not allowed in the endpoint string")
 var errEndpointWithQuery = errors.New("query information is not allowed in the endpoint string")
 
-// GetRegionEndpoint returns endpoint for given region code
-func GetRegionEndpoint(region string) (string, error) {
-	switch region {
+// ResolveEndpoint returns endpoint for given region code
+func ResolveEndpoint(endpoint string) (string, error) {
+	switch endpoint {
 	case "zrh":
 		return "https://zrh.cloudsigma.com/api/2.0/", nil
 	case "lvs":
 		return "https://lvs.cloudsigma.com/api/2.0/", nil
 	default:
-		return "", errUnknownRegion
+		if length := len(endpoint); length > 0 {
+			endpoint := strings.TrimSpace(endpoint)
+			if endpoint[length-1] != '/' {
+				endpoint += "/"
+			}
+		}
+		if err := VerifyEndpoint(endpoint); err != nil {
+			return "", err
+		} else {
+			return endpoint, nil
+		}
 	}
 }
 

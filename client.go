@@ -5,7 +5,7 @@ package gosigma
 
 import (
 	"crypto/tls"
-	"net/http"
+	"errors"
 	"net/url"
 
 	"github.com/Altoros/gosigma/data"
@@ -15,47 +15,41 @@ import (
 // A Client sends and receives requests to CloudSigma endpoint
 type Client struct {
 	endpoint string
-	cred     Credentials
 	https    *https.Client
 }
 
+var errEmptyUsername = errors.New("username is not allowed to be empty")
+var errEmptyPassword = errors.New("password is not allowed to be empty")
+
 // NewClient returns new CloudSigma client object
-func NewClient(endpoint string, credentials Credentials,
-	tlsConfig *tls.Config) (*Client, error) {
+func NewClient(endpoint string,
+	username, password string, tlsConfig *tls.Config) (*Client, error) {
 
-	// check the endpoint is a region name
-	resolved, err := GetRegionEndpoint(endpoint)
-	if err == nil {
-		endpoint = resolved
-	}
-
-	err = VerifyEndpoint(endpoint)
+	endpoint, err := ResolveEndpoint(endpoint)
 	if err != nil {
 		return nil, err
 	}
 
-	err = credentials.Verify()
-	if err != nil {
-		return nil, err
+	if len(username) == 0 {
+		return nil, errEmptyUsername
+	}
+
+	if len(password) == 0 {
+		return nil, errEmptyPassword
 	}
 
 	client := &Client{
 		endpoint: endpoint,
-		cred:     credentials,
-		https:    https.NewClient(tlsConfig),
+		https:    https.NewAuthClient(username, password, tlsConfig),
 	}
 
 	return client, nil
 }
 
-// Endpoint of CloudSigma cloud
-func (c *Client) Endpoint() string {
-	return c.endpoint
-}
-
 // Instances of all servers in current account
-func (c *Client) Instances() ([]data.Server, error) {
-	r, err := c.query("servers", url.Values{"limit": {"0"}})
+func (c Client) Instances() ([]data.Server, error) {
+	u := c.endpoint + "servers"
+	r, err := c.https.GetQuery(u, url.Values{"limit": {"0"}})
 	if err != nil {
 		return nil, err
 	}
@@ -64,37 +58,12 @@ func (c *Client) Instances() ([]data.Server, error) {
 }
 
 // Instance description for given server uuid
-func (c *Client) Instance(uuid string) (*data.Server, error) {
-	r, err := c.query("servers/"+uuid, nil)
+func (c Client) Instance(uuid string) (*data.Server, error) {
+	u := c.endpoint + "servers/" + uuid
+	r, err := c.https.Get(u)
 	if err != nil {
 		return nil, err
 	}
 	defer r.Body.Close()
 	return data.ReadServer(r.Body)
-}
-
-func (c *Client) get(url string) (*http.Response, error) {
-	url = c.Endpoint() + url
-
-	req, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	err = c.cred.Apply(req)
-	if err != nil {
-		return nil, err
-	}
-
-	return c.https.Do(req)
-}
-
-func (c *Client) query(query string, values url.Values) (*http.Response, error) {
-	if len(values) == 0 {
-		return c.get(query)
-	}
-
-	query += "?" + values.Encode()
-
-	return c.get(query)
 }

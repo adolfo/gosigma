@@ -5,15 +5,10 @@ package mock
 
 import (
 	"bytes"
-	"net/http"
-	"runtime"
 	"testing"
-
-	"github.com/Altoros/gosigma/https"
 )
 
 func init() {
-	runtime.GOMAXPROCS(runtime.NumCPU())
 	Start()
 }
 
@@ -22,15 +17,7 @@ func TestAuth(t *testing.T) {
 	t.Parallel()
 
 	check := func(u, p string, wants int) {
-		req, err := http.NewRequest("GET", Endpoint()+"capabilities", nil)
-		if err != nil {
-			t.Error(err)
-		}
-		if u != "" {
-			req.SetBasicAuth(u, p)
-		}
-		client := https.NewClient(nil)
-		resp, err := client.Do(req)
+		resp, err := GetAuth("capabilities", u, p)
 		if err != nil {
 			t.Error(err)
 		}
@@ -55,20 +42,20 @@ func TestSections(t *testing.T) {
 	ch := make(chan int)
 
 	check := func(s string) {
-		resp, err := Request(s)
+		resp, err := Get(s)
 		if err != nil {
 			t.Errorf("Section %s: %s", s, err)
 		}
 		defer resp.Body.Close()
 
-		id := GetIDFromResponse(resp)
-		jj := GetJournal(id)
-		Log(t, jj)
+		LogResponse(t, resp)
 
 		if resp.StatusCode != 200 {
 			t.Errorf("Section %s: %s", s, resp.Status)
 		}
 
+		id := GetIDFromResponse(resp)
+		jj := GetJournal(id)
 		if len(jj) == 0 {
 			t.Errorf("Section %s: journal length is zero", s)
 		}
