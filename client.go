@@ -7,6 +7,7 @@ import (
 	"crypto/tls"
 	"errors"
 	"net/url"
+	"time"
 
 	"github.com/Altoros/gosigma/data"
 	"github.com/Altoros/gosigma/https"
@@ -44,6 +45,16 @@ func NewClient(endpoint string, username, password string,
 	}
 
 	return client, nil
+}
+
+// ConnectTimeout sets connection timeout
+func (c Client) ConnectTimeout(timeout time.Duration) {
+	c.https.ConnectTimeout(timeout)
+}
+
+// ReadWriteTimeout sets read-write timeout
+func (c Client) ReadWriteTimeout(timeout time.Duration) {
+	c.https.ReadWriteTimeout(timeout)
 }
 
 // AllServers in current account

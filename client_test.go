@@ -8,6 +8,7 @@ import (
 	"flag"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/Altoros/gosigma/data"
 	"github.com/Altoros/gosigma/mock"
@@ -52,10 +53,74 @@ func TestClientCreation(t *testing.T) {
 	}
 }
 
+func TestSoftUnavailableEndpoint(t *testing.T) {
+	cli, err := NewClient(mockEndpoint+"1", mock.TestUser, mock.TestPassword, nil)
+	if err != nil || cli == nil {
+		t.Error("NewClient() failed:", err, cli)
+		return
+	}
+
+	ssf, err := cli.AllServers(false)
+	if err == nil || ssf != nil {
+		t.Error("AllServers(false) returned valid result with unavailable endpoint")
+		return
+	}
+	t.Log("OK: AllServers(false)", err)
+
+	sst, err := cli.AllServers(true)
+	if err == nil || sst != nil {
+		t.Error("AllServers(true) returned valid result with unavailable endpoint")
+		return
+	}
+	t.Log("OK: AllServers(true)", err)
+
+	s, err := cli.Server("uuid")
+	if err == nil || s != nil {
+		t.Error("Server() returned valid result with unavailable endpoint")
+		return
+	}
+	t.Log("OK, Server():", err)
+}
+
+func TestHardUnavailableEndpoint(t *testing.T) {
+	cli, err := NewClient("https://1.0.0.0:2000/api/2.0/", mock.TestUser, mock.TestPassword, nil)
+	if err != nil || cli == nil {
+		t.Error("NewClient() failed:", err, cli)
+		return
+	}
+
+	cli.ConnectTimeout(100 * time.Millisecond)
+	cli.ReadWriteTimeout(100 * time.Millisecond)
+
+	ssf, err := cli.AllServers(false)
+	if err == nil || ssf != nil {
+		t.Error("AllServers(false) returned valid result with unavailable endpoint")
+		return
+	}
+	t.Log("OK: AllServers(false)", err)
+
+	sst, err := cli.AllServers(true)
+	if err == nil || sst != nil {
+		t.Error("AllServers(true) returned valid result with unavailable endpoint")
+		return
+	}
+	t.Log("OK: AllServers(true)", err)
+
+	s, err := cli.Server("uuid")
+	if err == nil || s != nil {
+		t.Error("Server() returned valid result with unavailable endpoint")
+		return
+	}
+	t.Log("OK, Server():", err)
+}
+
 func TestAllServersEmpty(t *testing.T) {
+	mock.ResetServers()
+
 	cli, err := createClient()
 	if err != nil || cli == nil {
 		t.Error("NewClient() failed:", err, cli)
+		return
 	}
 
 	check := func(detail bool) {
@@ -73,6 +138,8 @@ func TestAllServersEmpty(t *testing.T) {
 }
 
 func TestAllServers(t *testing.T) {
+	mock.ResetServers()
+
 	ds := data.Server{
 		ServerRecord: data.ServerRecord{
 			Name:   "name",
@@ -87,21 +154,25 @@ func TestAllServers(t *testing.T) {
 	cli, err := createClient()
 	if err != nil {
 		t.Error(err)
+		return
 	}
 
 	servers, err := cli.AllServers(true)
 	if err != nil {
 		t.Error(err)
+		return
 	}
 
 	if len(servers) != 1 {
 		t.Errorf("invalid len: %v", servers)
+		return
 	}
 
 	s := servers[0]
 
 	if s.String() == "" {
 		t.Error("Empty string representation")
+		return
 	}
 
 	checkv := func(v, wants string) {
@@ -131,6 +202,7 @@ func TestAllServers(t *testing.T) {
 	ds.Meta["key3"] = "value33"
 	if err := s.Refresh(); err != nil {
 		t.Error(err)
+		return
 	}
 	checkv(s.Name(), "name1")
 	checkv(s.URI(), "uri1")
@@ -143,12 +215,15 @@ func TestAllServers(t *testing.T) {
 	mock.ResetServers()
 	if err := s.Refresh(); err == nil {
 		t.Error("Server refresh must fail")
+		return
 	}
 
 	mock.ResetServers()
 }
 
 func TestServer(t *testing.T) {
+	mock.ResetServers()
+
 	ds := data.Server{
 		ServerRecord: data.ServerRecord{
 			Name:   "name",
@@ -163,15 +238,18 @@ func TestServer(t *testing.T) {
 	cli, err := createClient()
 	if err != nil {
 		t.Error(err)
+		return
 	}
 
 	if s, err := cli.Server(""); err == nil || s != nil {
 		t.Error(err)
+		return
 	}
 
 	s, err := cli.Server("uuid")
 	if err != nil || s == nil {
 		t.Error(err)
+		return
 	}
 
 	if s.String() == "" {
@@ -218,6 +296,46 @@ func TestServer(t *testing.T) {
 	if err := s.Refresh(); err == nil {
 		t.Error("Server refresh must fail")
 	}
+}
+
+func TestAllServerDetail(t *testing.T) {
+	mock.ResetServers()
+
+	ds := data.Server{
+		ServerRecord: data.ServerRecord{
+			Name:   "name",
+			URI:    "uri",
+			Status: "status",
+			UUID:   "uuid",
+		},
+		Meta: map[string]string{"key1": "value1", "key2": "value2"},
+	}
+	mock.AddServer(&ds)
+
+	cli, err := createClient()
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	ss, err := cli.AllServers(false)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	if v, ok := ss[0].Get("key1"); ok || len(v) > 0 {
+		t.Error("Error getting short server list")
+	}
+
+	ss, err = cli.AllServers(true)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if v, ok := ss[0].Get("key1"); !ok || len(v) == 0 {
+		t.Error("Error getting detailed server list")
+	}
 
 	mock.ResetServers()
 }
@@ -253,6 +371,7 @@ func TestCloudServers(t *testing.T) {
 	cli, err := NewClient(DefaultRegion, cr[0], cr[1], nil)
 	if err != nil {
 		t.Error(err)
+		return
 	}
 
 	ii, err := cli.AllServers(false)
@@ -276,6 +395,7 @@ func TestCloudServer(t *testing.T) {
 	cli, err := NewClient(DefaultRegion, cr[0], cr[1], nil)
 	if err != nil {
 		t.Error(err)
+		return
 	}
 
 	ii, err := cli.Server(*uuid)

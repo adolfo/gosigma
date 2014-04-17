@@ -6,15 +6,20 @@ package https
 import (
 	"crypto/tls"
 	"errors"
+	"net"
 	"net/http"
 	"net/url"
+	"time"
 )
 
 // Client represents HTTPS client connection with optional basic authentication
 type Client struct {
-	protocol *http.Client
-	username string
-	password string
+	protocol         *http.Client
+	username         string
+	password         string
+	connectTimeout   time.Duration
+	readWriteTimeout time.Duration
+	transport        *http.Transport
 }
 
 // NewClient returns new Client object with configured https transport
@@ -43,7 +48,10 @@ func NewClient(tlsConfig *tls.Config) *Client {
 			Transport:     tr,
 			CheckRedirect: redirectChecker,
 		},
+		transport: tr,
 	}
+
+	tr.Dial = https.dialer
 
 	return https
 }
@@ -57,6 +65,17 @@ func NewAuthClient(username, password string, tlsConfig *tls.Config) *Client {
 	return https
 }
 
+// ConnectTimeout sets connection timeout
+func (c *Client) ConnectTimeout(timeout time.Duration) {
+	c.connectTimeout = timeout
+	c.transport.CloseIdleConnections()
+}
+
+// ReadWriteTimeout sets read-write timeout
+func (c *Client) ReadWriteTimeout(timeout time.Duration) {
+	c.readWriteTimeout = timeout
+}
+
 func (c Client) Get(url string) (*http.Response, error) {
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -67,7 +86,7 @@ func (c Client) Get(url string) (*http.Response, error) {
 		req.SetBasicAuth(c.username, c.password)
 	}
 
-	return c.protocol.Do(req)
+	return c.do(req)
 }
 
 func (c Client) GetQuery(url string, values url.Values) (*http.Response, error) {
@@ -78,4 +97,35 @@ func (c Client) GetQuery(url string, values url.Values) (*http.Response, error) 
 	url += "?" + values.Encode()
 
 	return c.Get(url)
+}
+
+func (c Client) do(r *http.Request) (*http.Response, error) {
+	var chStop chan int
+
+	readWriteTimeout := c.readWriteTimeout
+	if readWriteTimeout > 0 {
+		chStop = make(chan int)
+		go func() {
+			for {
+				select {
+				case <-time.After(readWriteTimeout):
+					c.transport.CancelRequest(r)
+				case <-chStop:
+					return
+				}
+			}
+		}()
+	}
+
+	resp, err := c.protocol.Do(r)
+
+	if chStop != nil {
+		close(chStop)
+	}
+
+	return resp, err
+}
+
+func (c *Client) dialer(netw, addr string) (net.Conn, error) {
+	return net.DialTimeout(netw, addr, c.connectTimeout)
 }
