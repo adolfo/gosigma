@@ -8,19 +8,6 @@ import (
 	"io"
 )
 
-const (
-	// ServerStopped defines constant for stopped instance state
-	ServerStopped = "stopped"
-	// ServerStarting defines constant for starting instance state
-	ServerStarting = "starting"
-	// ServerRunning defines constant for running instance state
-	ServerRunning = "running"
-	// ServerStopping defines constant for stopping instance state
-	ServerStopping = "stopping"
-	// ServerUnavailable defines constant for unavailable instance state
-	ServerUnavailable = "unavailable"
-)
-
 // Meta describes properties of dataset
 type Meta struct {
 	Limit      int `json:"limit"`
@@ -39,45 +26,52 @@ type NIC struct {
 	} `json:"ip_v4_conf"`
 }
 
-// ServerShort contains main properties of cloud server instance
-type ServerShort struct {
+// ServerRecord contains main properties of cloud server instance
+type ServerRecord struct {
 	Name   string `json:"name"`
 	URI    string `json:"resource_uri"`
 	Status string `json:"status"`
 	UUID   string `json:"uuid"`
 }
 
+// ServerRecords holds collection of Server objects
+type ServerRecords struct {
+	Meta    Meta           `json:"meta"`
+	Objects []ServerRecord `json:"objects"`
+}
+
 // Server contains detail properties of cloud server instance
 type Server struct {
-	ServerShort
+	ServerRecord
 	Meta map[string]string `json:"meta"`
 	NICs []NIC             `json:"nics"`
 }
 
-// ServersShort holds collection of cloud server instances
-type ServersShort struct {
-	Meta    Meta          `json:"meta"`
-	Objects []ServerShort `json:"objects"`
-}
-
-// Servers holds collection of cloud server instances
+// ServersInfo holds collection of ServerInfo objects
 type Servers struct {
 	Meta    Meta     `json:"meta"`
 	Objects []Server `json:"objects"`
 }
 
+// ReadJson
+func ReadJson(r io.Reader, v interface{}) error {
+	dec := json.NewDecoder(r)
+	for {
+		err := dec.Decode(v)
+		if err == io.EOF {
+			return nil
+		}
+		if err != nil {
+			return err
+		}
+	}
+}
+
 // ReadServers reads and unmarshalls information about cloud server instances from JSON stream
 func ReadServers(r io.Reader) ([]Server, error) {
 	var servers Servers
-	dec := json.NewDecoder(r)
-	for {
-		err := dec.Decode(&servers)
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			return nil, err
-		}
+	if err := ReadJson(r, &servers); err != nil {
+		return nil, err
 	}
 	return servers.Objects, nil
 }
@@ -85,15 +79,8 @@ func ReadServers(r io.Reader) ([]Server, error) {
 // ReadServer reads and unmarshalls information about single cloud server instance from JSON stream
 func ReadServer(r io.Reader) (*Server, error) {
 	var server Server
-	dec := json.NewDecoder(r)
-	for {
-		err := dec.Decode(&server)
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			return nil, err
-		}
+	if err := ReadJson(r, &server); err != nil {
+		return nil, err
 	}
 	return &server, nil
 }

@@ -13,7 +13,7 @@ import (
 )
 
 var syncServers sync.Mutex
-var servers map[string]*data.Server
+var servers = make(map[string]*data.Server)
 
 // AddServer adds server instance record under the mock
 func AddServer(s *data.Server) {
@@ -29,6 +29,13 @@ func RemoveServer(uuid string) {
 	defer syncServers.Unlock()
 
 	delete(servers, uuid)
+}
+
+// ResetServers removes all server instance records from the mock
+func ResetServers() {
+	syncServers.Lock()
+	defer syncServers.Unlock()
+	servers = make(map[string]*data.Server)
 }
 
 // SetServerStatus changes status of server instance in the mock
@@ -57,7 +64,7 @@ func serversHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	uuid := strings.TrimPrefix("/api/2.0/servers/", path)
+	uuid := strings.TrimPrefix(path, "/api/2.0/servers/")
 	handleServer(w, r, uuid)
 }
 
@@ -65,11 +72,11 @@ func handleServers(w http.ResponseWriter, r *http.Request) {
 	syncServers.Lock()
 	defer syncServers.Unlock()
 
-	var ss data.ServersShort
+	var ss data.ServerRecords
 	ss.Meta.TotalCount = len(servers)
-	ss.Objects = make([]data.ServerShort, 0, len(servers))
+	ss.Objects = make([]data.ServerRecord, 0, len(servers))
 	for _, s := range servers {
-		ss.Objects = append(ss.Objects, s.ServerShort)
+		ss.Objects = append(ss.Objects, s.ServerRecord)
 	}
 
 	data, err := json.Marshal(&ss)
