@@ -7,6 +7,7 @@ import (
 	"bytes"
 	"io"
 	"io/ioutil"
+	"strings"
 )
 
 // Error contains error information from server reply
@@ -36,4 +37,18 @@ func ReadError(r io.Reader) ([]Error, error) {
 	}
 
 	return []Error{e}, nil
+}
+
+func (e Error) Error() string {
+	var rr []string
+	if e.Point != "" {
+		rr = append(rr, e.Point)
+	}
+	if e.Type != "" {
+		rr = append(rr, e.Type)
+	}
+	if e.Message != "" {
+		rr = append(rr, e.Message)
+	}
+	return strings.Join(rr, ", ")
 }

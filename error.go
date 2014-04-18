@@ -37,7 +37,7 @@ func (s Error) Error() string {
 		if s.StatusCode > 0 {
 			str = s.StatusMessage + ", "
 		}
-		str += s.ServiceError.Message
+		str += s.ServiceError.Error()
 		return str
 	}
 	if s.StatusCode >= 400 {

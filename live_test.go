@@ -52,6 +52,10 @@ func TestLiveServers(t *testing.T) {
 		return
 	}
 
+	if *trace != "n" {
+		cli.Logger(t)
+	}
+
 	ii, err := cli.AllServers(false)
 	if err != nil {
 		t.Error(err)
@@ -78,9 +82,14 @@ func TestLiveServer(t *testing.T) {
 		return
 	}
 
+	if *trace != "n" {
+		cli.Logger(t)
+	}
+
 	s, err := cli.Server(*uuid)
 	if err != nil {
 		t.Error(err)
+		return
 	}
 	t.Logf("%v", s)
 }
@@ -110,6 +119,7 @@ func TestLiveStartServer(t *testing.T) {
 	s, err := cli.Server(*uuid)
 	if err != nil {
 		t.Error(err)
+		return
 	}
 
 	if s.Status() != ServerStopped && *force == "n" {

@@ -176,7 +176,7 @@ func (c Client) do(r *http.Request) (*Response, error) {
 	}
 
 	if logger != nil {
-		logger.Logf("HTTP/%d %s", resp.StatusCode, resp.Status)
+		logger.Logf("HTTP/%s", resp.Status)
 		for header, values := range resp.Header {
 			logger.Log(header+":", strings.Join(values, ","))
 		}
