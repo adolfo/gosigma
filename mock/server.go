@@ -134,13 +134,13 @@ func Endpoint(section string) string {
 }
 
 // GetAuth performs Get request to the given section of mock server with authentication
-func GetAuth(section, username, password string) (*http.Response, error) {
+func GetAuth(section, username, password string) (*https.Response, error) {
 	client := https.NewAuthClient(username, password, nil)
 	url := Endpoint(section)
-	return client.Get(url)
+	return client.Get(url, nil)
 }
 
 // Get performs Get request to the given section of mock server with default authentication
-func Get(section string) (*http.Response, error) {
+func Get(section string) (*https.Response, error) {
 	return GetAuth(section, TestUser, TestPassword)
 }

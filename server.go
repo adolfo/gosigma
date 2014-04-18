@@ -55,10 +55,22 @@ func (s Server) String() string {
 
 // Refresh information about server instance
 func (s *Server) Refresh() error {
-	obj, err := s.client.getServer(s.obj.UUID)
+	obj, err := s.client.getServer(s.UUID())
 	if err != nil {
 		return err
 	}
 	s.obj = obj
 	return nil
+}
+
+// Start server instance. This method does not check current server status,
+// start command is issued to the endpoint in case of any value cached in Status().
+func (s Server) Start() error {
+	return s.client.startServer(s.UUID(), nil)
+}
+
+// Stop server instance. This method does not check current server status,
+// stop command is issued to the endpoint in case of any value cached in Status().
+func (s Server) Stop() error {
+	return s.client.stopServer(s.UUID())
 }

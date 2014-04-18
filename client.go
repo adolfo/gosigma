@@ -7,6 +7,7 @@ import (
 	"crypto/tls"
 	"errors"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/Altoros/gosigma/data"
@@ -96,15 +97,14 @@ func (c Client) getAllServers(detail bool) ([]data.Server, error) {
 		u += "/detail"
 	}
 
-	r, err := c.https.GetQuery(u, url.Values{"limit": {"0"}})
+	r, err := c.https.Get(u, url.Values{"limit": {"0"}})
 	if err != nil {
 		return nil, err
 	}
-
 	defer r.Body.Close()
 
-	if r.StatusCode != 200 {
-		return nil, errors.New(r.Status)
+	if err := r.VerifyJSON(200); err != nil {
+		return nil, err
 	}
 
 	return data.ReadServers(r.Body)
@@ -112,16 +112,43 @@ func (c Client) getAllServers(detail bool) ([]data.Server, error) {
 
 func (c Client) getServer(uuid string) (*data.Server, error) {
 	u := c.endpoint + "servers/" + uuid
-	r, err := c.https.Get(u)
+
+	r, err := c.https.Get(u, nil)
 	if err != nil {
 		return nil, err
 	}
-
 	defer r.Body.Close()
 
-	if r.StatusCode != 200 {
-		return nil, errors.New(r.Status)
+	if err := r.VerifyJSON(200); err != nil {
+		return nil, err
 	}
 
 	return data.ReadServer(r.Body)
+}
+
+func (c Client) startServer(uuid string, avoid []string) error {
+	u := c.endpoint + "servers/" + uuid + "/action/"
+
+	var params = make(url.Values)
+	params["do"] = []string{"start"}
+
+	if len(avoid) > 0 {
+		params["avoid"] = []string{strings.Join(avoid, ",")}
+	}
+
+	r, err := c.https.Post(u, params, nil)
+	if err != nil {
+		return err
+	}
+	defer r.Body.Close()
+
+	if err := r.VerifyJSON(202); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (c Client) stopServer(uuid string) error {
+	return nil
 }

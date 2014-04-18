@@ -6,6 +6,7 @@ package https
 import (
 	"crypto/tls"
 	"errors"
+	"io"
 	"net"
 	"net/http"
 	"net/url"
@@ -80,7 +81,11 @@ func (c *Client) ReadWriteTimeout(timeout time.Duration) {
 }
 
 // Get performs get request to the url.
-func (c Client) Get(url string) (*http.Response, error) {
+func (c Client) Get(url string, query url.Values) (*Response, error) {
+	if len(query) != 0 {
+		url += "?" + query.Encode()
+	}
+
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, err
@@ -93,18 +98,31 @@ func (c Client) Get(url string) (*http.Response, error) {
 	return c.do(req)
 }
 
-// GetQuery performs get request to the url with the list of query arguments.
-func (c Client) GetQuery(url string, values url.Values) (*http.Response, error) {
-	if len(values) == 0 {
-		return c.Get(url)
+// Post performs post request to the url.
+func (c Client) Post(url string, query url.Values, body io.Reader) (*Response, error) {
+	if len(query) != 0 {
+		url += "?" + query.Encode()
 	}
 
-	url += "?" + values.Encode()
+	req, err := http.NewRequest("POST", url, body)
+	if err != nil {
+		return nil, err
+	}
 
-	return c.Get(url)
+	if body != nil {
+		h := req.Header
+		h["Content-Type"] = append(h["Content-Type"], "application/json")
+		h["Content-Type"] = append(h["Content-Type"], "charset=utf-8")
+	}
+
+	if len(c.username) != 0 {
+		req.SetBasicAuth(c.username, c.password)
+	}
+
+	return c.do(req)
 }
 
-func (c Client) do(r *http.Request) (*http.Response, error) {
+func (c Client) do(r *http.Request) (*Response, error) {
 	var chStop chan int
 
 	readWriteTimeout := c.readWriteTimeout
@@ -126,7 +144,11 @@ func (c Client) do(r *http.Request) (*http.Response, error) {
 		close(chStop)
 	}
 
-	return resp, err
+	if err != nil {
+		return nil, err
+	}
+
+	return &Response{resp}, nil
 }
 
 func (c *Client) dialer(netw, addr string) (net.Conn, error) {
