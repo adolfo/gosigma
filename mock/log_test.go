@@ -5,7 +5,7 @@ package mock
 
 import "testing"
 
-func TestLogSeverity(t *testing.T) {
+func TestMockLogSeverity(t *testing.T) {
 
 	t.Parallel()
 

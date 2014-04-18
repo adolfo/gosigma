@@ -12,7 +12,7 @@ func init() {
 	Start()
 }
 
-func TestAuth(t *testing.T) {
+func TestMockAuth(t *testing.T) {
 
 	t.Parallel()
 
@@ -35,7 +35,7 @@ func TestAuth(t *testing.T) {
 	go check(TestUser, TestPassword, 200)
 }
 
-func TestSections(t *testing.T) {
+func TestMockSections(t *testing.T) {
 
 	t.Parallel()
 

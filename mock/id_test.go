@@ -5,7 +5,7 @@ package mock
 
 import "testing"
 
-func TestGenerateID(t *testing.T) {
+func TestMockGenerateID(t *testing.T) {
 
 	t.Parallel()
 

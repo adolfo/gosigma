@@ -18,11 +18,11 @@ func init() {
 	mockEndpoint = mock.Endpoint("")
 }
 
-func createClient() (*Client, error) {
+func createTestClient() (*Client, error) {
 	return NewClient(mockEndpoint, mock.TestUser, mock.TestPassword, nil)
 }
 
-func TestClientCreation(t *testing.T) {
+func TestClientCreate(t *testing.T) {
 	check := func(ep, u, p string) {
 		cli, err := NewClient(ep, u, p, nil)
 		if err == nil || cli != nil {
@@ -44,13 +44,13 @@ func TestClientCreation(t *testing.T) {
 	check(mockEndpoint, "1234", "")
 
 	// OK
-	cli, err := createClient()
+	cli, err := createTestClient()
 	if err != nil || cli == nil {
 		t.Error("NewClient() failed:", err, cli)
 	}
 }
 
-func TestSoftUnavailableEndpoint(t *testing.T) {
+func TestClientEndpointUnavailableSoft(t *testing.T) {
 	cli, err := NewClient(mockEndpoint+"1", mock.TestUser, mock.TestPassword, nil)
 	if err != nil || cli == nil {
 		t.Error("NewClient() failed:", err, cli)
@@ -79,7 +79,7 @@ func TestSoftUnavailableEndpoint(t *testing.T) {
 	t.Log("OK, Server():", err)
 }
 
-func TestHardUnavailableEndpoint(t *testing.T) {
+func TestClientEndpointUnavailableHard(t *testing.T) {
 	cli, err := NewClient("https://1.0.0.0:2000/api/2.0/", mock.TestUser, mock.TestPassword, nil)
 	if err != nil || cli == nil {
 		t.Error("NewClient() failed:", err, cli)
@@ -111,10 +111,10 @@ func TestHardUnavailableEndpoint(t *testing.T) {
 	t.Log("OK, Server():", err)
 }
 
-func TestAllServersEmpty(t *testing.T) {
+func TestClientAllServersEmpty(t *testing.T) {
 	mock.ResetServers()
 
-	cli, err := createClient()
+	cli, err := createTestClient()
 	if err != nil || cli == nil {
 		t.Error("NewClient() failed:", err, cli)
 		return
@@ -134,7 +134,7 @@ func TestAllServersEmpty(t *testing.T) {
 	check(true)
 }
 
-func TestAllServers(t *testing.T) {
+func TestClientAllServers(t *testing.T) {
 	mock.ResetServers()
 
 	ds := data.Server{
@@ -148,7 +148,7 @@ func TestAllServers(t *testing.T) {
 	}
 	mock.AddServer(&ds)
 
-	cli, err := createClient()
+	cli, err := createTestClient()
 	if err != nil {
 		t.Error(err)
 		return
@@ -218,7 +218,7 @@ func TestAllServers(t *testing.T) {
 	mock.ResetServers()
 }
 
-func TestServer(t *testing.T) {
+func TestClientServer(t *testing.T) {
 	mock.ResetServers()
 
 	ds := data.Server{
@@ -232,7 +232,7 @@ func TestServer(t *testing.T) {
 	}
 	mock.AddServer(&ds)
 
-	cli, err := createClient()
+	cli, err := createTestClient()
 	if err != nil {
 		t.Error(err)
 		return
@@ -295,7 +295,7 @@ func TestServer(t *testing.T) {
 	}
 }
 
-func TestAllServerDetail(t *testing.T) {
+func TestClientAllServersDetail(t *testing.T) {
 	mock.ResetServers()
 
 	ds := data.Server{
@@ -309,7 +309,7 @@ func TestAllServerDetail(t *testing.T) {
 	}
 	mock.AddServer(&ds)
 
-	cli, err := createClient()
+	cli, err := createTestClient()
 	if err != nil {
 		t.Error(err)
 		return

@@ -9,7 +9,7 @@ import (
 	"testing"
 )
 
-func TestJournalExternalID(t *testing.T) {
+func TestMockJournalExternalID(t *testing.T) {
 
 	t.Parallel()
 
@@ -40,7 +40,7 @@ func TestJournalExternalID(t *testing.T) {
 	}
 }
 
-func TestJournalAutoID(t *testing.T) {
+func TestMockJournalAutoID(t *testing.T) {
 
 	t.Parallel()
 
