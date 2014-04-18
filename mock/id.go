@@ -7,6 +7,8 @@ import (
 	"errors"
 	"net/http"
 	"strconv"
+
+	"github.com/Altoros/gosigma/https"
 )
 
 var chID = make(chan int)
@@ -43,7 +45,7 @@ func GetIDFromRequest(r *http.Request) int {
 }
 
 // GetIDFromResponse returns journal ID from HTTP response
-func GetIDFromResponse(r *http.Response) int {
+func GetIDFromResponse(r *https.Response) int {
 	if id, err := GetID(r.Header); err == nil {
 		return id
 	}

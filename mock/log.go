@@ -5,10 +5,10 @@ package mock
 
 import (
 	"flag"
-	"net/http"
 	"net/http/httputil"
 	"strings"
 	"testing"
+	"github.com/Altoros/gosigma/https"
 )
 
 var logFlag = flag.String("log.mock", "n", "log mock server requests: none|n, url|u, detail|d")
@@ -42,7 +42,7 @@ func log() severity {
 }
 
 // LogResponse log journal entries associated with response to testing log
-func LogResponse(t *testing.T, r *http.Response) {
+func LogResponse(t *testing.T, r *https.Response) {
 	id := GetIDFromResponse(r)
 	jj := GetJournal(id)
 	Log(t, jj)

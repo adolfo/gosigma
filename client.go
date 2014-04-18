@@ -58,6 +58,11 @@ func (c Client) ReadWriteTimeout(timeout time.Duration) {
 	c.https.ReadWriteTimeout(timeout)
 }
 
+// Logger sets logger for http traces
+func (c Client) Logger(logger https.Logger) {
+	c.https.Logger(logger)
+}
+
 // AllServers in current account
 func (c Client) AllServers(detail bool) ([]Server, error) {
 	objs, err := c.getAllServers(detail)
@@ -89,6 +94,16 @@ func (c Client) Server(uuid string) (*Server, error) {
 	}
 
 	return srv, nil
+}
+
+// StartServer by uuid
+func (c Client) StartServer(uuid string, avoid []string) error {
+	return c.startServer(uuid, avoid)
+}
+
+// StopServer by uuid
+func (c Client) StopServer(uuid string) error {
+	return c.stopServer(uuid)
 }
 
 func (c Client) getAllServers(detail bool) ([]data.Server, error) {

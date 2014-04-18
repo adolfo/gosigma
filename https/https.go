@@ -4,14 +4,24 @@
 package https
 
 import (
+	"bytes"
 	"crypto/tls"
 	"errors"
 	"io"
+	"io/ioutil"
 	"net"
 	"net/http"
+	"net/http/httputil"
 	"net/url"
+	"strings"
 	"time"
 )
+
+// A Logger represents an active logging object to log Client communication
+type Logger interface {
+	Log(args ...interface{})
+	Logf(format string, args ...interface{})
+}
 
 // Client represents HTTPS client connection with optional basic authentication
 type Client struct {
@@ -21,6 +31,7 @@ type Client struct {
 	connectTimeout   time.Duration
 	readWriteTimeout time.Duration
 	transport        *http.Transport
+	logger           Logger
 }
 
 // NewClient returns new Client object with transport configured for https.
@@ -80,6 +91,11 @@ func (c *Client) ReadWriteTimeout(timeout time.Duration) {
 	c.readWriteTimeout = timeout
 }
 
+// Logger sets logger for http traces
+func (c *Client) Logger(logger Logger) {
+	c.logger = logger
+}
+
 // Get performs get request to the url.
 func (c Client) Get(url string, query url.Values) (*Response, error) {
 	if len(query) != 0 {
@@ -104,6 +120,10 @@ func (c Client) Post(url string, query url.Values, body io.Reader) (*Response, e
 		url += "?" + query.Encode()
 	}
 
+	if body == nil {
+		body = strings.NewReader("{}")
+	}
+
 	req, err := http.NewRequest("POST", url, body)
 	if err != nil {
 		return nil, err
@@ -111,8 +131,7 @@ func (c Client) Post(url string, query url.Values, body io.Reader) (*Response, e
 
 	if body != nil {
 		h := req.Header
-		h["Content-Type"] = append(h["Content-Type"], "application/json")
-		h["Content-Type"] = append(h["Content-Type"], "charset=utf-8")
+		h.Add("Content-Type", "application/json; charset=utf-8")
 	}
 
 	if len(c.username) != 0 {
@@ -124,6 +143,14 @@ func (c Client) Post(url string, query url.Values, body io.Reader) (*Response, e
 
 func (c Client) do(r *http.Request) (*Response, error) {
 	var chStop chan int
+
+	logger := c.logger
+	if logger != nil {
+		if buf, err := httputil.DumpRequest(r, true); err == nil {
+			logger.Log(string(buf))
+			logger.Log()
+		}
+	}
 
 	readWriteTimeout := c.readWriteTimeout
 	if readWriteTimeout > 0 {
@@ -146,6 +173,22 @@ func (c Client) do(r *http.Request) (*Response, error) {
 
 	if err != nil {
 		return nil, err
+	}
+
+	if logger != nil {
+		logger.Logf("HTTP/%d %s", resp.StatusCode, resp.Status)
+		for header, values := range resp.Header {
+			logger.Log(header+":", strings.Join(values, ","))
+		}
+
+		buf := new(bytes.Buffer)
+		buf.ReadFrom(resp.Body)
+
+		logger.Log()
+		logger.Log(buf.String())
+		logger.Log()
+
+		resp.Body = ioutil.NopCloser(buf)
 	}
 
 	return &Response{resp}, nil

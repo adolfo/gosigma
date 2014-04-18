@@ -12,6 +12,8 @@ import (
 
 var live = flag.String("live", "", "run live tests against CloudSigma endpoint, specify credentials in form -live=user:pass")
 var uuid = flag.String("uuid", "", "uuid of server at CloudSigma to run server specific tests")
+var force = flag.String("force", "n", "force start/stop live tests")
+var trace = flag.String("trace", "n", "trace live test requests/responses")
 
 func parseCredentials() (u string, p string, e error) {
 	if *live == "" {
@@ -76,9 +78,46 @@ func TestLiveServer(t *testing.T) {
 		return
 	}
 
-	ii, err := cli.Server(*uuid)
+	s, err := cli.Server(*uuid)
 	if err != nil {
 		t.Error(err)
 	}
-	t.Logf("%v", ii)
+	t.Logf("%v", s)
+}
+
+func TestLiveStartServer(t *testing.T) {
+	u, p, err := parseCredentials()
+	if u == "" {
+		skipTest(t, err)
+		return
+	}
+
+	if *uuid == "" {
+		t.Skip("-uuid=<server-uuid> must be specified")
+		return
+	}
+
+	cli, err := NewClient(DefaultRegion, u, p, nil)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	if *trace != "n" {
+		cli.Logger(t)
+	}
+
+	s, err := cli.Server(*uuid)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if s.Status() != ServerStopped && *force == "n" {
+		t.Skip("wrong server status", s.Status())
+		return
+	}
+
+	if err := s.Start(); err != nil {
+		t.Error(err)
+	}
 }
