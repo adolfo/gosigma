@@ -54,18 +54,28 @@ func SetServerStatus(uuid, status string) {
 // /api/2.0/servers/detail/
 // /api/2.0/servers/{uuid}/
 func serversHandler(w http.ResponseWriter, r *http.Request) {
-	path := strings.TrimSuffix(r.URL.Path, "/")
-	if path == "/api/2.0/servers" {
-		handleServers(w, r)
-		return
+	switch r.Method {
+	case "GET":
+		serversHandlerGet(w, r)
+	case "POST":
+		serversHandlerPost(w, r)
 	}
-	if path == "/api/2.0/servers/detail" {
-		handleServersDetail(w, r)
-		return
-	}
+}
 
-	uuid := strings.TrimPrefix(path, "/api/2.0/servers/")
-	handleServer(w, r, uuid)
+func serversHandlerGet(w http.ResponseWriter, r *http.Request) {
+	path := strings.TrimSuffix(r.URL.Path, "/")
+	switch path {
+	case "/api/2.0/servers":
+		handleServers(w, r)
+	case "/api/2.0/servers/detail":
+		handleServersDetail(w, r)
+	default:
+		uuid := strings.TrimPrefix(path, "/api/2.0/servers/")
+		handleServer(w, r, uuid)
+	}
+}
+
+func serversHandlerPost(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleServers(w http.ResponseWriter, r *http.Request) {

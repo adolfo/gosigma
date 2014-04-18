@@ -22,7 +22,9 @@ type Client struct {
 	transport        *http.Transport
 }
 
-// NewClient returns new Client object with configured https transport
+// NewClient returns new Client object with transport configured for https.
+// Parameter tlsConfig is optional and can be nil, the default TLSClientConfig of
+// http.Transport will be used in this case.
 func NewClient(tlsConfig *tls.Config) *Client {
 	if tlsConfig == nil {
 		tlsConfig = &tls.Config{InsecureSkipVerify: true}
@@ -57,7 +59,8 @@ func NewClient(tlsConfig *tls.Config) *Client {
 }
 
 // NewAuthClient returns new Client object with configured https transport
-// and attached authentication
+// and attached authentication. Parameter tlsConfig is optional and can be nil, the
+// default TLSClientConfig of http.Transport will be used in this case.
 func NewAuthClient(username, password string, tlsConfig *tls.Config) *Client {
 	https := NewClient(tlsConfig)
 	https.username = username
@@ -76,6 +79,7 @@ func (c *Client) ReadWriteTimeout(timeout time.Duration) {
 	c.readWriteTimeout = timeout
 }
 
+// Get performs get request to the url.
 func (c Client) Get(url string) (*http.Response, error) {
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -89,6 +93,7 @@ func (c Client) Get(url string) (*http.Response, error) {
 	return c.do(req)
 }
 
+// GetQuery performs get request to the url with the list of query arguments.
 func (c Client) GetQuery(url string, values url.Values) (*http.Response, error) {
 	if len(values) == 0 {
 		return c.Get(url)

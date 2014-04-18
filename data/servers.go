@@ -53,7 +53,7 @@ type Servers struct {
 	Objects []Server `json:"objects"`
 }
 
-// ReadJson
+// ReadJson from io.Reader to the interface
 func ReadJson(r io.Reader, v interface{}) error {
 	dec := json.NewDecoder(r)
 	for {
