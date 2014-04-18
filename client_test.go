@@ -295,6 +295,33 @@ func TestClientServer(t *testing.T) {
 	}
 }
 
+func TestClientServerNotFound(t *testing.T) {
+	mock.ResetServers()
+
+	cli, err := createTestClient()
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	s, err := cli.Server("uuid1234567")
+	if s != nil {
+		t.Errorf("found server %#v", s)
+	}
+	if err == nil {
+		t.Error("error equal to nil")
+	} else {
+		t.Log(err)
+		cs, ok := err.(*Error)
+		if !ok {
+			t.Error("error required to be gosigma.Error")
+		}
+		if cs.ServiceError.Message != "notfound" {
+			t.Error("invalid error message from mock server")
+		}
+	}
+}
+
 func TestClientAllServersDetail(t *testing.T) {
 	mock.ResetServers()
 

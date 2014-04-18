@@ -49,6 +49,12 @@ func SetServerStatus(uuid, status string) {
 	}
 }
 
+const jsonNotFound = `[{
+		"error_point": null,
+	 	"error_type": "notexist",
+	 	"error_message": "notfound"
+}]`
+
 // URLs:
 // /api/2.0/servers
 // /api/2.0/servers/detail/
@@ -97,8 +103,7 @@ func handleServers(w http.ResponseWriter, r *http.Request) {
 	}
 
 	h := w.Header()
-	h["Content-Type"] = append(h["Content-Type"], "application/json")
-	h["Content-Type"] = append(h["Content-Type"], "charset=utf-8")
+	h.Set("Content-Type", "application/json; charset=utf-8")
 	w.Write(data)
 }
 
@@ -121,8 +126,7 @@ func handleServersDetail(w http.ResponseWriter, r *http.Request) {
 	}
 
 	h := w.Header()
-	h["Content-Type"] = append(h["Content-Type"], "application/json")
-	h["Content-Type"] = append(h["Content-Type"], "charset=utf-8")
+	h.Set("Content-Type", "application/json; charset=utf-8")
 	w.Write(data)
 }
 
@@ -130,10 +134,14 @@ func handleServer(w http.ResponseWriter, r *http.Request, uuid string) {
 	syncServers.Lock()
 	defer syncServers.Unlock()
 
+	h := w.Header()
+
 	s, ok := servers[uuid]
 	if !ok {
+		h.Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(404)
-		w.Write([]byte("404 Not found\n"))
+		w.Write([]byte(jsonNotFound))
+
 		return
 	}
 
@@ -144,8 +152,6 @@ func handleServer(w http.ResponseWriter, r *http.Request, uuid string) {
 		return
 	}
 
-	h := w.Header()
-	h["Content-Type"] = append(h["Content-Type"], "application/json")
-	h["Content-Type"] = append(h["Content-Type"], "charset=utf-8")
+	h.Set("Content-Type", "application/json; charset=utf-8")
 	w.Write(data)
 }

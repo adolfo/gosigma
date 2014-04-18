@@ -26,7 +26,7 @@ func ReadError(r io.Reader) ([]Error, error) {
 	// try to read slice first (as JSON array)
 	var ee []Error
 	if err := ReadJson(bytes.NewReader(bb), &ee); err == nil {
-		return ee, err
+		return ee, nil
 	}
 
 	// try to read single object

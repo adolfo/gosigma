@@ -119,7 +119,7 @@ func (c Client) getAllServers(detail bool) ([]data.Server, error) {
 	defer r.Body.Close()
 
 	if err := r.VerifyJSON(200); err != nil {
-		return nil, err
+		return nil, NewError(r, err)
 	}
 
 	return data.ReadServers(r.Body)
@@ -135,7 +135,7 @@ func (c Client) getServer(uuid string) (*data.Server, error) {
 	defer r.Body.Close()
 
 	if err := r.VerifyJSON(200); err != nil {
-		return nil, err
+		return nil, NewError(r, err)
 	}
 
 	return data.ReadServer(r.Body)
@@ -158,7 +158,7 @@ func (c Client) startServer(uuid string, avoid []string) error {
 	defer r.Body.Close()
 
 	if err := r.VerifyJSON(202); err != nil {
-		return err
+		return NewError(r, err)
 	}
 
 	return nil

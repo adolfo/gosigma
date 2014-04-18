@@ -25,6 +25,7 @@ func ReadJson(r io.Reader, v interface{}) error {
 
 type failReader struct{}
 
+// Read implements test io.Reader interface always returning error.
 func (failReader) Read(p []byte) (n int, err error) {
 	return 0, errors.New("test error")
 }
