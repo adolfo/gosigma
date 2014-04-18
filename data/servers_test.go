@@ -10,6 +10,18 @@ import (
 	"testing/iotest"
 )
 
+func TestDataServersReaderFail(t *testing.T) {
+	r := failReader{}
+
+	if _, err := ReadServer(r); err == nil || err.Error() != "test error" {
+		t.Error("Fail")
+	}
+
+	if _, err := ReadServers(r); err == nil || err.Error() != "test error" {
+		t.Error("Fail")
+	}
+}
+
 func verifyServerObject(t *testing.T, i int, s Server, name, uri, status, uuid string) {
 	if s.Name != name {
 		t.Errorf("Object %d, Name = '%s', wants '%s'", i, s.Name, name)
@@ -63,7 +75,7 @@ func verifyServers(t *testing.T, ii *Servers) {
 	verifyServerObjects(t, ii.Objects)
 }
 
-func TestUnmarshal(t *testing.T) {
+func TestDataServersUnmarshal(t *testing.T) {
 	var ii Servers
 	ii.Meta.Limit = 12345
 	ii.Meta.Offset = 12345
@@ -75,7 +87,7 @@ func TestUnmarshal(t *testing.T) {
 	verifyServers(t, &ii)
 }
 
-func TestReadServers(t *testing.T) {
+func TestDataServersReadServers(t *testing.T) {
 	servers, err := ReadServers(strings.NewReader(jsonServersData))
 	if err != nil {
 		t.Error(err)
@@ -83,7 +95,7 @@ func TestReadServers(t *testing.T) {
 	verifyServerObjects(t, servers)
 }
 
-func TestReadServersHalf(t *testing.T) {
+func TestDataServersReadServersHalf(t *testing.T) {
 	r := strings.NewReader(jsonServersData)
 	servers, err := ReadServers(iotest.HalfReader(r))
 	if err != nil {
@@ -104,7 +116,7 @@ func verifyNIC(t *testing.T, i int, n NIC, conf, uri, uuid string) {
 	}
 }
 
-func TestReadServersDetail(t *testing.T) {
+func TestDataServersReadServersDetail(t *testing.T) {
 	servers, err := ReadServers(strings.NewReader(jsonServersDetailData))
 	if err != nil {
 		t.Error(err)
@@ -118,7 +130,7 @@ func TestReadServersDetail(t *testing.T) {
 	verifyNIC(t, 1, server.NICs[1], "", "", "")
 }
 
-func TestReadServerDetail(t *testing.T) {
+func TestDataServersReadServerDetail(t *testing.T) {
 	server, err := ReadServer(strings.NewReader(jsonServerData))
 	if err != nil {
 		t.Error(err)

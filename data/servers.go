@@ -3,10 +3,7 @@
 
 package data
 
-import (
-	"encoding/json"
-	"io"
-)
+import "io"
 
 // Meta describes properties of dataset
 type Meta struct {
@@ -51,20 +48,6 @@ type Server struct {
 type Servers struct {
 	Meta    Meta     `json:"meta"`
 	Objects []Server `json:"objects"`
-}
-
-// ReadJson from io.Reader to the interface
-func ReadJson(r io.Reader, v interface{}) error {
-	dec := json.NewDecoder(r)
-	for {
-		err := dec.Decode(v)
-		if err == io.EOF {
-			return nil
-		}
-		if err != nil {
-			return err
-		}
-	}
 }
 
 // ReadServers reads and unmarshalls information about cloud server instances from JSON stream

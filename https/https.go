@@ -181,14 +181,17 @@ func (c Client) do(r *http.Request) (*Response, error) {
 			logger.Log(header+":", strings.Join(values, ","))
 		}
 
-		buf := new(bytes.Buffer)
-		buf.ReadFrom(resp.Body)
+		bb, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			logger.Log("failed to read body", err)
+			return nil, err
+		}
 
 		logger.Log()
-		logger.Log(buf.String())
+		logger.Log(string(bb))
 		logger.Log()
 
-		resp.Body = ioutil.NopCloser(buf)
+		resp.Body = ioutil.NopCloser(bytes.NewReader(bb))
 	}
 
 	return &Response{resp}, nil
