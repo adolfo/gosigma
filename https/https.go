@@ -106,13 +106,11 @@ func (c Client) do(r *http.Request) (*http.Response, error) {
 	if readWriteTimeout > 0 {
 		chStop = make(chan int)
 		go func() {
-			for {
-				select {
-				case <-time.After(readWriteTimeout):
-					c.transport.CancelRequest(r)
-				case <-chStop:
-					return
-				}
+			select {
+			case <-time.After(readWriteTimeout):
+				c.transport.CancelRequest(r)
+			case <-chStop:
+				return
 			}
 		}()
 	}
