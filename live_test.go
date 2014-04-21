@@ -56,7 +56,7 @@ func TestLiveServers(t *testing.T) {
 		cli.Logger(t)
 	}
 
-	ii, err := cli.AllServers(false)
+	ii, err := cli.Servers(false)
 	if err != nil {
 		t.Error(err)
 		return

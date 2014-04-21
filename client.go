@@ -64,8 +64,8 @@ func (c Client) Logger(logger https.Logger) {
 }
 
 // AllServers in current account
-func (c Client) AllServers(detail bool) ([]Server, error) {
-	objs, err := c.getAllServers(detail)
+func (c Client) Servers(detail bool) ([]Server, error) {
+	objs, err := c.getServers(detail)
 	if err != nil {
 		return nil, err
 	}
@@ -106,7 +106,7 @@ func (c Client) StopServer(uuid string) error {
 	return c.stopServer(uuid)
 }
 
-func (c Client) getAllServers(detail bool) ([]data.Server, error) {
+func (c Client) getServers(detail bool) ([]data.Server, error) {
 	u := c.endpoint + "servers"
 	if detail {
 		u += "/detail"

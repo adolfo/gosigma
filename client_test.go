@@ -57,14 +57,14 @@ func TestClientEndpointUnavailableSoft(t *testing.T) {
 		return
 	}
 
-	ssf, err := cli.AllServers(false)
+	ssf, err := cli.Servers(false)
 	if err == nil || ssf != nil {
 		t.Error("AllServers(false) returned valid result with unavailable endpoint")
 		return
 	}
 	t.Log("OK: AllServers(false)", err)
 
-	sst, err := cli.AllServers(true)
+	sst, err := cli.Servers(true)
 	if err == nil || sst != nil {
 		t.Error("AllServers(true) returned valid result with unavailable endpoint")
 		return
@@ -89,14 +89,14 @@ func TestClientEndpointUnavailableHard(t *testing.T) {
 	cli.ConnectTimeout(100 * time.Millisecond)
 	cli.ReadWriteTimeout(100 * time.Millisecond)
 
-	ssf, err := cli.AllServers(false)
+	ssf, err := cli.Servers(false)
 	if err == nil || ssf != nil {
 		t.Error("AllServers(false) returned valid result with unavailable endpoint")
 		return
 	}
 	t.Log("OK: AllServers(false)", err)
 
-	sst, err := cli.AllServers(true)
+	sst, err := cli.Servers(true)
 	if err == nil || sst != nil {
 		t.Error("AllServers(true) returned valid result with unavailable endpoint")
 		return
@@ -121,7 +121,7 @@ func TestClientAllServersEmpty(t *testing.T) {
 	}
 
 	check := func(detail bool) {
-		servers, err := cli.AllServers(detail)
+		servers, err := cli.Servers(detail)
 		if err != nil {
 			t.Error(err)
 		}
@@ -154,7 +154,7 @@ func TestClientAllServers(t *testing.T) {
 		return
 	}
 
-	servers, err := cli.AllServers(true)
+	servers, err := cli.Servers(true)
 	if err != nil {
 		t.Error(err)
 		return
@@ -310,15 +310,16 @@ func TestClientServerNotFound(t *testing.T) {
 	}
 	if err == nil {
 		t.Error("error equal to nil")
-	} else {
-		t.Log(err)
-		cs, ok := err.(*Error)
-		if !ok {
-			t.Error("error required to be gosigma.Error")
-		}
-		if cs.ServiceError.Message != "notfound" {
-			t.Error("invalid error message from mock server")
-		}
+		return
+	}
+
+	t.Log(err)
+	cs, ok := err.(*Error)
+	if !ok {
+		t.Error("error required to be gosigma.Error")
+	}
+	if cs.ServiceError.Message != "notfound" {
+		t.Error("invalid error message from mock server")
 	}
 }
 
@@ -342,7 +343,7 @@ func TestClientAllServersDetail(t *testing.T) {
 		return
 	}
 
-	ss, err := cli.AllServers(false)
+	ss, err := cli.Servers(false)
 	if err != nil {
 		t.Error(err)
 		return
@@ -352,7 +353,7 @@ func TestClientAllServersDetail(t *testing.T) {
 		t.Error("Error getting short server list")
 	}
 
-	ss, err = cli.AllServers(true)
+	ss, err = cli.Servers(true)
 	if err != nil {
 		t.Error(err)
 	}
