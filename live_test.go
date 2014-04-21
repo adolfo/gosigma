@@ -94,7 +94,7 @@ func TestLiveServer(t *testing.T) {
 	t.Logf("%v", s)
 }
 
-func TestLiveStartServer(t *testing.T) {
+func TestLiveStart(t *testing.T) {
 	u, p, err := parseCredentials()
 	if u == "" {
 		skipTest(t, err)
@@ -128,6 +128,44 @@ func TestLiveStartServer(t *testing.T) {
 	}
 
 	if err := s.Start(); err != nil {
+		t.Error(err)
+	}
+}
+
+func TestLiveStop(t *testing.T) {
+	u, p, err := parseCredentials()
+	if u == "" {
+		skipTest(t, err)
+		return
+	}
+
+	if *uuid == "" {
+		t.Skip("-uuid=<server-uuid> must be specified")
+		return
+	}
+
+	cli, err := NewClient(DefaultRegion, u, p, nil)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	if *trace != "n" {
+		cli.Logger(t)
+	}
+
+	s, err := cli.Server(*uuid)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	if s.Status() != ServerRunning && *force == "n" {
+		t.Skip("wrong server status", s.Status())
+		return
+	}
+
+	if err := s.Stop(); err != nil {
 		t.Error(err)
 	}
 }
