@@ -5,7 +5,7 @@ Content-Type: application/json; charset=utf-8
 
 {}
 		
-HTTP/403
+HTTP/1.1 403 FORBIDDEN
 Server: cloudflare-nginx
 Date: Fri, 18 Apr 2014 10:53:23 GMT
 Content-Type: application/json
@@ -21,3 +21,17 @@ Cf-Ray: 11d051779e8d02dc-AMS
 	 "error_message": "Cannot start guest in state \"starting\". Guest should be in state \"stopped\""
 	}
 ]
+-----------------------------------------------------------------------------------
+< HTTP/1.1 202 ACCEPTED
+* Server cloudflare-nginx is not blacklisted
+< Server: cloudflare-nginx
+< Date: Mon, 21 Apr 2014 09:57:09 GMT
+< Content-Type: application/json; charset=utf-8
+< Transfer-Encoding: chunked
+< Connection: keep-alive
+< Set-Cookie: __cfduid=dd0d61c2572b1042b6c5a0d2bce3835601398074224922; expires=Mon, 23-Dec-2019 23:50:00 GMT; path=/; domain=.cloudsigma.com; HttpOnly
+< X-API-Version: Neon.prod.06e860ef2cb5+
+< CF-RAY: 11e8b721ca0502dd-AMS
+< 
+* Connection #0 to host zrh.cloudsigma.com left intact
+{"action": "start", "result": "success", "uuid": "472835d5-2bbb-4d87-9d08-7364bc373691"}

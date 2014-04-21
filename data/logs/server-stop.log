@@ -1,0 +1,66 @@
+curl https://zrh.cloudsigma.com/api/2.0/servers/472835d5-2bbb-4d87-9d08-7364bc373691/action/?do=stop -v -X POST
+* Adding handle: conn: 0xd35d20
+* Adding handle: send: 0
+* Adding handle: recv: 0
+* Curl_addHandleToPipeline: length: 1
+* - Conn 0 (0xd35d20) send_pipe: 1, recv_pipe: 0
+* About to connect() to zrh.cloudsigma.com port 443 (#0)
+*   Trying 190.93.243.150...
+* Connected to zrh.cloudsigma.com (190.93.243.150) port 443 (#0)
+* successfully set certificate verify locations:
+*   CAfile: none
+  CApath: /etc/ssl/certs
+* SSLv3, TLS handshake, Client hello (1):
+* SSLv3, TLS handshake, Server hello (2):
+* SSLv3, TLS handshake, CERT (11):
+* SSLv3, TLS handshake, Server key exchange (12):
+* SSLv3, TLS handshake, Server finished (14):
+* SSLv3, TLS handshake, Client key exchange (16):
+* SSLv3, TLS change cipher, Client hello (1):
+* SSLv3, TLS handshake, Finished (20):
+* SSLv3, TLS change cipher, Client hello (1):
+* SSLv3, TLS handshake, Finished (20):
+* SSL connection using ECDHE-RSA-AES128-SHA
+* Server certificate:
+* 	 subject: serialNumber=exxRXdxVi/RTFEeQxDYluf0VryDsx0BN; C=CH; ST=Zurich; L=Glattbrugg; O=CloudSigma AG; CN=*.cloudsigma.com
+* 	 start date: 2014-04-14 12:16:45 GMT
+* 	 expire date: 2014-07-21 01:31:35 GMT
+* 	 subjectAltName: zrh.cloudsigma.com matched
+* 	 issuer: C=US; O=GeoTrust, Inc.; CN=GeoTrust SSL CA
+* 	 SSL certificate verify ok.
+* Server auth using Basic with user 'vitaly.sedelnik@altoros.com'
+> POST /api/2.0/servers/472835d5-2bbb-4d87-9d08-7364bc373691/action/?do=stop HTTP/1.1
+> Authorization: Basic *********
+> User-Agent: curl/7.32.0
+> Host: zrh.cloudsigma.com
+> Accept: */*
+> 
+< HTTP/1.1 202 ACCEPTED
+* Server cloudflare-nginx is not blacklisted
+< Server: cloudflare-nginx
+< Date: Mon, 21 Apr 2014 09:33:37 GMT
+< Content-Type: application/json; charset=utf-8
+< Transfer-Encoding: chunked
+< Connection: keep-alive
+< Set-Cookie: __cfduid=db2df11d11ee49cec7b1cdb4524f491751398072816455; expires=Mon, 23-Dec-2019 23:50:00 GMT; path=/; domain=.cloudsigma.com; HttpOnly
+< X-API-Version: Neon.prod.06e860ef2cb5+
+< CF-RAY: 11e894bed92e047f-FRA
+< 
+* Connection #0 to host zrh.cloudsigma.com left intact
+{"action": "stop", "result": "success", "uuid": "472835d5-2bbb-4d87-9d08-7364bc373691"}
+
+-----------------------------------------------------------------------------------
+HTTP/1.1 403 FORBIDDEN
+Server: cloudflare-nginx
+Date: Fri, 18 Apr 2014 10:53:23 GMT
+Content-Type: application/json
+X-Api-Version: Neon.prod.06e860ef2cb5+
+Connection: keep-alive
+Set-Cookie: __cfduid=dcb87381d6520c433ed20aeb5ca5515db1397818402495; expires=Mon, 23-Dec-2019 23:50:00 GMT; path=/; domain=.cloudsigma.com; HttpOnly
+Cf-Ray: 11d051779e8d02dc-AMS
+
+[{
+		"error_point": null,
+		"error_type": "permission",
+		"error_message": "Cannot stop guest in state \"stopped\". Guest should be in state \"['started', 'running_legacy']\""
+}]
