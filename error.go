@@ -17,17 +17,27 @@ type Error struct {
 }
 
 func NewError(r *https.Response, e error) *Error {
-	err := &Error{
-		SystemError:   e,
-		StatusCode:    r.StatusCode,
-		StatusMessage: r.Status,
-	}
-	if dee, e := data.ReadError(r.Body); e == nil {
-		if len(dee) > 0 {
-			err.ServiceError = &dee[0]
+	if r == nil {
+		if e == nil {
+			return nil
 		}
+		err := &Error{
+			SystemError: e,
+		}
+		return err
+	} else {
+		err := &Error{
+			SystemError:   e,
+			StatusCode:    r.StatusCode,
+			StatusMessage: r.Status,
+		}
+		if dee, e := data.ReadError(r.Body); e == nil {
+			if len(dee) > 0 {
+				err.ServiceError = &dee[0]
+			}
+		}
+		return err
 	}
-	return err
 }
 
 // Error implements error interface
