@@ -5,9 +5,11 @@ package mock
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/Altoros/gosigma/data"
 )
@@ -55,6 +57,24 @@ const jsonNotFound = `[{
 	 	"error_message": "notfound"
 }]`
 
+const jsonStartFailed = `[{
+		"error_point": null,
+		"error_type": "permission",
+		"error_message": "Cannot start guest in state \"started\". Guest should be in state \"stopped\""
+}]`
+
+const jsonStopFailed = `[{
+		"error_point": null,
+		"error_type": "permission",
+		"error_message": "Cannot stop guest in state \"stopped\". Guest should be in state \"['started', 'running_legacy']\""
+}]`
+
+const jsonActionSuccess = `{
+		"action": "%s",
+		"result": "success",
+		"uuid": "%s"
+}`
+
 // URLs:
 // /api/2.0/servers
 // /api/2.0/servers/detail/
@@ -82,6 +102,9 @@ func serversHandlerGet(w http.ResponseWriter, r *http.Request) {
 }
 
 func serversHandlerPost(w http.ResponseWriter, r *http.Request) {
+	path := strings.TrimSuffix(r.URL.Path, "/action/")
+	uuid := strings.TrimPrefix(path, "/api/2.0/servers/")
+	handleServerAction(w, r, uuid)
 }
 
 func handleServers(w http.ResponseWriter, r *http.Request) {
@@ -141,7 +164,6 @@ func handleServer(w http.ResponseWriter, r *http.Request, uuid string) {
 		h.Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(404)
 		w.Write([]byte(jsonNotFound))
-
 		return
 	}
 
@@ -154,4 +176,87 @@ func handleServer(w http.ResponseWriter, r *http.Request, uuid string) {
 
 	h.Set("Content-Type", "application/json; charset=utf-8")
 	w.Write(data)
+}
+
+func handleServerAction(w http.ResponseWriter, r *http.Request, uuid string) {
+	vv := r.URL.Query()
+
+	v, ok := vv["do"]
+	if !ok || len(v) < 1 {
+		w.WriteHeader(400)
+		return
+	}
+
+	action := v[0]
+	switch action {
+	case "start":
+		handleServerStart(w, r, uuid)
+	case "stop":
+		handleServerStop(w, r, uuid)
+	default:
+		w.WriteHeader(400)
+		return
+	}
+}
+
+func handleServerStart(w http.ResponseWriter, r *http.Request, uuid string) {
+	syncServers.Lock()
+	defer syncServers.Unlock()
+
+	h := w.Header()
+	h.Set("Content-Type", "application/json; charset=utf-8")
+
+	s, ok := servers[uuid]
+	if !ok {
+		w.WriteHeader(404)
+		w.Write([]byte(jsonNotFound))
+		return
+	}
+
+	if !strings.HasPrefix(s.Status, "stopped") {
+		w.WriteHeader(403)
+		w.Write([]byte(jsonStartFailed))
+		return
+	}
+
+	s.Status = "starting"
+	go func() {
+		syncServers.Lock()
+		defer syncServers.Unlock()
+		<-time.After(300 * time.Millisecond)
+		s.Status = "running"
+	}()
+
+	w.Write([]byte(fmt.Sprintf(string(jsonActionSuccess), "start", s.UUID)))
+}
+
+func handleServerStop(w http.ResponseWriter, r *http.Request, uuid string) {
+	syncServers.Lock()
+	defer syncServers.Unlock()
+
+	h := w.Header()
+	h.Set("Content-Type", "application/json; charset=utf-8")
+
+	s, ok := servers[uuid]
+	if !ok {
+		w.WriteHeader(404)
+		w.Write([]byte(jsonNotFound))
+		return
+	}
+
+	if !strings.HasPrefix(s.Status, "running") {
+		w.WriteHeader(403)
+		w.Write([]byte(jsonStopFailed))
+		return
+	}
+
+	s.Status = "stopping"
+	go func() {
+		syncServers.Lock()
+		defer syncServers.Unlock()
+		<-time.After(300 * time.Millisecond)
+		s.Status = "stopped"
+	}()
+
+	w.Write([]byte(fmt.Sprintf(jsonActionSuccess, "stop", s.UUID)))
 }

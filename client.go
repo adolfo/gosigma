@@ -96,12 +96,12 @@ func (c Client) Server(uuid string) (*Server, error) {
 	return srv, nil
 }
 
-// StartServer by uuid
+// StartServer by uuid of server instance
 func (c Client) StartServer(uuid string, avoid []string) error {
 	return c.startServer(uuid, avoid)
 }
 
-// StopServer by uuid
+// StopServer by uuid of server instance
 func (c Client) StopServer(uuid string) error {
 	return c.stopServer(uuid)
 }
@@ -165,5 +165,20 @@ func (c Client) startServer(uuid string, avoid []string) error {
 }
 
 func (c Client) stopServer(uuid string) error {
+	u := c.endpoint + "servers/" + uuid + "/action/"
+
+	var params = make(url.Values)
+	params["do"] = []string{"stop"}
+
+	r, err := c.https.Post(u, params, nil)
+	if err != nil {
+		return err
+	}
+	defer r.Body.Close()
+
+	if err := r.VerifyJSON(202); err != nil {
+		return NewError(r, err)
+	}
+
 	return nil
 }
