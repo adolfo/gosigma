@@ -22,6 +22,7 @@ type Client struct {
 
 var errEmptyUsername = errors.New("username is not allowed to be empty")
 var errEmptyPassword = errors.New("password is not allowed to be empty")
+var errEmptyUUID = errors.New("password is not allowed to be empty")
 
 // NewClient returns new CloudSigma client object
 func NewClient(endpoint string, username, password string,
@@ -126,6 +127,11 @@ func (c Client) getServers(detail bool) ([]data.Server, error) {
 }
 
 func (c Client) getServer(uuid string) (*data.Server, error) {
+	uuid = strings.TrimSpace(uuid)
+	if uuid == "" {
+		return nil, errEmptyUUID
+	}
+
 	u := c.endpoint + "servers/" + uuid
 
 	r, err := c.https.Get(u, nil)
@@ -142,6 +148,11 @@ func (c Client) getServer(uuid string) (*data.Server, error) {
 }
 
 func (c Client) startServer(uuid string, avoid []string) error {
+	uuid = strings.TrimSpace(uuid)
+	if uuid == "" {
+		return errEmptyUUID
+	}
+
 	u := c.endpoint + "servers/" + uuid + "/action/"
 
 	var params = make(url.Values)
@@ -165,6 +176,11 @@ func (c Client) startServer(uuid string, avoid []string) error {
 }
 
 func (c Client) stopServer(uuid string) error {
+	uuid = strings.TrimSpace(uuid)
+	if uuid == "" {
+		return errEmptyUUID
+	}
+
 	u := c.endpoint + "servers/" + uuid + "/action/"
 
 	var params = make(url.Values)

@@ -227,6 +227,7 @@ func handleServerStart(w http.ResponseWriter, r *http.Request, uuid string) {
 		s.Status = "running"
 	}()
 
+	w.WriteHeader(202)
 	w.Write([]byte(fmt.Sprintf(string(jsonActionSuccess), "start", s.UUID)))
 }
 
@@ -258,5 +259,6 @@ func handleServerStop(w http.ResponseWriter, r *http.Request, uuid string) {
 		s.Status = "stopped"
 	}()
 
+	w.WriteHeader(202)
 	w.Write([]byte(fmt.Sprintf(jsonActionSuccess, "stop", s.UUID)))
 }

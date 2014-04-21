@@ -50,6 +50,53 @@ func TestClientCreate(t *testing.T) {
 	}
 }
 
+type testLog struct{ written int }
+
+func (l *testLog) Log(args ...interface{})                 { l.written += 1 }
+func (l *testLog) Logf(format string, args ...interface{}) { l.written += 1 }
+
+func TestClientLogger(t *testing.T) {
+	cli, err := NewClient("https://1.0.0.0:2000/api/2.0/", mock.TestUser, mock.TestPassword, nil)
+	if err != nil || cli == nil {
+		t.Error("NewClient() failed:", err, cli)
+		return
+	}
+
+	var log testLog
+	cli.Logger(&log)
+
+	cli.ConnectTimeout(100 * time.Millisecond)
+	cli.ReadWriteTimeout(100 * time.Millisecond)
+
+	ssf, err := cli.Servers(false)
+	if err == nil || ssf != nil {
+		t.Error("Servers(false) returned valid result for unavailable endpoint")
+		return
+	}
+
+	if log.written == 0 {
+		t.Error("no writes to log")
+	}
+}
+
+func TestClientEmptyUUID(t *testing.T) {
+	cli, err := createTestClient()
+	if err != nil || cli == nil {
+		t.Error("NewClient() failed:", err, cli)
+		return
+	}
+
+	if _, err := cli.Server(""); err != errEmptyUUID {
+		t.Error("Server('') must fail with errEmptyUUID")
+	}
+	if err := cli.StartServer("", nil); err != errEmptyUUID {
+		t.Error("StartServer('') must fail with errEmptyUUID")
+	}
+	if err := cli.StopServer(""); err != errEmptyUUID {
+		t.Error("StopServer('') must fail with errEmptyUUID")
+	}
+}
+
 func TestClientEndpointUnavailableSoft(t *testing.T) {
 	cli, err := NewClient(mockEndpoint+"1", mock.TestUser, mock.TestPassword, nil)
 	if err != nil || cli == nil {
@@ -59,24 +106,38 @@ func TestClientEndpointUnavailableSoft(t *testing.T) {
 
 	ssf, err := cli.Servers(false)
 	if err == nil || ssf != nil {
-		t.Error("AllServers(false) returned valid result with unavailable endpoint")
+		t.Error("AllServers(false) returned valid result for unavailable endpoint")
 		return
 	}
 	t.Log("OK: AllServers(false)", err)
 
 	sst, err := cli.Servers(true)
 	if err == nil || sst != nil {
-		t.Error("AllServers(true) returned valid result with unavailable endpoint")
+		t.Error("AllServers(true) returned valid result for unavailable endpoint")
 		return
 	}
 	t.Log("OK: AllServers(true)", err)
 
 	s, err := cli.Server("uuid")
 	if err == nil || s != nil {
-		t.Error("Server() returned valid result with unavailable endpoint")
+		t.Error("Server() returned valid result with for unavailable endpoint")
 		return
 	}
 	t.Log("OK, Server():", err)
+
+	err = cli.StartServer("uuid", nil)
+	if err == nil || s != nil {
+		t.Error("StartServer() returned valid result for unavailable endpoint")
+		return
+	}
+	t.Log("OK, StartServer():", err)
+
+	err = cli.StopServer("uuid")
+	if err == nil || s != nil {
+		t.Error("StopServer() returned valid result for unavailable endpoint")
+		return
+	}
+	t.Log("OK, StopServer():", err)
 }
 
 func TestClientEndpointUnavailableHard(t *testing.T) {
@@ -91,27 +152,41 @@ func TestClientEndpointUnavailableHard(t *testing.T) {
 
 	ssf, err := cli.Servers(false)
 	if err == nil || ssf != nil {
-		t.Error("AllServers(false) returned valid result with unavailable endpoint")
+		t.Error("Servers(false) returned valid result for unavailable endpoint")
 		return
 	}
-	t.Log("OK: AllServers(false)", err)
+	t.Log("OK: Servers(false)", err)
 
 	sst, err := cli.Servers(true)
 	if err == nil || sst != nil {
-		t.Error("AllServers(true) returned valid result with unavailable endpoint")
+		t.Error("Servers(true) returned valid result for unavailable endpoint")
 		return
 	}
-	t.Log("OK: AllServers(true)", err)
+	t.Log("OK: Servers(true)", err)
 
 	s, err := cli.Server("uuid")
 	if err == nil || s != nil {
-		t.Error("Server() returned valid result with unavailable endpoint")
+		t.Error("Server() returned valid result for unavailable endpoint")
 		return
 	}
 	t.Log("OK, Server():", err)
+
+	err = cli.StartServer("uuid", nil)
+	if err == nil || s != nil {
+		t.Error("StartServer() returned valid result for unavailable endpoint")
+		return
+	}
+	t.Log("OK, StartServer():", err)
+
+	err = cli.StopServer("uuid")
+	if err == nil || s != nil {
+		t.Error("StopServer() returned valid result for unavailable endpoint")
+		return
+	}
+	t.Log("OK, StopServer():", err)
 }
 
-func TestClientAllServersEmpty(t *testing.T) {
+func TestClientServersEmpty(t *testing.T) {
 	mock.ResetServers()
 
 	cli, err := createTestClient()
@@ -134,7 +209,7 @@ func TestClientAllServersEmpty(t *testing.T) {
 	check(true)
 }
 
-func TestClientAllServers(t *testing.T) {
+func TestClientServers(t *testing.T) {
 	mock.ResetServers()
 
 	ds := data.Server{
@@ -323,7 +398,7 @@ func TestClientServerNotFound(t *testing.T) {
 	}
 }
 
-func TestClientAllServersDetail(t *testing.T) {
+func TestClientServersDetail(t *testing.T) {
 	mock.ResetServers()
 
 	ds := data.Server{
@@ -363,4 +438,107 @@ func TestClientAllServersDetail(t *testing.T) {
 	}
 
 	mock.ResetServers()
+}
+
+func TestClientStartServerInvalidUUID(t *testing.T) {
+	mock.ResetServers()
+
+	cli, err := createTestClient()
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	// No Server
+	if err := cli.StartServer("uuid-123", []string{""}); err == nil {
+		t.Error("Start server must fail here")
+	} else {
+		t.Log("Start server:", err)
+	}
+}
+
+func TestClientStartServer(t *testing.T) {
+	mock.ResetServers()
+
+	cli, err := createTestClient()
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	ds := data.Server{
+		ServerRecord: data.ServerRecord{
+			Name:   "name",
+			URI:    "uri",
+			Status: "stopped",
+			UUID:   "uuid",
+		},
+		Meta: map[string]string{"key1": "value1", "key2": "value2"},
+	}
+	mock.AddServer(&ds)
+
+	s, err := cli.Server("uuid")
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	if err := s.Start(); err != nil {
+		t.Error(err)
+		return
+	}
+
+	for i := 0; i < 10 && s.Status() != ServerRunning; i++ {
+		if err := s.Refresh(); err != nil {
+			t.Error(err)
+			return
+		}
+	}
+
+	if s.Status() != ServerRunning {
+		t.Error("Server status must be running")
+	}
+}
+
+func TestClientStopServer(t *testing.T) {
+	mock.ResetServers()
+
+	cli, err := createTestClient()
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	ds := data.Server{
+		ServerRecord: data.ServerRecord{
+			Name:   "name",
+			URI:    "uri",
+			Status: "running",
+			UUID:   "uuid",
+		},
+		Meta: map[string]string{"key1": "value1", "key2": "value2"},
+	}
+	mock.AddServer(&ds)
+
+	s, err := cli.Server("uuid")
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	if err := s.Stop(); err != nil {
+		t.Error(err)
+		return
+	}
+
+	for i := 0; i < 10 && s.Status() != ServerStopped; i++ {
+		if err := s.Refresh(); err != nil {
+			t.Error(err)
+			return
+		}
+	}
+
+	if s.Status() != ServerStopped {
+		t.Error("Server status must be stopped")
+	}
 }
