@@ -45,6 +45,9 @@ endif
 format:
 	gofmt -w -l .
 
+lc:
+	find -name "*.go" | xargs cat | wc -l
+
 .PHONY: build check test install clean
 .PHONY: format
 
