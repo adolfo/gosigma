@@ -11,7 +11,8 @@ import (
 )
 
 var live = flag.String("live", "", "run live tests against CloudSigma endpoint, specify credentials in form -live=user:pass")
-var uuid = flag.String("uuid", "", "uuid of server at CloudSigma to run server specific tests")
+var suid = flag.String("suid", "", "uuid of server at CloudSigma to run server specific tests")
+var duid = flag.String("duid", "", "uuid of drive at CloudSigma to run drive specific tests")
 var force = flag.String("force", "n", "force start/stop live tests")
 
 func parseCredentials() (u string, p string, e error) {
@@ -70,8 +71,8 @@ func TestLiveServer(t *testing.T) {
 		return
 	}
 
-	if *uuid == "" {
-		t.Skip("-uuid=<server-uuid> must be specified")
+	if *suid == "" {
+		t.Skip("-suid=<server-uuid> must be specified")
 		return
 	}
 
@@ -85,7 +86,7 @@ func TestLiveServer(t *testing.T) {
 		cli.Logger(t)
 	}
 
-	s, err := cli.Server(*uuid)
+	s, err := cli.Server(*suid)
 	if err != nil {
 		t.Error(err)
 		return
@@ -100,8 +101,8 @@ func TestLiveStart(t *testing.T) {
 		return
 	}
 
-	if *uuid == "" {
-		t.Skip("-uuid=<server-uuid> must be specified")
+	if *suid == "" {
+		t.Skip("-suid=<server-uuid> must be specified")
 		return
 	}
 
@@ -115,7 +116,7 @@ func TestLiveStart(t *testing.T) {
 		cli.Logger(t)
 	}
 
-	s, err := cli.Server(*uuid)
+	s, err := cli.Server(*suid)
 	if err != nil {
 		t.Error(err)
 		return
@@ -138,8 +139,8 @@ func TestLiveStop(t *testing.T) {
 		return
 	}
 
-	if *uuid == "" {
-		t.Skip("-uuid=<server-uuid> must be specified")
+	if *suid == "" {
+		t.Skip("-suid=<server-uuid> must be specified")
 		return
 	}
 
@@ -153,7 +154,7 @@ func TestLiveStop(t *testing.T) {
 		cli.Logger(t)
 	}
 
-	s, err := cli.Server(*uuid)
+	s, err := cli.Server(*suid)
 	if err != nil {
 		t.Error(err)
 		return
@@ -167,4 +168,34 @@ func TestLiveStop(t *testing.T) {
 	if err := s.Stop(); err != nil {
 		t.Error(err)
 	}
+}
+
+func TestLiveDrive(t *testing.T) {
+	u, p, err := parseCredentials()
+	if u == "" {
+		skipTest(t, err)
+		return
+	}
+
+	if *duid == "" {
+		t.Skip("-duid=<drive-uuid> must be specified")
+		return
+	}
+
+	cli, err := NewClient(DefaultRegion, u, p, nil)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	if *trace != "n" {
+		cli.Logger(t)
+	}
+
+	d, err := cli.Drive(*duid)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	t.Logf("%v", d)
 }

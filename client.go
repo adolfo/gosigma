@@ -97,6 +97,21 @@ func (c Client) Server(uuid string) (*Server, error) {
 	return srv, nil
 }
 
+// Drive returns given drive by uuid
+func (c Client) Drive(uuid string) (*Drive, error) {
+	obj, err := c.getDrive(uuid)
+	if err != nil {
+		return nil, err
+	}
+
+	drv := &Drive{
+		client: &c,
+		obj:    obj,
+	}
+
+	return drv, nil
+}
+
 // StartServer by uuid of server instance
 func (c Client) StartServer(uuid string, avoid []string) error {
 	return c.startServer(uuid, avoid)
@@ -150,7 +165,7 @@ func (c Client) getServer(uuid string) (*data.Server, error) {
 		return nil, errEmptyUUID
 	}
 
-	u := c.endpoint + "servers/" + uuid
+	u := c.endpoint + "servers/" + uuid + "/"
 
 	r, err := c.https.Get(u, nil)
 	if err != nil {
@@ -232,4 +247,25 @@ func (c Client) createServer(json string) ([]data.Server, error) {
 	}
 
 	return data.ReadServers(r.Body)
+}
+
+func (c Client) getDrive(uuid string) (*data.Drive, error) {
+	uuid = strings.TrimSpace(uuid)
+	if uuid == "" {
+		return nil, errEmptyUUID
+	}
+
+	u := c.endpoint + "drives/" + uuid + "/"
+
+	r, err := c.https.Get(u, nil)
+	if err != nil {
+		return nil, err
+	}
+	defer r.Body.Close()
+
+	if err := r.VerifyJSON(200); err != nil {
+		return nil, NewError(r, err)
+	}
+
+	return data.ReadDrive(r.Body)
 }
