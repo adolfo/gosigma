@@ -162,6 +162,13 @@ func TestClientEndpointUnavailableSoft(t *testing.T) {
 		return
 	}
 	t.Log("OK, StopServer():", err)
+
+	ssj, err := cli.CreateFromJSON("json")
+	if err == nil || ssj != nil {
+		t.Error("CreateFromJSON() returned valid result for unavailable endpoint")
+		return
+	}
+	t.Log("OK, CreateFromJSON():", err)
 }
 
 func TestClientEndpointUnavailableHard(t *testing.T) {
@@ -212,6 +219,13 @@ func TestClientEndpointUnavailableHard(t *testing.T) {
 		return
 	}
 	t.Log("OK, StopServer():", err)
+
+	ssj, err := cli.CreateFromJSON("json")
+	if err == nil || ssj != nil {
+		t.Error("CreateFromJSON() returned valid result for unavailable endpoint")
+		return
+	}
+	t.Log("OK, CreateFromJSON():", err)
 }
 
 func TestClientServersEmpty(t *testing.T) {
@@ -455,6 +469,20 @@ func TestClientStartServerInvalidUUID(t *testing.T) {
 
 	// No Server
 	if err := cli.StartServer("uuid-123", nil); err == nil {
+		t.Error("Start server must fail here")
+	} else {
+		t.Log("Start server:", err)
+	}
+
+	// No Server with empty non-nil avoid
+	if err := cli.StartServer("uuid-123", []string{}); err == nil {
+		t.Error("Start server must fail here")
+	} else {
+		t.Log("Start server:", err)
+	}
+
+	// No Server with non-empty non-nil avoid
+	if err := cli.StartServer("uuid-123", []string{"non-uuid"}); err == nil {
 		t.Error("Start server must fail here")
 	} else {
 		t.Log("Start server:", err)
