@@ -5,12 +5,15 @@ package data
 
 import "io"
 
+// IPv4 describes properties of IPv4 address
+type IPv4 struct {
+	Conf string   `json:"conf"`
+	IP   Resource `json:"ip"`
+}
+
 // NIC describes properties of network interface card
 type NIC struct {
-	IPv4 struct {
-		Conf string   `json:"conf"`
-		IP   Resource `json:"ip"`
-	} `json:"ip_v4_conf"`
+	IPv4  IPv4     `json:"ip_v4_conf"`
 	Model string   `json:"model"`
 	VLAN  Resource `json:"vlan"`
 }
@@ -30,7 +33,7 @@ type ServerRecord struct {
 	Status string `json:"status"`
 }
 
-// ServerRecords holds collection of Server objects
+// ServerRecords holds collection of ServerRecord objects
 type ServerRecords struct {
 	Meta    Meta           `json:"meta"`
 	Objects []ServerRecord `json:"objects"`
@@ -39,20 +42,20 @@ type ServerRecords struct {
 // Server contains detail properties of cloud server instance
 type Server struct {
 	ServerRecord
-	Cpu    int64             `json:"cpu"`
+	CPU    int64             `json:"cpu"`
 	Mem    int64             `json:"mem"`
 	Meta   map[string]string `json:"meta"`
 	NICs   []NIC             `json:"nics"`
 	Drives []ServerDrive     `json:"drives"`
 }
 
-// ServersInfo holds collection of ServerInfo objects
+// Servers holds collection of Server objects
 type Servers struct {
 	Meta    Meta     `json:"meta"`
 	Objects []Server `json:"objects"`
 }
 
-// ReadServers reads and unmarshalls information about cloud server instances from JSON stream
+// ReadServers reads and unmarshalls description of cloud server instances from JSON stream
 func ReadServers(r io.Reader) ([]Server, error) {
 	var servers Servers
 	if err := ReadJson(r, &servers); err != nil {
@@ -61,7 +64,7 @@ func ReadServers(r io.Reader) ([]Server, error) {
 	return servers.Objects, nil
 }
 
-// ReadServer reads and unmarshalls information about single cloud server instance from JSON stream
+// ReadServer reads and unmarshalls description of single cloud server instance from JSON stream
 func ReadServer(r io.Reader) (*Server, error) {
 	var server Server
 	if err := ReadJson(r, &server); err != nil {

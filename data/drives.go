@@ -3,6 +3,8 @@
 
 package data
 
+import "io"
+
 // DriveRecord contains main properties of cloud server instance
 type DriveRecord struct {
 	Resource
@@ -10,45 +12,43 @@ type DriveRecord struct {
 	Status string   `json:"status"`
 }
 
-/*
-// ServerRecords holds collection of Server objects
-type ServerRecords struct {
-	Meta    Meta           `json:"meta"`
-	Objects []ServerRecord `json:"objects"`
+// DriveRecords holds collection of DriverRecord objects
+type DriveRecords struct {
+	Meta    Meta          `json:"meta"`
+	Objects []DriveRecord `json:"objects"`
 }
 
-// Server contains detail properties of cloud server instance
-type Server struct {
-	ServerRecord
-	Cpu    int64             `json:"cpu"`
-	Mem    int64             `json:"mem"`
-	Meta   map[string]string `json:"meta"`
-	NICs   []NIC             `json:"nics"`
-	Drives []ServerDrive     `json:"drives"`
+// Drive contains detail properties of cloud server instance
+type Drive struct {
+	DriveRecord
+	Media       string            `json:"media"`
+	Meta        map[string]string `json:"meta"`
+	Name        string            `json:"name"`
+	Size        int64             `json:"size"`
+	StorageType string            `json:"storage_type"`
+	Jobs        []Resource        `json:"jobs"`
 }
 
-// ServersInfo holds collection of ServerInfo objects
-type Servers struct {
-	Meta    Meta     `json:"meta"`
-	Objects []Server `json:"objects"`
+// Drives holds collection of Drive objects
+type Drives struct {
+	Meta    Meta    `json:"meta"`
+	Objects []Drive `json:"objects"`
 }
 
-// ReadServers reads and unmarshalls information about cloud server instances from JSON stream
-func ReadServers(r io.Reader) ([]Server, error) {
-	var servers Servers
-	if err := ReadJson(r, &servers); err != nil {
+// ReadDrives reads and unmarshalls information about cloud drive instances from JSON stream
+func ReadDrives(r io.Reader) ([]Drive, error) {
+	var drives Drives
+	if err := ReadJson(r, &drives); err != nil {
 		return nil, err
 	}
-	return servers.Objects, nil
+	return drives.Objects, nil
 }
 
-// ReadServer reads and unmarshalls information about single cloud server instance from JSON stream
-func ReadServer(r io.Reader) (*Server, error) {
-	var server Server
-	if err := ReadJson(r, &server); err != nil {
+// ReadDrive reads and unmarshalls information about single cloud drive instance from JSON stream
+func ReadDrive(r io.Reader) (*Drive, error) {
+	var drive Drive
+	if err := ReadJson(r, &drive); err != nil {
 		return nil, err
 	}
-	return &server, nil
+	return &drive, nil
 }
-
-*/

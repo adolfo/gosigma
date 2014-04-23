@@ -13,7 +13,6 @@ import (
 var live = flag.String("live", "", "run live tests against CloudSigma endpoint, specify credentials in form -live=user:pass")
 var uuid = flag.String("uuid", "", "uuid of server at CloudSigma to run server specific tests")
 var force = flag.String("force", "n", "force start/stop live tests")
-var trace = flag.String("trace", "n", "trace live test requests/responses")
 
 func parseCredentials() (u string, p string, e error) {
 	if *live == "" {

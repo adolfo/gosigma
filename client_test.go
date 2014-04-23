@@ -29,8 +29,17 @@ func newDataServer() *data.Server {
 	}
 }
 
-func createTestClient() (*Client, error) {
-	return NewClient(mockEndpoint, mock.TestUser, mock.TestPassword, nil)
+func createTestClient(t *testing.T) (*Client, error) {
+	cli, err := NewClient(mockEndpoint, mock.TestUser, mock.TestPassword, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	if *trace != "n" {
+		cli.Logger(t)
+	}
+
+	return cli, nil
 }
 
 func TestClientCreate(t *testing.T) {
@@ -55,7 +64,7 @@ func TestClientCreate(t *testing.T) {
 	check(mockEndpoint, "1234", "")
 
 	// OK
-	cli, err := createTestClient()
+	cli, err := createTestClient(t)
 	if err != nil || cli == nil {
 		t.Error("NewClient() failed:", err, cli)
 	}
@@ -91,7 +100,7 @@ func TestClientLogger(t *testing.T) {
 }
 
 func TestClientEmptyUUID(t *testing.T) {
-	cli, err := createTestClient()
+	cli, err := createTestClient(t)
 	if err != nil || cli == nil {
 		t.Error("NewClient() failed:", err, cli)
 		return
@@ -113,6 +122,10 @@ func TestClientEndpointUnavailableSoft(t *testing.T) {
 	if err != nil || cli == nil {
 		t.Error("NewClient() failed:", err, cli)
 		return
+	}
+
+	if *trace != "n" {
+		cli.Logger(t)
 	}
 
 	ssf, err := cli.Servers(false)
@@ -158,6 +171,10 @@ func TestClientEndpointUnavailableHard(t *testing.T) {
 		return
 	}
 
+	if *trace != "n" {
+		cli.Logger(t)
+	}
+
 	cli.ConnectTimeout(100 * time.Millisecond)
 	cli.ReadWriteTimeout(100 * time.Millisecond)
 
@@ -200,7 +217,7 @@ func TestClientEndpointUnavailableHard(t *testing.T) {
 func TestClientServersEmpty(t *testing.T) {
 	mock.ResetServers()
 
-	cli, err := createTestClient()
+	cli, err := createTestClient(t)
 	if err != nil || cli == nil {
 		t.Error("NewClient() failed:", err, cli)
 		return
@@ -226,7 +243,7 @@ func TestClientServers(t *testing.T) {
 	ds := newDataServer()
 	mock.AddServer(ds)
 
-	cli, err := createTestClient()
+	cli, err := createTestClient(t)
 	if err != nil {
 		t.Error(err)
 		return
@@ -302,7 +319,7 @@ func TestClientServer(t *testing.T) {
 	ds := newDataServer()
 	mock.AddServer(ds)
 
-	cli, err := createTestClient()
+	cli, err := createTestClient(t)
 	if err != nil {
 		t.Error(err)
 		return
@@ -368,7 +385,7 @@ func TestClientServer(t *testing.T) {
 func TestClientServerNotFound(t *testing.T) {
 	mock.ResetServers()
 
-	cli, err := createTestClient()
+	cli, err := createTestClient(t)
 	if err != nil {
 		t.Error(err)
 		return
@@ -399,7 +416,7 @@ func TestClientServersDetail(t *testing.T) {
 	ds := newDataServer()
 	mock.AddServer(ds)
 
-	cli, err := createTestClient()
+	cli, err := createTestClient(t)
 	if err != nil {
 		t.Error(err)
 		return
@@ -430,7 +447,7 @@ func TestClientServersDetail(t *testing.T) {
 func TestClientStartServerInvalidUUID(t *testing.T) {
 	mock.ResetServers()
 
-	cli, err := createTestClient()
+	cli, err := createTestClient(t)
 	if err != nil {
 		t.Error(err)
 		return
@@ -451,7 +468,7 @@ func TestClientStartServer(t *testing.T) {
 	ds.Status = "stopped"
 	mock.AddServer(ds)
 
-	cli, err := createTestClient()
+	cli, err := createTestClient(t)
 	if err != nil {
 		t.Error(err)
 		return
@@ -487,7 +504,7 @@ func TestClientStopServer(t *testing.T) {
 	ds.Status = "running"
 	mock.AddServer(ds)
 
-	cli, err := createTestClient()
+	cli, err := createTestClient(t)
 	if err != nil {
 		t.Error(err)
 		return
@@ -519,7 +536,7 @@ func TestClientStopServer(t *testing.T) {
 func TestClientCreateServerFromJSON(t *testing.T) {
 	mock.ResetServers()
 
-	cli, err := createTestClient()
+	cli, err := createTestClient(t)
 	if err != nil {
 		t.Error(err)
 		return
@@ -563,8 +580,6 @@ func TestClientCreateServerFromJSON(t *testing.T) {
     ],
     "vnc_password": "testserver"
 }`
-
-	cli.Logger(t)
 
 	ss, err := cli.CreateFromJSON(json)
 	if err != nil {

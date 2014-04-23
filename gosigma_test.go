@@ -3,7 +3,12 @@
 
 package gosigma
 
-import "testing"
+import (
+	"flag"
+	"testing"
+)
+
+var trace = flag.String("trace", "n", "trace test requests/responses")
 
 func TestVersionStringMatches(t *testing.T) {
 	if vs, vns := Version(), VersionNumber().String(); vs != vns {
