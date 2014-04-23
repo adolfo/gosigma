@@ -40,6 +40,12 @@ func (s Server) Status() string { return s.obj.Status }
 // UUID of server instance
 func (s Server) UUID() string { return s.obj.UUID }
 
+// Cpu speed in MHz
+func (s Server) Cpu() int64 { return s.obj.Cpu }
+
+// Mem capacity in bytes
+func (s Server) Mem() int64 { return s.obj.Mem }
+
 // Get meta-information value stored in the server instance
 func (s Server) Get(key string) (v string, ok bool) {
 	v, ok = s.obj.Meta[key]

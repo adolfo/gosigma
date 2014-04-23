@@ -12,15 +12,28 @@ type Meta struct {
 	TotalCount int `json:"total_count"`
 }
 
+// Resource describes properties of linked resource
+type Resource struct {
+	URI  string `json:"resource_uri"`
+	UUID string `json:"uuid"`
+}
+
 // NIC describes properties of network interface card
 type NIC struct {
 	IPv4 struct {
-		Conf string `json:"conf"`
-		IP   struct {
-			URI  string `json:"resource_uri"`
-			UUID string `json:"uuid"`
-		} `json:"ip"`
+		Conf string   `json:"conf"`
+		IP   Resource `json:"ip"`
 	} `json:"ip_v4_conf"`
+	Model string   `json:"model"`
+	VLAN  Resource `json:"vlan"`
+}
+
+// Drive describe properties of disk drive
+type Drive struct {
+	BootOrder int      `json:"boot_order"`
+	Channel   string   `json:"dev_channel"`
+	Device    string   `json:"device"`
+	Drive     Resource `json:"drive"`
 }
 
 // ServerRecord contains main properties of cloud server instance
@@ -40,8 +53,11 @@ type ServerRecords struct {
 // Server contains detail properties of cloud server instance
 type Server struct {
 	ServerRecord
-	Meta map[string]string `json:"meta"`
-	NICs []NIC             `json:"nics"`
+	Cpu    int64             `json:"cpu"`
+	Mem    int64             `json:"mem"`
+	Meta   map[string]string `json:"meta"`
+	NICs   []NIC             `json:"nics"`
+	Drives []Drive           `json:"drives"`
 }
 
 // ServersInfo holds collection of ServerInfo objects

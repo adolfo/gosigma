@@ -52,6 +52,8 @@ type handlerType func(http.ResponseWriter, *http.Request)
 func makeHandler(name string, f handlerType) (string, handlerType) {
 	url := serverBase + name + "/"
 	handler := func(w http.ResponseWriter, r *http.Request) {
+		defer r.Body.Close()
+
 		rec := httptest.NewRecorder()
 
 		if isValidAuth(r) {

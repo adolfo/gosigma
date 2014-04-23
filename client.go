@@ -107,6 +107,24 @@ func (c Client) StopServer(uuid string) error {
 	return c.stopServer(uuid)
 }
 
+// CreateFromJSON creates new server instance(s) from passed JSON
+func (c Client) CreateFromJSON(json string) ([]Server, error) {
+	objs, err := c.createServer(json)
+	if err != nil {
+		return nil, err
+	}
+
+	servers := make([]Server, len(objs))
+	for i := 0; i < len(objs); i++ {
+		servers[i] = Server{
+			client: &c,
+			obj:    &objs[i],
+		}
+	}
+
+	return servers, nil
+}
+
 func (c Client) getServers(detail bool) ([]data.Server, error) {
 	u := c.endpoint + "servers"
 	if detail {
@@ -197,4 +215,21 @@ func (c Client) stopServer(uuid string) error {
 	}
 
 	return nil
+}
+
+func (c Client) createServer(json string) ([]data.Server, error) {
+	u := c.endpoint + "servers/"
+
+	content := strings.NewReader(json)
+	r, err := c.https.Post(u, nil, content)
+	if err != nil {
+		return nil, err
+	}
+	defer r.Body.Close()
+
+	if err := r.VerifyJSON(201); err != nil {
+		return nil, NewError(r, err)
+	}
+
+	return data.ReadServers(r.Body)
 }

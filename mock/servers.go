@@ -4,8 +4,11 @@
 package mock
 
 import (
+	"bytes"
+	"crypto/rand"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"strings"
 	"sync"
@@ -17,12 +20,69 @@ import (
 var syncServers sync.Mutex
 var servers = make(map[string]*data.Server)
 
+// GenerateUUID generated new UUID for server
+func GenerateUUID() (string, error) {
+	uuid := make([]byte, 16)
+	n, err := rand.Read(uuid)
+	if n != len(uuid) || err != nil {
+		return "", err
+	}
+
+	uuid[8] = 0x80 // variant bits see page 5
+	uuid[4] = 0x40 // version 4 Pseudo Random, see page 7
+
+	return fmt.Sprintf("%0x%0x%0x%0x-%0x%0x-%0x%0x-%0x%0x-%0x%0x%0x%0x%0x%0x",
+		uuid[0], uuid[1], uuid[2], uuid[3],
+		uuid[4], uuid[5],
+		uuid[6], uuid[7],
+		uuid[8], uuid[9],
+		uuid[10], uuid[11], uuid[12], uuid[13], uuid[14], uuid[15]), nil
+}
+
+func initServer(s *data.Server) (*data.Server, error) {
+	if s.UUID == "" {
+		uuid, err := GenerateUUID()
+		if err != nil {
+			return nil, err
+		}
+		s.UUID = uuid
+	}
+	if s.Status == "" {
+		s.Status = "stopped"
+	}
+
+	return s, nil
+}
+
 // AddServer adds server instance record under the mock
-func AddServer(s *data.Server) {
+func AddServer(s *data.Server) error {
+	s, err := initServer(s)
+	if err != nil {
+		return err
+	}
+
 	syncServers.Lock()
 	defer syncServers.Unlock()
 
 	servers[s.UUID] = s
+
+	return nil
+}
+
+// AddServers adds server instance records under the mock
+func AddServers(ss []data.Server) []string {
+	syncServers.Lock()
+	defer syncServers.Unlock()
+
+	var result []string
+	for _, s := range ss {
+		s, err := initServer(&s)
+		if err != nil {
+			servers[s.UUID] = s
+			result = append(result, s.UUID)
+		}
+	}
+	return result
 }
 
 // RemoveServer removes server instance record from the mock
@@ -94,10 +154,10 @@ func serversHandlerGet(w http.ResponseWriter, r *http.Request) {
 	case "/api/2.0/servers":
 		handleServers(w, r)
 	case "/api/2.0/servers/detail":
-		handleServersDetail(w, r)
+		handleServersDetail(w, r, 200, nil)
 	default:
 		uuid := strings.TrimPrefix(path, "/api/2.0/servers/")
-		handleServer(w, r, uuid)
+		handleServer(w, r, 200, uuid)
 	}
 }
 
@@ -130,15 +190,26 @@ func handleServers(w http.ResponseWriter, r *http.Request) {
 	w.Write(data)
 }
 
-func handleServersDetail(w http.ResponseWriter, r *http.Request) {
+func handleServersDetail(w http.ResponseWriter, r *http.Request, okcode int, filter []string) {
 	syncServers.Lock()
 	defer syncServers.Unlock()
 
 	var ss data.Servers
-	ss.Meta.TotalCount = len(servers)
-	ss.Objects = make([]data.Server, 0, len(servers))
-	for _, s := range servers {
-		ss.Objects = append(ss.Objects, *s)
+
+	if len(filter) == 0 {
+		ss.Meta.TotalCount = len(servers)
+		ss.Objects = make([]data.Server, 0, len(servers))
+		for _, s := range servers {
+			ss.Objects = append(ss.Objects, *s)
+		}
+	} else {
+		ss.Meta.TotalCount = len(filter)
+		ss.Objects = make([]data.Server, 0, len(filter))
+		for _, uuid := range filter {
+			if s, ok := servers[uuid]; ok {
+				ss.Objects = append(ss.Objects, *s)
+			}
+		}
 	}
 
 	data, err := json.Marshal(&ss)
@@ -150,10 +221,11 @@ func handleServersDetail(w http.ResponseWriter, r *http.Request) {
 
 	h := w.Header()
 	h.Set("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(okcode)
 	w.Write(data)
 }
 
-func handleServer(w http.ResponseWriter, r *http.Request, uuid string) {
+func handleServer(w http.ResponseWriter, r *http.Request, okcode int, uuid string) {
 	syncServers.Lock()
 	defer syncServers.Unlock()
 
@@ -175,6 +247,7 @@ func handleServer(w http.ResponseWriter, r *http.Request, uuid string) {
 	}
 
 	h.Set("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(okcode)
 	w.Write(data)
 }
 
@@ -183,7 +256,7 @@ func handleServerAction(w http.ResponseWriter, r *http.Request, uuid string) {
 
 	v, ok := vv["do"]
 	if !ok || len(v) < 1 {
-		w.WriteHeader(400)
+		handleServerCreate(w, r)
 		return
 	}
 
@@ -194,8 +267,7 @@ func handleServerAction(w http.ResponseWriter, r *http.Request, uuid string) {
 	case "stop":
 		handleServerStop(w, r, uuid)
 	default:
-		w.WriteHeader(400)
-		return
+		handleServerCreate(w, r)
 	}
 }
 
@@ -261,4 +333,31 @@ func handleServerStop(w http.ResponseWriter, r *http.Request, uuid string) {
 
 	w.WriteHeader(202)
 	w.Write([]byte(fmt.Sprintf(jsonActionSuccess, "stop", s.UUID)))
+}
+
+func handleServerCreate(w http.ResponseWriter, r *http.Request) {
+	bb, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	s, err := data.ReadServer(bytes.NewReader(bb))
+	if err == nil {
+		if err = AddServer(s); err != nil {
+			w.WriteHeader(400)
+		} else {
+			handleServersDetail(w, r, 201, []string{s.UUID})
+		}
+		return
+	}
+
+	ss, err := data.ReadServers(bytes.NewReader(bb))
+	if err == nil {
+		uuids := AddServers(ss)
+		handleServersDetail(w, r, 201, uuids)
+		return
+	}
+
+	w.WriteHeader(400)
 }

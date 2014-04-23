@@ -450,7 +450,7 @@ func TestClientStartServerInvalidUUID(t *testing.T) {
 	}
 
 	// No Server
-	if err := cli.StartServer("uuid-123", []string{""}); err == nil {
+	if err := cli.StartServer("uuid-123", nil); err == nil {
 		t.Error("Start server must fail here")
 	} else {
 		t.Log("Start server:", err)
@@ -538,6 +538,83 @@ func TestClientStopServer(t *testing.T) {
 		}
 	}
 
+	if s.Status() != ServerStopped {
+		t.Error("Server status must be stopped")
+	}
+}
+
+func TestClientCreateServerFromJSON(t *testing.T) {
+	mock.ResetServers()
+
+	cli, err := createTestClient()
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	const json = `{
+    "cpu": 2000,
+    "cpu_model": null,
+    "cpus_instead_of_cores": false,
+    "drives": [
+        {
+            "boot_order": 1,
+            "dev_channel": "0:0",
+            "device": "virtio",
+            "drive": {
+                "resource_uri": "/api/2.0/drives/ddce5beb-6cfe-4a80-81bd-3ae5f71e0c00/",
+                "uuid": "ddce5beb-6cfe-4a80-81bd-3ae5f71e0c00"
+            }
+        }
+    ],
+    "mem": 2147483648,
+    "meta": {
+        "description": "test",
+        "ssh_public_key": "1234"
+    },
+    "name": "test",
+    "nics": [
+        {
+            "ip_v4_conf": {
+                "conf": "dhcp"
+            },
+            "model": "virtio"
+        },
+        {
+            "model": "virtio",
+            "vlan": {
+                "resource_uri": "/api/2.0/vlans/5bc05e7e-6555-4f40-add8-3b8e91447702/",
+                "uuid": "5bc05e7e-6555-4f40-add8-3b8e91447702"
+            }
+        }
+    ],
+    "vnc_password": "testserver"
+}`
+
+	cli.Logger(t)
+
+	ss, err := cli.CreateFromJSON(json)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	if len(ss) != 1 {
+		t.Error("Invalid array length")
+		return
+	}
+
+	s := ss[0]
+
+	if s.Name() != "test" {
+		t.Error("Invalid name")
+	}
+	if s.Cpu() != 2000 {
+		t.Error("Invalid cpu")
+	}
+	if s.Mem() != 2147483648 {
+		t.Error("Invalid mem")
+	}
 	if s.Status() != ServerStopped {
 		t.Error("Server status must be stopped")
 	}
