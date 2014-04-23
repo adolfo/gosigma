@@ -18,6 +18,17 @@ func init() {
 	mockEndpoint = mock.Endpoint("")
 }
 
+func newDataServer() *data.Server {
+	return &data.Server{
+		ServerRecord: data.ServerRecord{
+			Resource: data.Resource{URI: "uri", UUID: "uuid"},
+			Name:     "name",
+			Status:   "status",
+		},
+		Meta: map[string]string{"key1": "value1", "key2": "value2"},
+	}
+}
+
 func createTestClient() (*Client, error) {
 	return NewClient(mockEndpoint, mock.TestUser, mock.TestPassword, nil)
 }
@@ -212,16 +223,8 @@ func TestClientServersEmpty(t *testing.T) {
 func TestClientServers(t *testing.T) {
 	mock.ResetServers()
 
-	ds := data.Server{
-		ServerRecord: data.ServerRecord{
-			Name:   "name",
-			URI:    "uri",
-			Status: "status",
-			UUID:   "uuid",
-		},
-		Meta: map[string]string{"key1": "value1", "key2": "value2"},
-	}
-	mock.AddServer(&ds)
+	ds := newDataServer()
+	mock.AddServer(ds)
 
 	cli, err := createTestClient()
 	if err != nil {
@@ -296,16 +299,8 @@ func TestClientServers(t *testing.T) {
 func TestClientServer(t *testing.T) {
 	mock.ResetServers()
 
-	ds := data.Server{
-		ServerRecord: data.ServerRecord{
-			Name:   "name",
-			URI:    "uri",
-			Status: "status",
-			UUID:   "uuid",
-		},
-		Meta: map[string]string{"key1": "value1", "key2": "value2"},
-	}
-	mock.AddServer(&ds)
+	ds := newDataServer()
+	mock.AddServer(ds)
 
 	cli, err := createTestClient()
 	if err != nil {
@@ -401,16 +396,8 @@ func TestClientServerNotFound(t *testing.T) {
 func TestClientServersDetail(t *testing.T) {
 	mock.ResetServers()
 
-	ds := data.Server{
-		ServerRecord: data.ServerRecord{
-			Name:   "name",
-			URI:    "uri",
-			Status: "status",
-			UUID:   "uuid",
-		},
-		Meta: map[string]string{"key1": "value1", "key2": "value2"},
-	}
-	mock.AddServer(&ds)
+	ds := newDataServer()
+	mock.AddServer(ds)
 
 	cli, err := createTestClient()
 	if err != nil {
@@ -460,22 +447,15 @@ func TestClientStartServerInvalidUUID(t *testing.T) {
 func TestClientStartServer(t *testing.T) {
 	mock.ResetServers()
 
+	ds := newDataServer()
+	ds.Status = "stopped"
+	mock.AddServer(ds)
+
 	cli, err := createTestClient()
 	if err != nil {
 		t.Error(err)
 		return
 	}
-
-	ds := data.Server{
-		ServerRecord: data.ServerRecord{
-			Name:   "name",
-			URI:    "uri",
-			Status: "stopped",
-			UUID:   "uuid",
-		},
-		Meta: map[string]string{"key1": "value1", "key2": "value2"},
-	}
-	mock.AddServer(&ds)
 
 	s, err := cli.Server("uuid")
 	if err != nil {
@@ -503,22 +483,15 @@ func TestClientStartServer(t *testing.T) {
 func TestClientStopServer(t *testing.T) {
 	mock.ResetServers()
 
+	ds := newDataServer()
+	ds.Status = "running"
+	mock.AddServer(ds)
+
 	cli, err := createTestClient()
 	if err != nil {
 		t.Error(err)
 		return
 	}
-
-	ds := data.Server{
-		ServerRecord: data.ServerRecord{
-			Name:   "name",
-			URI:    "uri",
-			Status: "running",
-			UUID:   "uuid",
-		},
-		Meta: map[string]string{"key1": "value1", "key2": "value2"},
-	}
-	mock.AddServer(&ds)
 
 	s, err := cli.Server("uuid")
 	if err != nil {

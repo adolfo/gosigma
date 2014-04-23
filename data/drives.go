@@ -3,33 +3,14 @@
 
 package data
 
-import "io"
-
-// NIC describes properties of network interface card
-type NIC struct {
-	IPv4 struct {
-		Conf string   `json:"conf"`
-		IP   Resource `json:"ip"`
-	} `json:"ip_v4_conf"`
-	Model string   `json:"model"`
-	VLAN  Resource `json:"vlan"`
-}
-
-// ServerDrive describe properties of disk drive
-type ServerDrive struct {
-	BootOrder int      `json:"boot_order"`
-	Channel   string   `json:"dev_channel"`
-	Device    string   `json:"device"`
-	Drive     Resource `json:"drive"`
-}
-
-// ServerRecord contains main properties of cloud server instance
-type ServerRecord struct {
+// DriveRecord contains main properties of cloud server instance
+type DriveRecord struct {
 	Resource
-	Name   string `json:"name"`
-	Status string `json:"status"`
+	Owner  Resource `json:"owner"`
+	Status string   `json:"status"`
 }
 
+/*
 // ServerRecords holds collection of Server objects
 type ServerRecords struct {
 	Meta    Meta           `json:"meta"`
@@ -69,3 +50,5 @@ func ReadServer(r io.Reader) (*Server, error) {
 	}
 	return &server, nil
 }
+
+*/

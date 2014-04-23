@@ -125,7 +125,7 @@ func verifyNIC(t *testing.T, i int, n NIC, conf, model string, IP, VLAN Resource
 	}
 }
 
-func verifyDrive(t *testing.T, d Drive, boot int, ch, dev string, r Resource) {
+func verifyDrive(t *testing.T, d ServerDrive, boot int, ch, dev string, r Resource) {
 	if d.BootOrder != boot {
 		t.Errorf("drive.BootOrder for %+v", d)
 	}
