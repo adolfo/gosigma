@@ -22,7 +22,7 @@ const (
 	ServerUnavailable = "unavailable"
 )
 
-// A Server represent server instance in CloudSigma account
+// A Server represents server instance in CloudSigma account
 type Server struct {
 	client *Client
 	obj    *data.Server

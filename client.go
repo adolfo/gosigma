@@ -140,6 +140,11 @@ func (c Client) CreateFromJSON(json string) ([]Server, error) {
 	return servers, nil
 }
 
+// Job returns job object by uuid
+func (c Client) Job(uuid string) (*Job, error) {
+	return nil, nil
+}
+
 func (c Client) getServers(detail bool) ([]data.Server, error) {
 	u := c.endpoint + "servers"
 	if detail {
@@ -268,4 +273,25 @@ func (c Client) getDrive(uuid string) (*data.Drive, error) {
 	}
 
 	return data.ReadDrive(r.Body)
+}
+
+func (c Client) getJob(uuid string) (*data.Job, error) {
+	uuid = strings.TrimSpace(uuid)
+	if uuid == "" {
+		return nil, errEmptyUUID
+	}
+
+	u := c.endpoint + "jobs/" + uuid + "/"
+
+	r, err := c.https.Get(u, nil)
+	if err != nil {
+		return nil, err
+	}
+	defer r.Body.Close()
+
+	if err := r.VerifyJSON(200); err != nil {
+		return nil, NewError(r, err)
+	}
+
+	return data.ReadJob(r.Body)
 }

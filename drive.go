@@ -18,9 +18,10 @@ const (
 	DriveResizing = "resizing"
 	// DriveCloningDst defines constant for drive cloning status
 	DriveCloningDst = "cloning_dst"
+	// ... may be another values here, contact CloudSigma devs
 )
 
-// A Drive represent drive instance in CloudSigma account
+// A Drive represents drive instance in CloudSigma account
 type Drive struct {
 	client *Client
 	obj    *data.Drive
@@ -70,16 +71,8 @@ func (d *Drive) Refresh() error {
 	return nil
 }
 
-/*
-// Start server instance. This method does not check current server status,
-// start command is issued to the endpoint in case of any value cached in Status().
-func (d Drive) Start() error {
-	return d.client.startServer(d.UUID(), nil)
+// Clone drive instance.
+func (d Drive) Clone() (Job, error) {
+	var j Job
+	return j, nil
 }
-
-// Stop server instance. This method does not check current server status,
-// stop command is issued to the endpoint in case of any value cached in Status().
-func (d Drive) Stop() error {
-	return d.client.stopServer(d.UUID())
-}
-*/
