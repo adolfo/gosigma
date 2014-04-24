@@ -25,6 +25,13 @@ const (
 	// ... may be another values here, contact CloudSigma devs
 )
 
+const (
+	// MediaCdrom defines media type for cdrom drives
+	MediaCdrom = "cdrom"
+	// MediaDisk defines media type for disk drives
+	MediaDisk = "disk"
+)
+
 // A Drive represents drive instance in CloudSigma account
 type Drive struct {
 	client *Client
@@ -56,6 +63,19 @@ func (d Drive) Size() int64 { return d.obj.Size }
 func (d Drive) Get(key string) (v string, ok bool) {
 	v, ok = d.obj.Meta[key]
 	return
+}
+
+// Jobs for this drive instance.
+// Every job object in result slice carries only UUID and URI.
+// To obtain additional information for job, one should use Job.Refresh() method
+// to query cloud for detailed job information.
+func (d Drive) Jobs() []Job {
+	r := make([]Job, 0, len(d.obj.Jobs))
+	for _, j := range d.obj.Jobs {
+		job := Job{d.client, &data.Job{Resource: j}}
+		r = append(r, job)
+	}
+	return r
 }
 
 // String method is used to print values passed as an operand to any format that
