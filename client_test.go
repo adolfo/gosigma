@@ -163,7 +163,7 @@ func TestClientEndpointUnavailableSoft(t *testing.T) {
 	}
 	t.Log("OK, StopServer():", err)
 
-	ssj, err := cli.CreateFromJSON("json")
+	ssj, err := cli.Factory().CreateServerFromJSON("json")
 	if err == nil || ssj != nil {
 		t.Error("CreateFromJSON() returned valid result for unavailable endpoint")
 		return
@@ -220,7 +220,7 @@ func TestClientEndpointUnavailableHard(t *testing.T) {
 	}
 	t.Log("OK, StopServer():", err)
 
-	ssj, err := cli.CreateFromJSON("json")
+	ssj, err := cli.Factory().CreateServerFromJSON("json")
 	if err == nil || ssj != nil {
 		t.Error("CreateFromJSON() returned valid result for unavailable endpoint")
 		return
@@ -605,7 +605,7 @@ func TestClientCreateServerFromJSON(t *testing.T) {
     "vnc_password": "testserver"
 }`
 
-	ss, err := cli.CreateFromJSON(json)
+	ss, err := cli.Factory().CreateServerFromJSON(json)
 	if err != nil {
 		t.Error(err)
 		return

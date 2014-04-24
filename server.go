@@ -40,7 +40,7 @@ func (s Server) Status() string { return s.obj.Status }
 // UUID of server instance
 func (s Server) UUID() string { return s.obj.UUID }
 
-// Cpu speed in MHz
+// Cpu frequency in MHz
 func (s Server) Cpu() int64 { return s.obj.CPU }
 
 // Mem capacity in bytes

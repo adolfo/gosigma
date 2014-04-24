@@ -1,7 +1,5 @@
 {
     "cpu": 2000,
-    "cpu_model": null,
-    "cpus_instead_of_cores": false,
     "drives": [
         {
             "boot_order": 1,

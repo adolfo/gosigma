@@ -3,6 +3,8 @@
 
 package data
 
+import "fmt"
+
 // Meta describes properties of dataset
 type Meta struct {
 	Limit      int `json:"limit"`
@@ -14,4 +16,12 @@ type Meta struct {
 type Resource struct {
 	URI  string `json:"resource_uri"`
 	UUID string `json:"uuid"`
+}
+
+// MakeResource returns Resource structure from given type and UUID
+func MakeResource(t, uuid string) Resource {
+	return Resource{
+		URI:  fmt.Sprintf("/api/2.0/%s/%s/", t, uuid),
+		UUID: uuid,
+	}
 }

@@ -8,6 +8,7 @@ import (
 	"flag"
 	"strings"
 	"testing"
+	"time"
 )
 
 var live = flag.String("live", "", "run live tests against CloudSigma endpoint, specify credentials in form -live=user:pass")
@@ -193,6 +194,38 @@ func TestLiveDrive(t *testing.T) {
 	}
 
 	d, err := cli.Drive(*duid)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	t.Logf("%v", d)
+}
+
+func TestLiveDriveClone(t *testing.T) {
+	u, p, err := parseCredentials()
+	if u == "" {
+		skipTest(t, err)
+		return
+	}
+
+	if *duid == "" {
+		t.Skip("-duid=<drive-uuid> must be specified")
+		return
+	}
+
+	cli, err := NewClient(DefaultRegion, u, p, nil)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	if *trace != "n" {
+		cli.Logger(t)
+	}
+
+	f := cli.Factory()
+
+	d, err := f.CloneDrive(*duid, "LiveTest-"+time.Now().Format("15-04-05-999999999"))
 	if err != nil {
 		t.Error(err)
 		return

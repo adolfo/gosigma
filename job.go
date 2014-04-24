@@ -10,6 +10,13 @@ import (
 	"github.com/Altoros/gosigma/data"
 )
 
+const (
+	// JobStateStarted defines constant for started job state
+	JobStateStarted = "started"
+	// JobStateSuccess defines constant for success job state
+	JobStateSuccess = "success"
+)
+
 // A Job represents job instance in CloudSigma account
 type Job struct {
 	client *Client

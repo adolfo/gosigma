@@ -86,9 +86,19 @@ func (c *Client) ConnectTimeout(timeout time.Duration) {
 	c.transport.CloseIdleConnections()
 }
 
+// GetConnectTimeout returns connection timeout for the object
+func (c Client) GetConnectTimeout() time.Duration {
+	return c.connectTimeout
+}
+
 // ReadWriteTimeout sets read-write timeout
 func (c *Client) ReadWriteTimeout(timeout time.Duration) {
 	c.readWriteTimeout = timeout
+}
+
+// GetReadWriteTimeout returns connection timeout for the object
+func (c Client) GetReadWriteTimeout() time.Duration {
+	return c.readWriteTimeout
 }
 
 // Logger sets logger for http traces
