@@ -142,6 +142,11 @@ func (c Client) Job(uuid string) (Job, error) {
 	return job, nil
 }
 
+// RemoveServer by uuid of server instance with an option recursively removing attached drives
+func (c Client) RemoveServer(uuid, recurse string) error {
+	return c.removeServer(uuid, recurse)
+}
+
 func (c Client) getServers(detail bool) ([]data.Server, error) {
 	u := c.endpoint + "servers"
 	if detail {
@@ -307,4 +312,32 @@ func (c Client) clone(uuid string, params *CloneParams, avoid []string) ([]data.
 	}
 
 	return data.ReadDrives(r.Body)
+}
+
+func (c Client) removeServer(uuid, recurse string) error {
+	uuid = strings.TrimSpace(uuid)
+	if uuid == "" {
+		return errEmptyUUID
+	}
+
+	u := c.endpoint + "servers/" + uuid + "/"
+
+	var qq url.Values
+	recurse = strings.TrimSpace(recurse)
+	if recurse != "" {
+		qq = make(url.Values)
+		qq["recurse"] = []string{recurse}
+	}
+
+	r, err := c.https.Delete(u, qq, nil)
+	if err != nil {
+		return err
+	}
+	defer r.Body.Close()
+
+	if err := r.VerifyCode(204); err != nil {
+		return NewError(r, err)
+	}
+
+	return nil
 }

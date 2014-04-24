@@ -67,7 +67,7 @@ func TestLiveServers(t *testing.T) {
 	t.Logf("%v", ii)
 }
 
-func TestLiveServer(t *testing.T) {
+func TestLiveServerGet(t *testing.T) {
 	u, p, err := parseCredentials()
 	if u == "" {
 		skipTest(t, err)
@@ -97,7 +97,7 @@ func TestLiveServer(t *testing.T) {
 	t.Logf("%v", s)
 }
 
-func TestLiveStart(t *testing.T) {
+func TestLiveServerStart(t *testing.T) {
 	u, p, err := parseCredentials()
 	if u == "" {
 		skipTest(t, err)
@@ -135,7 +135,7 @@ func TestLiveStart(t *testing.T) {
 	}
 }
 
-func TestLiveStop(t *testing.T) {
+func TestLiveServerStop(t *testing.T) {
 	u, p, err := parseCredentials()
 	if u == "" {
 		skipTest(t, err)
@@ -173,7 +173,7 @@ func TestLiveStop(t *testing.T) {
 	}
 }
 
-func TestLiveDrive(t *testing.T) {
+func TestLiveDriveGet(t *testing.T) {
 	u, p, err := parseCredentials()
 	if u == "" {
 		skipTest(t, err)
@@ -289,4 +289,49 @@ func TestLiveServerClone(t *testing.T) {
 	}
 
 	t.Logf("%v", s)
+}
+
+func TestLiveServerRemove(t *testing.T) {
+	u, p, err := parseCredentials()
+	if u == "" {
+		skipTest(t, err)
+		return
+	}
+
+	if *suid == "" {
+		t.Skip("-suid=<server-uuid> must be specified")
+		return
+	}
+
+	cli, err := NewClient(DefaultRegion, u, p, nil)
+	if err != nil {
+		t.Error("create client", err)
+		return
+	}
+
+	if *trace != "n" {
+		cli.Logger(t)
+	}
+
+	s, err := cli.Server(*suid)
+	if err != nil {
+		t.Error("query server:", err)
+		return
+	}
+
+	if s.Status() != ServerStopped {
+		err := s.Stop()
+		if err != nil {
+			t.Error("stop server:", err)
+			return
+		}
+	}
+
+	err = s.Remove(RecurseAllDrives)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	t.Log("Server deleted")
 }

@@ -22,6 +22,17 @@ const (
 	ServerUnavailable = "unavailable"
 )
 
+const (
+	// RecurseNothing defines constant to remove server and leave all attached disks and CDROMs.
+	RecurseNothing = ""
+	// RecurseAllDrives defines constant to remove server and all attached drives regardless of media type they have.
+	RecurseAllDrives = "all_drives"
+	// RecurseDisks defines constant to remove server and all attached drives having media type "disk".
+	RecurseDisks = "disks"
+	// RecurseCDROMs defines constant to remove server and all attached drives having media type "cdrom".
+	RecurseCDROMs = "cdroms"
+)
+
 // A Server represents server instance in CloudSigma account
 type Server struct {
 	client *Client
@@ -79,4 +90,9 @@ func (s Server) Start() error {
 // stop command is issued to the endpoint in case of any value cached in Status().
 func (s Server) Stop() error {
 	return s.client.stopServer(s.UUID())
+}
+
+// Remove server instance
+func (s Server) Remove(recurse string) error {
+	return s.client.removeServer(s.UUID(), recurse)
 }

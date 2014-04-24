@@ -126,6 +126,15 @@ func (c Client) Get(url string, query url.Values) (*Response, error) {
 
 // Post performs post request to the url.
 func (c Client) Post(url string, query url.Values, body io.Reader) (*Response, error) {
+	return c.perform("POST", url, query, body)
+}
+
+// Delete performs delete request to the url.
+func (c Client) Delete(url string, query url.Values, body io.Reader) (*Response, error) {
+	return c.perform("DELETE", url, query, body)
+}
+
+func (c Client) perform(request, url string, query url.Values, body io.Reader) (*Response, error) {
 	if len(query) != 0 {
 		url += "?" + query.Encode()
 	}
@@ -134,7 +143,7 @@ func (c Client) Post(url string, query url.Values, body io.Reader) (*Response, e
 		body = strings.NewReader("{}")
 	}
 
-	req, err := http.NewRequest("POST", url, body)
+	req, err := http.NewRequest(request, url, body)
 	if err != nil {
 		return nil, err
 	}
