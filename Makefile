@@ -33,6 +33,9 @@ clean:
 	find -name "*.test" | xargs rm -f
 	find -name "*.out" | xargs rm -f
 
+update:
+	go get -u -v ./...
+
 else # --------------------------------
 
 build check test install clean:
