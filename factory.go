@@ -198,5 +198,7 @@ func (f Factory) CloneDrive(uuid, name string) (Drive, error) {
 		return Drive{}, errors.New("timeout waiting for finish of drive cloning process")
 	}
 
+	d.Refresh()
+
 	return d, nil
 }

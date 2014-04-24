@@ -14,6 +14,8 @@ import (
 var live = flag.String("live", "", "run live tests against CloudSigma endpoint, specify credentials in form -live=user:pass")
 var suid = flag.String("suid", "", "uuid of server at CloudSigma to run server specific tests")
 var duid = flag.String("duid", "", "uuid of drive at CloudSigma to run drive specific tests")
+var vlan = flag.String("vlan", "", "uuid of vlan at CloudSigma to run server specific tests")
+var sshkey = flag.String("sshkey", "", "public ssh key to run server specific tests")
 var force = flag.String("force", "n", "force start/stop live tests")
 
 func parseCredentials() (u string, p string, e error) {
@@ -231,4 +233,60 @@ func TestLiveDriveClone(t *testing.T) {
 		return
 	}
 	t.Logf("%v", d)
+}
+
+func TestLiveServerClone(t *testing.T) {
+	u, p, err := parseCredentials()
+	if u == "" {
+		skipTest(t, err)
+		return
+	}
+
+	if *duid == "" {
+		t.Skip("-duid=<drive-uuid> must be specified")
+		return
+	}
+
+	if *vlan == "" {
+		t.Skip("-vlan=<vlan-uuid> must be specified")
+		return
+	}
+
+	if *sshkey == "" {
+		t.Skip("-sshkey=<ssh-public-key> must be specified")
+		return
+	}
+
+	cli, err := NewClient(DefaultRegion, u, p, nil)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	if *trace != "n" {
+		cli.Logger(t)
+	}
+
+	f := cli.Factory()
+
+	stamp := time.Now().Format("15-04-05-999999999")
+	var conf = ServerConfiguration{
+		Name:          "LiveTest-srv-" + stamp,
+		CPU:           2000,
+		Mem:           2147483648,
+		TemplateDrive: *duid,
+		DriveName:     "LiveTest-drv-" + stamp,
+		VLan:          *vlan,
+		VNCPassword:   "test-vnc-password",
+		SSHPublicKey:  *sshkey,
+		Description:   "test-description",
+	}
+
+	s, err := f.CreateServerFromConfiguration(conf)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	t.Logf("%v", s)
 }
