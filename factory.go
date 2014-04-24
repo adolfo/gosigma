@@ -29,13 +29,13 @@ type ServerConfiguration struct {
 	TemplateDrive string
 	// DriveName for newly cloned drive
 	DriveName string
-	// VLan UUID to attach newly created server to.
+	// VLan UUID to attach newly created server to (may be empty).
 	VLan string
 	// VNCPassword for new server
 	VNCPassword string
 	// SSHPublicKey defines SSH public key for new server
 	SSHPublicKey string
-	// Description of server
+	// Description of server (may be empty)
 	Description string
 }
 
@@ -59,7 +59,9 @@ func (f Factory) CreateServerFromConfiguration(p ServerConfiguration) (Server, e
 
 	// meta-information
 	var meta = make(map[string]string)
-	meta["description"] = p.Description
+	if p.Description != "" {
+		meta["description"] = p.Description
+	}
 	meta["ssh_public_key"] = p.SSHPublicKey
 	m["meta"] = meta
 
@@ -72,15 +74,20 @@ func (f Factory) CreateServerFromConfiguration(p ServerConfiguration) (Server, e
 	m["drives"] = []interface{}{drive}
 
 	// nics
+	var nics []interface{}
+
 	var dhcp = make(map[string]interface{})
 	dhcp["ip_v4_conf"] = map[string]string{"conf": "dhcp"}
 	dhcp["model"] = "virtio"
+	nics = append(nics, dhcp)
 
-	var vlan = make(map[string]interface{})
-	vlan["vlan"] = data.MakeResource("vlans", p.VLan)
-	vlan["model"] = "virtio"
-
-	m["nics"] = []interface{}{dhcp, vlan}
+	if p.VLan != "" {
+		var vlan = make(map[string]interface{})
+		vlan["vlan"] = data.MakeResource("vlans", p.VLan)
+		vlan["model"] = "virtio"
+		nics = append(nics, vlan)
+	}
+	m["nics"] = nics
 
 	// serialize
 	bb, err := json.Marshal(m)
