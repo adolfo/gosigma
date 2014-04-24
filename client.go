@@ -112,7 +112,7 @@ func (c Client) Drive(uuid string) (Drive, error) {
 	return drv, nil
 }
 
-// StartServer by uuid of server instance
+// StartServer by uuid of server instance.
 func (c Client) StartServer(uuid string, avoid []string) error {
 	return c.startServer(uuid, avoid)
 }
@@ -304,4 +304,37 @@ func (c Client) getJob(uuid string) (*data.Job, error) {
 	}
 
 	return data.ReadJob(r.Body)
+}
+
+func (c Client) clone(uuid string, params *CloneParams, avoid []string) ([]data.Drive, error) {
+	uuid = strings.TrimSpace(uuid)
+	if uuid == "" {
+		return nil, errEmptyUUID
+	}
+
+	u := c.endpoint + "drives/" + uuid + "/action/"
+
+	var qq = make(url.Values)
+	qq["do"] = []string{"clone"}
+
+	if len(avoid) > 0 {
+		qq["avoid"] = []string{strings.Join(avoid, ",")}
+	}
+
+	rr, err := params.makeJsonReader()
+	if err != nil {
+		return nil, err
+	}
+
+	r, err := c.https.Post(u, qq, rr)
+	if err != nil {
+		return nil, err
+	}
+	defer r.Body.Close()
+
+	if err := r.VerifyJSON(202); err != nil {
+		return nil, NewError(r, err)
+	}
+
+	return data.ReadDrives(r.Body)
 }

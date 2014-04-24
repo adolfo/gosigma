@@ -4,7 +4,11 @@
 package gosigma
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
 
 	"github.com/Altoros/gosigma/data"
 )
@@ -71,8 +75,50 @@ func (d *Drive) Refresh() error {
 	return nil
 }
 
+// CloneParams defines attributes for drive cloning operation
+type CloneParams struct {
+	Affinities []string
+	Media      string
+	Name       string
+}
+
+func (c *CloneParams) makeJsonReader() (io.Reader, error) {
+	if c == nil {
+		return nil, nil
+	}
+
+	var m = make(map[string]interface{})
+	if len(c.Affinities) > 0 {
+		m["affinities"] = c.Affinities
+	}
+	if c.Media != "" {
+		m["media"] = c.Media
+	}
+	if c.Name != "" {
+		m["name"] = c.Name
+	}
+
+	bb, err := json.Marshal(m)
+	if err != nil {
+		return nil, err
+	}
+
+	return bytes.NewReader(bb), nil
+}
+
 // Clone drive instance.
-func (d Drive) Clone() (Job, error) {
-	var j Job
-	return j, nil
+func (d Drive) Clone(params *CloneParams, avoid []string) (Drive, error) {
+	objs, err := d.client.clone(d.UUID(), params, avoid)
+
+	if err != nil {
+		return Drive{}, err
+	}
+
+	if len(objs) == 0 {
+		return Drive{}, errors.New("No object was returned from server")
+	}
+
+	drv := Drive{d.client, &objs[0]}
+
+	return drv, nil
 }
