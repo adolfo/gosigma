@@ -102,6 +102,21 @@ func (c Client) Server(uuid string) (Server, error) {
 	return srv, nil
 }
 
+// StartServer by uuid of server instance.
+func (c Client) StartServer(uuid string, avoid []string) error {
+	return c.startServer(uuid, avoid)
+}
+
+// StopServer by uuid of server instance
+func (c Client) StopServer(uuid string) error {
+	return c.stopServer(uuid)
+}
+
+// RemoveServer by uuid of server instance with an option recursively removing attached drives
+func (c Client) RemoveServer(uuid, recurse string) error {
+	return c.removeServer(uuid, recurse)
+}
+
 // Drive returns given drive by uuid
 func (c Client) Drive(uuid string) (Drive, error) {
 	obj, err := c.getDrive(uuid)
@@ -117,16 +132,6 @@ func (c Client) Drive(uuid string) (Drive, error) {
 	return drv, nil
 }
 
-// StartServer by uuid of server instance.
-func (c Client) StartServer(uuid string, avoid []string) error {
-	return c.startServer(uuid, avoid)
-}
-
-// StopServer by uuid of server instance
-func (c Client) StopServer(uuid string) error {
-	return c.stopServer(uuid)
-}
-
 // Job returns job object by uuid
 func (c Client) Job(uuid string) (Job, error) {
 	obj, err := c.getJob(uuid)
@@ -140,11 +145,6 @@ func (c Client) Job(uuid string) (Job, error) {
 	}
 
 	return job, nil
-}
-
-// RemoveServer by uuid of server instance with an option recursively removing attached drives
-func (c Client) RemoveServer(uuid, recurse string) error {
-	return c.removeServer(uuid, recurse)
 }
 
 func (c Client) getServers(detail bool) ([]data.Server, error) {
@@ -239,6 +239,34 @@ func (c Client) stopServer(uuid string) error {
 	return nil
 }
 
+func (c Client) removeServer(uuid, recurse string) error {
+	uuid = strings.TrimSpace(uuid)
+	if uuid == "" {
+		return errEmptyUUID
+	}
+
+	u := c.endpoint + "servers/" + uuid + "/"
+
+	var qq url.Values
+	recurse = strings.TrimSpace(recurse)
+	if recurse != "" {
+		qq = make(url.Values)
+		qq["recurse"] = []string{recurse}
+	}
+
+	r, err := c.https.Delete(u, qq, nil)
+	if err != nil {
+		return err
+	}
+	defer r.Body.Close()
+
+	if err := r.VerifyCode(204); err != nil {
+		return NewError(r, err)
+	}
+
+	return nil
+}
+
 func (c Client) getDrive(uuid string) (*data.Drive, error) {
 	uuid = strings.TrimSpace(uuid)
 	if uuid == "" {
@@ -258,27 +286,6 @@ func (c Client) getDrive(uuid string) (*data.Drive, error) {
 	}
 
 	return data.ReadDrive(r.Body)
-}
-
-func (c Client) getJob(uuid string) (*data.Job, error) {
-	uuid = strings.TrimSpace(uuid)
-	if uuid == "" {
-		return nil, errEmptyUUID
-	}
-
-	u := c.endpoint + "jobs/" + uuid + "/"
-
-	r, err := c.https.Get(u, nil)
-	if err != nil {
-		return nil, err
-	}
-	defer r.Body.Close()
-
-	if err := r.VerifyJSON(200); err != nil {
-		return nil, NewError(r, err)
-	}
-
-	return data.ReadJob(r.Body)
 }
 
 func (c Client) cloneDrive(uuid string, params *CloneParams, avoid []string) ([]data.Drive, error) {
@@ -314,30 +321,23 @@ func (c Client) cloneDrive(uuid string, params *CloneParams, avoid []string) ([]
 	return data.ReadDrives(r.Body)
 }
 
-func (c Client) removeServer(uuid, recurse string) error {
+func (c Client) getJob(uuid string) (*data.Job, error) {
 	uuid = strings.TrimSpace(uuid)
 	if uuid == "" {
-		return errEmptyUUID
+		return nil, errEmptyUUID
 	}
 
-	u := c.endpoint + "servers/" + uuid + "/"
+	u := c.endpoint + "jobs/" + uuid + "/"
 
-	var qq url.Values
-	recurse = strings.TrimSpace(recurse)
-	if recurse != "" {
-		qq = make(url.Values)
-		qq["recurse"] = []string{recurse}
-	}
-
-	r, err := c.https.Delete(u, qq, nil)
+	r, err := c.https.Get(u, nil)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	defer r.Body.Close()
 
-	if err := r.VerifyCode(204); err != nil {
-		return NewError(r, err)
+	if err := r.VerifyJSON(200); err != nil {
+		return nil, NewError(r, err)
 	}
 
-	return nil
+	return data.ReadJob(r.Body)
 }
