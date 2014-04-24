@@ -150,7 +150,7 @@ func (f Factory) CreateServerFromJSON(json string) ([]Server, error) {
 func (f Factory) CloneDrive(uuid, name string) (Drive, error) {
 	// clone the drive
 	var params = CloneParams{Name: name}
-	dd, err := f.clone(uuid, &params, nil)
+	dd, err := f.cloneDrive(uuid, &params, nil)
 	if err != nil {
 		return Drive{}, err
 	}

@@ -128,7 +128,7 @@ func (c *CloneParams) makeJsonReader() (io.Reader, error) {
 
 // Clone drive instance.
 func (d Drive) Clone(params *CloneParams, avoid []string) (Drive, error) {
-	objs, err := d.client.clone(d.UUID(), params, avoid)
+	objs, err := d.client.cloneDrive(d.UUID(), params, avoid)
 
 	if err != nil {
 		return Drive{}, err

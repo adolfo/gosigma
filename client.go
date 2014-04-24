@@ -281,7 +281,7 @@ func (c Client) getJob(uuid string) (*data.Job, error) {
 	return data.ReadJob(r.Body)
 }
 
-func (c Client) clone(uuid string, params *CloneParams, avoid []string) ([]data.Drive, error) {
+func (c Client) cloneDrive(uuid string, params *CloneParams, avoid []string) ([]data.Drive, error) {
 	uuid = strings.TrimSpace(uuid)
 	if uuid == "" {
 		return nil, errEmptyUUID
