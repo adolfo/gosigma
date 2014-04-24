@@ -15,6 +15,7 @@ type IPv4 struct {
 type NIC struct {
 	IPv4  IPv4     `json:"ip_v4_conf"`
 	Model string   `json:"model"`
+	MAC   string   `json:"mac"`
 	VLAN  Resource `json:"vlan"`
 }
 

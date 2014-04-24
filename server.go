@@ -114,6 +114,26 @@ func (s Server) Remove(recurse string) error {
 	return s.client.removeServer(s.UUID(), recurse)
 }
 
+// NICs for this server instance.
+func (s Server) NICs() []NIC {
+	r := make([]NIC, 0, len(s.obj.NICs))
+	for _, n := range s.obj.NICs {
+		nic := NIC{s.client, &n}
+		r = append(r, nic)
+	}
+	return r
+}
+
+// Drives for this server instance.
+func (s Server) Drives() []ServerDrive {
+	r := make([]ServerDrive, 0, len(s.obj.Drives))
+	for _, d := range s.obj.Drives {
+		drive := ServerDrive{s.client, &d}
+		r = append(r, drive)
+	}
+	return r
+}
+
 func (s *Server) waitStatus(status string) error {
 	var stop = false
 

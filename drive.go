@@ -66,7 +66,7 @@ func (d Drive) Get(key string) (v string, ok bool) {
 }
 
 // Jobs for this drive instance.
-// Every job object in result slice carries only UUID and URI.
+// Every job object in resulting slice carries only UUID and URI.
 // To obtain additional information for job, one should use Job.Refresh() method
 // to query cloud for detailed job information.
 func (d Drive) Jobs() []Job {
