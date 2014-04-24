@@ -82,3 +82,25 @@ func (j *Job) Refresh() error {
 	j.obj = obj
 	return nil
 }
+
+// Wait job is finished
+func (j *Job) Wait() error {
+	var stop = false
+
+	timeout := j.client.GetOperationTimeout()
+	if timeout > 0 {
+		timer := time.AfterFunc(timeout, func() { stop = true })
+		defer timer.Stop()
+	}
+
+	for j.Progress() < 100 {
+		if err := j.Refresh(); err != nil {
+			return err
+		}
+		if stop {
+			return ErrOperationTimeout
+		}
+	}
+
+	return nil
+}

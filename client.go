@@ -16,8 +16,9 @@ import (
 
 // A Client sends and receives requests to CloudSigma endpoint
 type Client struct {
-	endpoint string
-	https    *https.Client
+	endpoint         string
+	https            *https.Client
+	operationTimeout time.Duration
 }
 
 var errEmptyUsername = errors.New("username is not allowed to be empty")
@@ -59,9 +60,29 @@ func (c Client) ConnectTimeout(timeout time.Duration) {
 	c.https.ConnectTimeout(timeout)
 }
 
+// GetConnectTimeout returns connection timeout for the object
+func (c Client) GetConnectTimeout() time.Duration {
+	return c.https.GetConnectTimeout()
+}
+
 // ReadWriteTimeout sets read-write timeout
 func (c Client) ReadWriteTimeout(timeout time.Duration) {
 	c.https.ReadWriteTimeout(timeout)
+}
+
+// GetReadWriteTimeout returns connection timeout for the object
+func (c Client) GetReadWriteTimeout() time.Duration {
+	return c.https.GetReadWriteTimeout()
+}
+
+// OperationTimeout sets timeout for cloud operations (like cloning, starting, stopping etc)
+func (c *Client) OperationTimeout(timeout time.Duration) {
+	c.operationTimeout = timeout
+}
+
+// GetOperationTimeout gets timeout for cloud operations (like cloning, starting, stopping etc)
+func (c Client) GetOperationTimeout() time.Duration {
+	return c.operationTimeout
 }
 
 // Logger sets logger for http traces

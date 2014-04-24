@@ -5,6 +5,7 @@ package gosigma
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/Altoros/gosigma/data"
 )
@@ -92,7 +93,44 @@ func (s Server) Stop() error {
 	return s.client.stopServer(s.UUID())
 }
 
+// Start server instance and waits for status ServerRunning with timeout
+func (s *Server) StartWait() error {
+	if err := s.Start(); err != nil {
+		return err
+	}
+	return s.waitStatus(ServerRunning)
+}
+
+// Stop server instance and waits for status ServerStopped with timeout
+func (s *Server) StopWait() error {
+	if err := s.Stop(); err != nil {
+		return err
+	}
+	return s.waitStatus(ServerStopped)
+}
+
 // Remove server instance
 func (s Server) Remove(recurse string) error {
 	return s.client.removeServer(s.UUID(), recurse)
+}
+
+func (s *Server) waitStatus(status string) error {
+	var stop = false
+
+	timeout := s.client.GetOperationTimeout()
+	if timeout > 0 {
+		timer := time.AfterFunc(timeout, func() { stop = true })
+		defer timer.Stop()
+	}
+
+	for s.Status() != status {
+		if err := s.Refresh(); err != nil {
+			return err
+		}
+		if stop {
+			return ErrOperationTimeout
+		}
+	}
+
+	return nil
 }

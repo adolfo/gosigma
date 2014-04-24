@@ -320,8 +320,7 @@ func TestLiveServerRemove(t *testing.T) {
 	}
 
 	if s.Status() != ServerStopped {
-		err := s.Stop()
-		if err != nil {
+		if err := s.StopWait(); err != nil {
 			t.Error("stop server:", err)
 			return
 		}

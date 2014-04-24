@@ -161,8 +161,6 @@ func (c Client) perform(request, url string, query url.Values, body io.Reader) (
 }
 
 func (c Client) do(r *http.Request) (*Response, error) {
-	var chStop chan int
-
 	logger := c.logger
 	if logger != nil {
 		if buf, err := httputil.DumpRequest(r, true); err == nil {
@@ -173,23 +171,13 @@ func (c Client) do(r *http.Request) (*Response, error) {
 
 	readWriteTimeout := c.readWriteTimeout
 	if readWriteTimeout > 0 {
-		chStop = make(chan int)
-		go func() {
-			select {
-			case <-time.After(readWriteTimeout):
-				c.transport.CancelRequest(r)
-			case <-chStop:
-				return
-			}
-		}()
+		timer := time.AfterFunc(readWriteTimeout, func() {
+			c.transport.CancelRequest(r)
+		})
+		defer timer.Stop()
 	}
 
 	resp, err := c.protocol.Do(r)
-
-	if chStop != nil {
-		close(chStop)
-	}
-
 	if err != nil {
 		return nil, err
 	}

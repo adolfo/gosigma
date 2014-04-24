@@ -8,7 +8,6 @@ import (
 	"encoding/json"
 	"errors"
 	"strings"
-	"time"
 
 	"github.com/Altoros/gosigma/data"
 )
@@ -167,35 +166,8 @@ func (f Factory) CloneDrive(uuid, name string) (Drive, error) {
 
 	j := jj[0]
 
-	var chStop chan int
-	var stop = false
-
-	readWriteTimeout := f.https.GetReadWriteTimeout()
-	if readWriteTimeout > 0 {
-		chStop = make(chan int)
-		go func() {
-			select {
-			case <-time.After(readWriteTimeout):
-				stop = true
-			case <-chStop:
-				return
-			}
-		}()
-	}
-
-	for !stop && j.Progress() < 100 {
-		err := j.Refresh()
-		if err != nil {
-			return Drive{}, err
-		}
-	}
-
-	if chStop != nil {
-		close(chStop)
-	}
-
-	if stop {
-		return Drive{}, errors.New("timeout waiting for finish of drive cloning process")
+	if err := j.Wait(); err != nil {
+		return Drive{}, err
 	}
 
 	d.Refresh()

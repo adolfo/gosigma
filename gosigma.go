@@ -3,7 +3,10 @@
 
 package gosigma
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+)
 
 type VersionNum struct {
 	Major int
@@ -22,3 +25,5 @@ func VersionNumber() VersionNum {
 func Version() string {
 	return VersionNumber().String()
 }
+
+var ErrOperationTimeout = errors.New("operation timeout")
