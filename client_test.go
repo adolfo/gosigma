@@ -143,21 +143,21 @@ func TestClientEndpointUnavailableSoft(t *testing.T) {
 	t.Log("OK: AllServers(true)", err)
 
 	s, err := cli.Server("uuid")
-	if err == nil || s != nil {
-		t.Error("Server() returned valid result with for unavailable endpoint")
+	if err == nil {
+		t.Error("Server() returned valid result with for unavailable endpoint: %#v", s)
 		return
 	}
 	t.Log("OK, Server():", err)
 
 	err = cli.StartServer("uuid", nil)
-	if err == nil || s != nil {
+	if err == nil {
 		t.Error("StartServer() returned valid result for unavailable endpoint")
 		return
 	}
 	t.Log("OK, StartServer():", err)
 
 	err = cli.StopServer("uuid")
-	if err == nil || s != nil {
+	if err == nil {
 		t.Error("StopServer() returned valid result for unavailable endpoint")
 		return
 	}
@@ -200,21 +200,21 @@ func TestClientEndpointUnavailableHard(t *testing.T) {
 	t.Log("OK: Servers(true)", err)
 
 	s, err := cli.Server("uuid")
-	if err == nil || s != nil {
-		t.Error("Server() returned valid result for unavailable endpoint")
+	if err == nil {
+		t.Error("Server() returned valid result for unavailable endpoint: %#v", s)
 		return
 	}
 	t.Log("OK, Server():", err)
 
 	err = cli.StartServer("uuid", nil)
-	if err == nil || s != nil {
+	if err == nil {
 		t.Error("StartServer() returned valid result for unavailable endpoint")
 		return
 	}
 	t.Log("OK, StartServer():", err)
 
 	err = cli.StopServer("uuid")
-	if err == nil || s != nil {
+	if err == nil {
 		t.Error("StopServer() returned valid result for unavailable endpoint")
 		return
 	}
@@ -339,13 +339,13 @@ func TestClientServer(t *testing.T) {
 		return
 	}
 
-	if s, err := cli.Server(""); err == nil || s != nil {
-		t.Error(err)
+	if s, err := cli.Server(""); err == nil {
+		t.Errorf("Server() returned valid result for empty uuid: %#v", s)
 		return
 	}
 
 	s, err := cli.Server("uuid")
-	if err != nil || s == nil {
+	if err != nil {
 		t.Error(err)
 		return
 	}
@@ -369,8 +369,8 @@ func TestClientServer(t *testing.T) {
 			t.Errorf("value of Get(%q) = %q, %v; wants %s", k, v, ok, wants)
 		}
 	}
-	checkg(*s, "key1", "value1")
-	checkg(*s, "key2", "value2")
+	checkg(s, "key1", "value1")
+	checkg(s, "key2", "value2")
 
 	// refresh
 	ds.Name = "name1"
@@ -385,9 +385,9 @@ func TestClientServer(t *testing.T) {
 	checkv(s.Name(), "name1")
 	checkv(s.URI(), "uri1")
 	checkv(s.Status(), "status1")
-	checkg(*s, "key1", "value11")
-	checkg(*s, "key2", "value22")
-	checkg(*s, "key3", "value33")
+	checkg(s, "key1", "value11")
+	checkg(s, "key2", "value22")
+	checkg(s, "key3", "value33")
 
 	// failed refresh
 	mock.ResetServers()
@@ -406,12 +406,8 @@ func TestClientServerNotFound(t *testing.T) {
 	}
 
 	s, err := cli.Server("uuid1234567")
-	if s != nil {
-		t.Errorf("found server %#v", s)
-	}
 	if err == nil {
-		t.Error("error equal to nil")
-		return
+		t.Errorf("found server %#v", s)
 	}
 
 	t.Log(err)

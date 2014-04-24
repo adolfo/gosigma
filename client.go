@@ -83,13 +83,13 @@ func (c Client) Servers(detail bool) ([]Server, error) {
 }
 
 // Server returns given server by uuid
-func (c Client) Server(uuid string) (*Server, error) {
+func (c Client) Server(uuid string) (Server, error) {
 	obj, err := c.getServer(uuid)
 	if err != nil {
-		return nil, err
+		return Server{}, err
 	}
 
-	srv := &Server{
+	srv := Server{
 		client: &c,
 		obj:    obj,
 	}
@@ -98,13 +98,13 @@ func (c Client) Server(uuid string) (*Server, error) {
 }
 
 // Drive returns given drive by uuid
-func (c Client) Drive(uuid string) (*Drive, error) {
+func (c Client) Drive(uuid string) (Drive, error) {
 	obj, err := c.getDrive(uuid)
 	if err != nil {
-		return nil, err
+		return Drive{}, err
 	}
 
-	drv := &Drive{
+	drv := Drive{
 		client: &c,
 		obj:    obj,
 	}
@@ -141,8 +141,18 @@ func (c Client) CreateFromJSON(json string) ([]Server, error) {
 }
 
 // Job returns job object by uuid
-func (c Client) Job(uuid string) (*Job, error) {
-	return nil, nil
+func (c Client) Job(uuid string) (Job, error) {
+	obj, err := c.getJob(uuid)
+	if err != nil {
+		return Job{}, err
+	}
+
+	job := Job{
+		client: &c,
+		obj:    obj,
+	}
+
+	return job, nil
 }
 
 func (c Client) getServers(detail bool) ([]data.Server, error) {
