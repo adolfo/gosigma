@@ -192,7 +192,7 @@ func TestComponentsNetworkStatic4(t *testing.T) {
 
 	if s, err := c.marshalString(); err != nil {
 		t.Error(err)
-	} else if v := `{"nics":[{"ip_v4_conf":{"conf":"static","ip":"ipaddr"},"model":"virtio"}]}`; s != v {
+	} else if v := `{"nics":[{"ip_v4_conf":{"conf":"static","ip":{"resource_uri":"/api/2.0/ips/ipaddr/","uuid":"ipaddr"}},"model":"virtio"}]}`; s != v {
 		t.Errorf("invalid AttachNIC, returned `%s`, wants `%s`", s, v)
 	}
 }
@@ -216,7 +216,7 @@ func TestComponentsNetworkVLan(t *testing.T) {
 
 	if s, err := c.marshalString(); err != nil {
 		t.Error(err)
-	} else if v := `{"nics":[{"model":"virtio","vlan":"vlanuuid"}]}`; s != v {
+	} else if v := `{"nics":[{"model":"virtio","vlan":{"resource_uri":"/api/2.0/vlans/vlanuuid/","uuid":"vlanuuid"}}]}`; s != v {
 		t.Errorf("invalid AttachNIC, returned `%s`, wants `%s`", s, v)
 	}
 }

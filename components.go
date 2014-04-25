@@ -9,6 +9,8 @@ import (
 	"io"
 	"io/ioutil"
 	"strings"
+
+	"github.com/Altoros/gosigma/data"
 )
 
 const (
@@ -108,7 +110,7 @@ func (c *Components) NetworkVLan(model, uuid string) {
 	}
 
 	if uuid != "" {
-		nm["vlan"] = uuid
+		nm["vlan"] = data.MakeVLanResource(uuid)
 	}
 
 	if len(nm) > 0 {
@@ -126,9 +128,9 @@ func (c *Components) network4(model, conf, address string) {
 		nm["model"] = model
 	}
 
-	var conf4 = map[string]string{"conf": conf}
+	var conf4 = map[string]interface{}{"conf": conf}
 	if address != "" {
-		conf4["ip"] = address
+		conf4["ip"] = data.MakeIPResource(address)
 	}
 	nm["ip_v4_conf"] = conf4
 

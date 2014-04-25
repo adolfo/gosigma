@@ -5,6 +5,8 @@ package gosigma
 
 import (
 	"testing"
+
+	"github.com/Altoros/gosigma/data"
 	"github.com/Altoros/gosigma/mock"
 )
 
@@ -351,6 +353,17 @@ func TestClientCreateServer(t *testing.T) {
 	c.SetCPU(2000)
 	c.SetMem(2147483648)
 	c.SetVNCPassword("testserver")
+	c.NetworkDHCP4("virtio")
+	c.NetworkManual4("virtio")
+	c.NetworkStatic4("virtio", "ipaddr")
+	c.NetworkVLan("virtio", "vlanid")
+
+	var d = Drive{nil, &data.Drive{
+		DriveRecord: data.DriveRecord{
+			Resource: data.MakeDriveResource("uuid"),
+		},
+	}}
+	c.AttachDrive(d, 1, "0:0", "virtio")
 
 	s, err := cli.CreateServer(c)
 	if err != nil {
@@ -372,5 +385,117 @@ func TestClientCreateServer(t *testing.T) {
 	}
 	if s.VNCPassword() != "testserver" {
 		t.Error("VNCPassword invalid")
+	}
+
+	nics := s.NICs()
+	if len(nics) != 4 {
+		t.Errorf("NICs error: %#v", nics)
+	}
+
+	n := nics[0]
+	if n.Type() != "ip" {
+		t.Errorf("NIC.Type [0]: %q", n.Type())
+	}
+	if n.Conf() != "dhcp" {
+		t.Errorf("NIC.Conf [0]: %q", n.Conf())
+	}
+	if n.Model() != "virtio" {
+		t.Errorf("NIC.Model [0]: %q", n.Model())
+	}
+	if n.MAC() != "" {
+		t.Errorf("NIC.MAC [0]: %q", n.MAC())
+	}
+	if n.Runtime() != nil {
+		t.Errorf("NIC.Runtime [0]: %q", n.Runtime())
+	}
+
+	n = nics[1]
+	if n.Type() != "ip" {
+		t.Errorf("NIC.Type [1]: %q", n.Type())
+	}
+	if n.Conf() != "manual" {
+		t.Errorf("NIC.Conf [1]: %q", n.Conf())
+	}
+	if n.Model() != "virtio" {
+		t.Errorf("NIC.Model [1]: %q", n.Model())
+	}
+	if n.MAC() != "" {
+		t.Errorf("NIC.MAC [1]: %q", n.MAC())
+	}
+	if n.Runtime() != nil {
+		t.Errorf("NIC.Runtime [1]: %q", n.Runtime())
+	}
+
+	n = nics[2]
+	if n.Type() != "ip" {
+		t.Errorf("NIC.Type [2]: %q", n.Type())
+	}
+	if n.Conf() != "static" {
+		t.Errorf("NIC.Conf [2]: %q", n.Conf())
+	}
+	if n.Model() != "virtio" {
+		t.Errorf("NIC.Model [2]: %q", n.Model())
+	}
+	if n.MAC() != "" {
+		t.Errorf("NIC.MAC [2]: %q", n.MAC())
+	}
+	if n.Runtime() != nil {
+		t.Errorf("NIC.Runtime [2]: %q", n.Runtime())
+	}
+
+	n = nics[3]
+	if n.Type() != "vlan" {
+		t.Errorf("NIC.Type [3]: %q", n.Type())
+	}
+	if n.Conf() != "vlan" {
+		t.Errorf("NIC.Conf [3]: %q", n.Conf())
+	}
+	if n.Model() != "virtio" {
+		t.Errorf("NIC.Model [3]: %q", n.Model())
+	}
+	if n.MAC() != "" {
+		t.Errorf("NIC.MAC [3]: %q", n.MAC())
+	}
+	if n.Runtime() != nil {
+		t.Errorf("NIC.Runtime [3]: %q", n.Runtime())
+	}
+
+	drives := s.Drives()
+	if len(drives) != 1 {
+		t.Errorf("Drives error: %#v", drives)
+	}
+
+	dd := drives[0]
+	if v := dd.BootOrder(); v != 1 {
+		t.Errorf("ServerDrive.BootOrder: %#v", v)
+	}
+	if v := dd.Channel(); v != "0:0" {
+		t.Errorf("ServerDrive.BootOrder: %#v", v)
+	}
+	if v := dd.Device(); v != "virtio" {
+		t.Errorf("ServerDrive.Device: %#v", v)
+	}
+
+	ddd := dd.Drive()
+	if v := ddd.UUID(); v != "uuid" {
+		t.Errorf("Drive.UUID: %#v", v)
+	}
+	if v := ddd.URI(); v != data.MakeDriveResource("uuid").URI {
+		t.Errorf("Drive.URI: %#v", v)
+	}
+	if v := ddd.Name(); v != "" {
+		t.Errorf("Drive.Name: %#v", v)
+	}
+	if v := ddd.Status(); v != "" {
+		t.Errorf("Drive.Status: %#v", v)
+	}
+	if v := ddd.Media(); v != "" {
+		t.Errorf("Drive.Media: %#v", v)
+	}
+	if v := ddd.StorageType(); v != "" {
+		t.Errorf("Drive.StorageType: %#v", v)
+	}
+	if v := ddd.Size(); v != 0 {
+		t.Errorf("Drive.Size: %#v", v)
 	}
 }

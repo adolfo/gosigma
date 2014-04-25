@@ -120,8 +120,8 @@ func (s Server) Remove(recurse string) error {
 // NICs for this server instance.
 func (s Server) NICs() []NIC {
 	r := make([]NIC, 0, len(s.obj.NICs))
-	for _, n := range s.obj.NICs {
-		nic := NIC{s.client, &n}
+	for i := range s.obj.NICs {
+		nic := NIC{s.client, &s.obj.NICs[i]}
 		r = append(r, nic)
 	}
 	return r
@@ -130,8 +130,8 @@ func (s Server) NICs() []NIC {
 // Drives for this server instance.
 func (s Server) Drives() []ServerDrive {
 	r := make([]ServerDrive, 0, len(s.obj.Drives))
-	for _, d := range s.obj.Drives {
-		drive := ServerDrive{s.client, &d}
+	for i := range s.obj.Drives {
+		drive := ServerDrive{s.client, &s.obj.Drives[i]}
 		r = append(r, drive)
 	}
 	return r

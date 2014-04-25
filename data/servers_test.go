@@ -85,6 +85,34 @@ func TestDataServersReadServerDetail(t *testing.T) {
 	compareServers(t, 0, s, &serverData)
 }
 
+func compareNICs(t *testing.T, i int, value, wants *NIC) {
+	if value.IPv4 != nil && wants.IPv4 != nil {
+		if value.IPv4.Conf != wants.IPv4.Conf {
+			t.Errorf("NIC.IPv4.Conf error [%d]: found %#v, wants %#v", i, value.IPv4.Conf, wants.IPv4.Conf)
+		}
+		if value.IPv4.IP != wants.IPv4.IP {
+			t.Errorf("NIC.IPv4.IP error [%d]: found %#v, wants %#v", i, value.IPv4.IP, wants.IPv4.IP)
+		}
+	} else if value.IPv4 != nil || wants.IPv4 != nil {
+		t.Errorf("NIC.IPv4 error [%d]: found %#v, wants %#v", i, value.IPv4, wants.IPv4)
+	}
+
+	if value.Model != wants.Model {
+		t.Errorf("NIC.Model error [%d]: found %#v, wants %#v", i, value.Model, wants.Model)
+	}
+	if value.MAC != wants.MAC {
+		t.Errorf("NIC.MAC error [%d]: found %#v, wants %#v", i, value.MAC, wants.MAC)
+	}
+
+	if value.VLAN != nil && wants.VLAN != nil {
+		if *value.VLAN != *wants.VLAN {
+			t.Errorf("NIC.VLAN error [%d]: found %#v, wants %#v", i, value.VLAN, wants.VLAN)
+		}
+	} else if value.VLAN != nil || wants.VLAN != nil {
+		t.Errorf("NIC.VLAN error [%d]: found %#v, wants %#v", i, value.VLAN, wants.VLAN)
+	}
+}
+
 func compareServers(t *testing.T, i int, value, wants *Server) {
 	if value.ServerRecord != wants.ServerRecord {
 		t.Errorf("ServerRecord error [%d]: found %#v, wants %#v", i, value.ServerRecord, wants.ServerRecord)
@@ -113,9 +141,7 @@ func compareServers(t *testing.T, i int, value, wants *Server) {
 		t.Errorf("Server.NICs error [%d]: found %#v, wants %#v", i, value.NICs, wants.NICs)
 	}
 	for i := 0; i < len(value.NICs); i++ {
-		if value.NICs[i] != wants.NICs[i] {
-			t.Errorf("Server.NIC error [%d]: found %#v, wants %#v", i, value.NICs[i], wants.NICs[i])
-		}
+		compareNICs(t, i, &value.NICs[i], &wants.NICs[i])
 	}
 
 	if len(value.Drives) != len(wants.Drives) {
