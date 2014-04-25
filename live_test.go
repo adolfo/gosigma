@@ -8,6 +8,7 @@ import (
 	"flag"
 	"strings"
 	"testing"
+	"time"
 )
 
 var live = flag.String("live", "", "run live tests against CloudSigma endpoint, specify credentials in form -live=user:pass")
@@ -224,14 +225,20 @@ func TestLiveDriveClone(t *testing.T) {
 		cli.Logger(t)
 	}
 
-	/*	f := cli.Factory()
+	d, err := cli.Drive(*duid)
+	if err != nil {
+		t.Error(err)
+		return
+	}
 
-		d, err := f.CloneDrive(*duid, "LiveTest-"+time.Now().Format("15-04-05-999999999"))
-		if err != nil {
-			t.Error(err)
-			return
-		}
-		t.Logf("%v", d)*/
+	var cloneParams CloneParams
+	cloneParams.Name = "LiveTest-" + time.Now().Format("15-04-05-999999999")
+	newDrive, err := d.CloneWait(cloneParams, nil)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	t.Logf("%v", newDrive)
 }
 
 func TestLiveServerClone(t *testing.T) {
@@ -266,29 +273,41 @@ func TestLiveServerClone(t *testing.T) {
 		cli.Logger(t)
 	}
 
-	/*
-		f := cli.Factory()
+	originalDrive, err := cli.Drive(*duid)
+	if err != nil {
+		t.Error(err)
+		return
+	}
 
-		stamp := time.Now().Format("15-04-05-999999999")
-		var conf = ServerConfiguration{
-			Name:          "LiveTest-srv-" + stamp,
-			CPU:           2000,
-			Mem:           2147483648,
-			TemplateDrive: *duid,
-			DriveName:     "LiveTest-drv-" + stamp,
-			VLan:          *vlan,
-			VNCPassword:   "test-vnc-password",
-			SSHPublicKey:  *sshkey,
-			Description:   "test-description",
-		}
+	stamp := time.Now().Format("15-04-05-999999999")
 
-		s, err := f.CreateServerFromConfiguration(conf)
-		if err != nil {
-			t.Error(err)
-			return
-		}
+	var cloneParams CloneParams
+	cloneParams.Name = "LiveTest-drv-" + stamp
+	newDrive, err := originalDrive.CloneWait(cloneParams, nil)
+	if err != nil {
+		t.Error(err)
+		return
+	}
 
-		t.Logf("%v", s)*/
+	var c Components
+	c.SetName("LiveTest-srv-" + stamp)
+	c.SetCPU(2000)
+	c.SetMem(2 * Gigabyte)
+	c.SetVNCPassword("test-vnc-password")
+	c.SetSSHPublicKey(*sshkey)
+	c.SetDescription("test-description")
+	c.AttachDrive(newDrive, 1, "0:0", "virtio")
+	c.NetworkDHCP4(ModelVirtio)
+	c.NetworkVLan(ModelVirtio, *vlan)
+
+	s, err := cli.CreateServer(c)
+
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	t.Logf("%v", s)
 }
 
 func TestLiveServerRemove(t *testing.T) {

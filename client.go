@@ -350,7 +350,7 @@ func (c Client) getDrive(uuid string) (*data.Drive, error) {
 	return data.ReadDrive(r.Body)
 }
 
-func (c Client) cloneDrive(uuid string, params *CloneParams, avoid []string) ([]data.Drive, error) {
+func (c Client) cloneDrive(uuid string, params CloneParams, avoid []string) ([]data.Drive, error) {
 	uuid = strings.TrimSpace(uuid)
 	if uuid == "" {
 		return nil, errEmptyUUID

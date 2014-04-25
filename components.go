@@ -9,8 +9,18 @@ import (
 	"io"
 	"io/ioutil"
 	"strings"
+)
 
-	"github.com/Altoros/gosigma/data"
+const (
+	Kilobyte = 1024
+	Megabyte = 1024 * 1024
+	Gigabyte = 1024 * 1024 * 1024
+	Terabyte = 1024 * 1024 * 1024 * 1024
+)
+
+const (
+	ModelVirtio = "virtio"
+	ModelE1000  = "e1000"
 )
 
 // A Components contains information to create new server
@@ -48,22 +58,22 @@ func (c *Components) SetSSHPublicKey(description string) {
 	c.setMeta("ssh_public_key", description)
 }
 
-// AttachDrive attaches drive to components.
-func (c *Components) AttachDrive(drive data.ServerDrive) {
+// AttachDriveData attaches drive to components from drive data.
+func (c *Components) AttachDrive(drive Drive, bootOrder int, channel, device string) {
 	c.init()
 
 	var dm = make(map[string]interface{})
-	if drive.BootOrder > 0 {
-		dm["boot_order"] = drive.BootOrder
+	if bootOrder > 0 {
+		dm["boot_order"] = bootOrder
 	}
-	if drive.Channel != "" {
-		dm["dev_channel"] = drive.Channel
+	if channel != "" {
+		dm["dev_channel"] = channel
 	}
-	if drive.Device != "" {
-		dm["device"] = drive.Device
+	if device != "" {
+		dm["device"] = device
 	}
-	if drive.Drive.UUID != "" {
-		dm["drive"] = drive.Drive
+	if drive.obj != nil && drive.obj.UUID != "" {
+		dm["drive"] = drive.obj.Resource
 	}
 
 	if len(dm) > 0 {
@@ -72,36 +82,58 @@ func (c *Components) AttachDrive(drive data.ServerDrive) {
 	}
 }
 
-// AttachNIC_DHCPv4 attaches network card configured for IPv4 DHCP
-func (c *Components) AttachNIC(nic data.NIC) {
+// NetworkDHCP4 attaches NIC, configured with IPv4 DHCP
+func (c *Components) NetworkDHCP4(model string) {
+	c.network4(model, "dhcp", "")
+}
+
+// NetworkDHCP4 attaches NIC, configured with IPv4 static address
+func (c *Components) NetworkStatic4(model, address string) {
+	c.network4(model, "static", address)
+}
+
+// NetworkManual4 attaches NIC, configured with IPv4 manual settings
+func (c *Components) NetworkManual4(model string) {
+	c.network4(model, "manual", "")
+}
+
+// NetworkManual4 attaches NIC, configured with private VLan
+func (c *Components) NetworkVLan(model, uuid string) {
 	c.init()
 
 	var nm = make(map[string]interface{})
 
-	if nic.Model != "" {
-		nm["model"] = nic.Model
+	if model != "" {
+		nm["model"] = model
 	}
 
-	if nic.VLAN.UUID != "" {
-		nm["vlan"] = nic.VLAN.UUID
-	} else {
-		switch nic.IPv4.Conf {
-		case "dhcp":
-			nm["ip_v4_conf"] = map[string]string{"conf": "dhcp"}
-		case "static":
-			nm["ip_v4_conf"] = map[string]string{
-				"conf": "static",
-				"ip":   nic.IPv4.IP.UUID,
-			}
-		case "manual":
-			nm["ip_v4_conf"] = map[string]string{"conf": "manual"}
-		}
+	if uuid != "" {
+		nm["vlan"] = uuid
 	}
 
 	if len(nm) > 0 {
 		nics, _ := c.m["nics"].([]interface{})
 		c.m["nics"] = append(nics, nm)
 	}
+}
+
+func (c *Components) network4(model, conf, address string) {
+	c.init()
+
+	var nm = make(map[string]interface{})
+
+	if model != "" {
+		nm["model"] = model
+	}
+
+	var conf4 = map[string]string{"conf": conf}
+	if address != "" {
+		conf4["ip"] = address
+	}
+	nm["ip_v4_conf"] = conf4
+
+	nics, _ := c.m["nics"].([]interface{})
+	c.m["nics"] = append(nics, nm)
 }
 
 func (c *Components) init() {

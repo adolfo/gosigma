@@ -127,7 +127,7 @@ func (c *CloneParams) makeJsonReader() (io.Reader, error) {
 }
 
 // Clone drive instance.
-func (d Drive) Clone(params *CloneParams, avoid []string) (Drive, error) {
+func (d Drive) Clone(params CloneParams, avoid []string) (Drive, error) {
 	objs, err := d.client.cloneDrive(d.UUID(), params, avoid)
 
 	if err != nil {
@@ -141,4 +141,29 @@ func (d Drive) Clone(params *CloneParams, avoid []string) (Drive, error) {
 	drv := Drive{d.client, &objs[0]}
 
 	return drv, nil
+}
+
+// Clone drive instance, wait for operation finished.
+func (d Drive) CloneWait(params CloneParams, avoid []string) (Drive, error) {
+	newDrive, err := d.Clone(params, avoid)
+	if err != nil {
+		return Drive{}, err
+	}
+
+	jj := newDrive.Jobs()
+	if len(jj) == 0 {
+		return newDrive, nil
+	}
+
+	j := jj[0]
+
+	if err := j.Wait(); err != nil {
+		return Drive{}, err
+	}
+
+	if err := newDrive.Refresh(); err != nil {
+		return Drive{}, err
+	}
+
+	return newDrive, nil
 }

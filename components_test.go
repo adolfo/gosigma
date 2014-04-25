@@ -104,14 +104,11 @@ func TestComponentsSSHPublicKey(t *testing.T) {
 
 func TestComponentsAttachDrive(t *testing.T) {
 	var c Components
-	var d = data.ServerDrive{
-		BootOrder: 1,
-		Channel:   "0:0",
-		Device:    "virtio",
-		Drive:     data.MakeDriveResource("uuid"),
-	}
+	var d = Drive{nil, &data.Drive{
+		DriveRecord: data.DriveRecord{Resource: data.MakeDriveResource("uuid")},
+	}}
 
-	c.AttachDrive(d)
+	c.AttachDrive(d, 1, "0:0", "virtio")
 
 	di, ok := c.m["drives"]
 	if !ok || di == nil {
@@ -165,9 +162,9 @@ func TestComponentsAttachDrive(t *testing.T) {
 
 func TestComponentsAttachEmptyDrive(t *testing.T) {
 	var c Components
-	var d = data.ServerDrive{}
+	var d = Drive{}
 
-	c.AttachDrive(d)
+	c.AttachDrive(d, 0, "", "")
 
 	di, ok := c.m["drives"]
 	if ok || di != nil {
@@ -176,14 +173,10 @@ func TestComponentsAttachEmptyDrive(t *testing.T) {
 	}
 }
 
-func TestComponentsAttachDHCPNic(t *testing.T) {
+func TestComponentsNetworkDHCP4(t *testing.T) {
 	var c Components
 
-	var n = data.NIC{}
-	n.Model = "virtio"
-	n.IPv4.Conf = "dhcp"
-
-	c.AttachNIC(n)
+	c.NetworkDHCP4("virtio")
 
 	if s, err := c.marshalString(); err != nil {
 		t.Error(err)
@@ -192,15 +185,10 @@ func TestComponentsAttachDHCPNic(t *testing.T) {
 	}
 }
 
-func TestComponentsAttachStaticNic(t *testing.T) {
+func TestComponentsNetworkStatic4(t *testing.T) {
 	var c Components
 
-	var n = data.NIC{}
-	n.Model = "virtio"
-	n.IPv4.Conf = "static"
-	n.IPv4.IP = data.MakeIPResource("ipaddr")
-
-	c.AttachNIC(n)
+	c.NetworkStatic4("virtio", "ipaddr")
 
 	if s, err := c.marshalString(); err != nil {
 		t.Error(err)
@@ -209,14 +197,10 @@ func TestComponentsAttachStaticNic(t *testing.T) {
 	}
 }
 
-func TestComponentsAttachManualNic(t *testing.T) {
+func TestComponentsNetworkManual4(t *testing.T) {
 	var c Components
 
-	var n = data.NIC{}
-	n.Model = "virtio"
-	n.IPv4.Conf = "manual"
-
-	c.AttachNIC(n)
+	c.NetworkManual4("virtio")
 
 	if s, err := c.marshalString(); err != nil {
 		t.Error(err)
@@ -225,14 +209,10 @@ func TestComponentsAttachManualNic(t *testing.T) {
 	}
 }
 
-func TestComponentsAttachVLanNic(t *testing.T) {
+func TestComponentsNetworkVLan(t *testing.T) {
 	var c Components
 
-	var n = data.NIC{}
-	n.Model = "virtio"
-	n.VLAN = data.MakeVLanResource("vlanuuid")
-
-	c.AttachNIC(n)
+	c.NetworkVLan("virtio", "vlanuuid")
 
 	if s, err := c.marshalString(); err != nil {
 		t.Error(err)
