@@ -163,12 +163,11 @@ func TestClientEndpointUnavailableSoft(t *testing.T) {
 	}
 	t.Log("OK, StopServer():", err)
 
-	ssj, err := cli.Factory().CreateServerFromJSON("json")
-	if err == nil || ssj != nil {
-		t.Error("CreateFromJSON() returned valid result for unavailable endpoint")
+	if _, err := cli.CreateServer(Components{}); err == nil {
+		t.Error("CreateServer() returned valid result for unavailable endpoint")
 		return
 	}
-	t.Log("OK, CreateFromJSON():", err)
+	t.Log("OK, CreateServer():", err)
 }
 
 func TestClientEndpointUnavailableHard(t *testing.T) {
@@ -220,12 +219,11 @@ func TestClientEndpointUnavailableHard(t *testing.T) {
 	}
 	t.Log("OK, StopServer():", err)
 
-	ssj, err := cli.Factory().CreateServerFromJSON("json")
-	if err == nil || ssj != nil {
-		t.Error("CreateFromJSON() returned valid result for unavailable endpoint")
+	if _, err := cli.CreateServer(Components{}); err == nil {
+		t.Error("CreateServer() returned valid result for unavailable endpoint")
 		return
 	}
-	t.Log("OK, CreateFromJSON():", err)
+	t.Log("OK, CreateServer():", err)
 }
 
 func TestClientServersEmpty(t *testing.T) {
@@ -557,7 +555,7 @@ func TestClientStopServer(t *testing.T) {
 	}
 }
 
-func TestClientCreateServerFromJSON(t *testing.T) {
+func TestClientCreateServer(t *testing.T) {
 	mock.ResetServers()
 
 	cli, err := createTestClient(t)
@@ -566,57 +564,17 @@ func TestClientCreateServerFromJSON(t *testing.T) {
 		return
 	}
 
-	const json = `{
-    "cpu": 2000,
-    "cpu_model": null,
-    "cpus_instead_of_cores": false,
-    "drives": [
-        {
-            "boot_order": 1,
-            "dev_channel": "0:0",
-            "device": "virtio",
-            "drive": {
-                "resource_uri": "/api/2.0/drives/ddce5beb-6cfe-4a80-81bd-3ae5f71e0c00/",
-                "uuid": "ddce5beb-6cfe-4a80-81bd-3ae5f71e0c00"
-            }
-        }
-    ],
-    "mem": 2147483648,
-    "meta": {
-        "description": "test",
-        "ssh_public_key": "1234"
-    },
-    "name": "test",
-    "nics": [
-        {
-            "ip_v4_conf": {
-                "conf": "dhcp"
-            },
-            "model": "virtio"
-        },
-        {
-            "model": "virtio",
-            "vlan": {
-                "resource_uri": "/api/2.0/vlans/5bc05e7e-6555-4f40-add8-3b8e91447702/",
-                "uuid": "5bc05e7e-6555-4f40-add8-3b8e91447702"
-            }
-        }
-    ],
-    "vnc_password": "testserver"
-}`
+	var c Components
+	c.SetName("test")
+	c.SetCPU(2000)
+	c.SetMem(2147483648)
+	c.SetVNCPassword("testserver")
 
-	ss, err := cli.Factory().CreateServerFromJSON(json)
+	s, err := cli.CreateServer(c)
 	if err != nil {
 		t.Error(err)
 		return
 	}
-
-	if len(ss) != 1 {
-		t.Error("Invalid array length")
-		return
-	}
-
-	s := ss[0]
 
 	if s.Name() != "test" {
 		t.Error("Invalid name")
@@ -629,5 +587,8 @@ func TestClientCreateServerFromJSON(t *testing.T) {
 	}
 	if s.Status() != ServerStopped {
 		t.Error("Server status must be stopped")
+	}
+	if s.VNCPassword() != "testserver" {
+		t.Error("VNCPassword invalid")
 	}
 }

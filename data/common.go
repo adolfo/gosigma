@@ -25,3 +25,18 @@ func MakeResource(t, uuid string) Resource {
 		UUID: uuid,
 	}
 }
+
+// MakeDriveResource returns drive Resource structure for given UUID
+func MakeDriveResource(uuid string) Resource {
+	return MakeResource("drives", uuid)
+}
+
+// MakeIPResource returns IP Resource structure for given IP address
+func MakeIPResource(ip string) Resource {
+	return MakeResource("ips", ip)
+}
+
+// MakeVLanResource returns VLan Resource structure for given UUID
+func MakeVLanResource(uuid string) Resource {
+	return MakeResource("vlans", uuid)
+}

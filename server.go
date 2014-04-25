@@ -58,6 +58,9 @@ func (s Server) Cpu() int64 { return s.obj.CPU }
 // Mem capacity in bytes
 func (s Server) Mem() int64 { return s.obj.Mem }
 
+// VNCPassword to accerss the server
+func (s Server) VNCPassword() string { return s.obj.VNCPassword }
+
 // Get meta-information value stored in the server instance
 func (s Server) Get(key string) (v string, ok bool) {
 	v, ok = s.obj.Meta[key]

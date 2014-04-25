@@ -8,7 +8,6 @@ import (
 	"flag"
 	"strings"
 	"testing"
-	"time"
 )
 
 var live = flag.String("live", "", "run live tests against CloudSigma endpoint, specify credentials in form -live=user:pass")
@@ -225,14 +224,14 @@ func TestLiveDriveClone(t *testing.T) {
 		cli.Logger(t)
 	}
 
-	f := cli.Factory()
+	/*	f := cli.Factory()
 
-	d, err := f.CloneDrive(*duid, "LiveTest-"+time.Now().Format("15-04-05-999999999"))
-	if err != nil {
-		t.Error(err)
-		return
-	}
-	t.Logf("%v", d)
+		d, err := f.CloneDrive(*duid, "LiveTest-"+time.Now().Format("15-04-05-999999999"))
+		if err != nil {
+			t.Error(err)
+			return
+		}
+		t.Logf("%v", d)*/
 }
 
 func TestLiveServerClone(t *testing.T) {
@@ -267,28 +266,29 @@ func TestLiveServerClone(t *testing.T) {
 		cli.Logger(t)
 	}
 
-	f := cli.Factory()
+	/*
+		f := cli.Factory()
 
-	stamp := time.Now().Format("15-04-05-999999999")
-	var conf = ServerConfiguration{
-		Name:          "LiveTest-srv-" + stamp,
-		CPU:           2000,
-		Mem:           2147483648,
-		TemplateDrive: *duid,
-		DriveName:     "LiveTest-drv-" + stamp,
-		VLan:          *vlan,
-		VNCPassword:   "test-vnc-password",
-		SSHPublicKey:  *sshkey,
-		Description:   "test-description",
-	}
+		stamp := time.Now().Format("15-04-05-999999999")
+		var conf = ServerConfiguration{
+			Name:          "LiveTest-srv-" + stamp,
+			CPU:           2000,
+			Mem:           2147483648,
+			TemplateDrive: *duid,
+			DriveName:     "LiveTest-drv-" + stamp,
+			VLan:          *vlan,
+			VNCPassword:   "test-vnc-password",
+			SSHPublicKey:  *sshkey,
+			Description:   "test-description",
+		}
 
-	s, err := f.CreateServerFromConfiguration(conf)
-	if err != nil {
-		t.Error(err)
-		return
-	}
+		s, err := f.CreateServerFromConfiguration(conf)
+		if err != nil {
+			t.Error(err)
+			return
+		}
 
-	t.Logf("%v", s)
+		t.Logf("%v", s)*/
 }
 
 func TestLiveServerRemove(t *testing.T) {

@@ -13,6 +13,15 @@ var serversData = []Server{
 			"stopped",
 		},
 	},
+	Server{
+		ServerRecord: ServerRecord{
+			Resource{
+				"/api/2.0/servers/3be1ebc6-1d03-4c4b-88ff-02557b940d19/",
+				"3be1ebc6-1d03-4c4b-88ff-02557b940d19"},
+			"test_server_2",
+			"stopped",
+		},
+	},
 }
 
 const jsonServersData = `{
@@ -99,6 +108,7 @@ var serversDetailData = []Server{
 					IP:   Resource{URI: "/api/2.0/ips/31.171.246.37/", UUID: "31.171.246.37"},
 				},
 				Model: "virtio",
+				MAC:   "22:40:85:4f:d3:ce",
 				VLAN:  Resource{URI: "", UUID: ""},
 			},
 			NIC{
@@ -107,13 +117,15 @@ var serversDetailData = []Server{
 					IP:   Resource{URI: "", UUID: ""},
 				},
 				Model: "virtio",
+				MAC:   "22:aa:fe:07:48:3b",
 				VLAN: Resource{
 					URI:  "/api/2.0/vlans/5bc05e7e-6555-4f40-add8-3b8e91447702/",
 					UUID: "5bc05e7e-6555-4f40-add8-3b8e91447702",
 				},
 			},
 		},
-		Drives: []ServerDrive{},
+		Drives:      []ServerDrive{},
+		VNCPassword: "testserver",
 	},
 }
 
@@ -312,11 +324,13 @@ var serverData = Server{
 				IP:   Resource{"/api/2.0/ips/31.171.246.37/", "31.171.246.37"},
 			},
 			Model: "virtio",
+			MAC:   "22:40:85:4f:d3:ce",
 			VLAN:  Resource{},
 		},
 		NIC{
 			IPv4:  IPv4{},
 			Model: "virtio",
+			MAC:   "22:aa:fe:07:48:3b",
 			VLAN: Resource{
 				"/api/2.0/vlans/5bc05e7e-6555-4f40-add8-3b8e91447702/",
 				"5bc05e7e-6555-4f40-add8-3b8e91447702",
@@ -334,6 +348,7 @@ var serverData = Server{
 			},
 		},
 	},
+	VNCPassword: "Pim3UkEc",
 }
 
 const jsonServerData = `{

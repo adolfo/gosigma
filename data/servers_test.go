@@ -61,7 +61,7 @@ func TestDataServersDetailUnmarshal(t *testing.T) {
 
 	verifyMeta(t, &ss.Meta, 0, 0, 5)
 
-	for i := 0; i < len(serversData); i++ {
+	for i := 0; i < len(serversDetailData); i++ {
 		compareServers(t, i, &ss.Objects[i], &serversDetailData[i])
 	}
 }
@@ -72,7 +72,7 @@ func TestDataServersReadServersDetail(t *testing.T) {
 		t.Error(err)
 	}
 
-	for i := 0; i < len(serversData); i++ {
+	for i := 0; i < len(serversDetailData); i++ {
 		compareServers(t, i, &ss[i], &serversDetailData[i])
 	}
 }
@@ -95,13 +95,39 @@ func compareServers(t *testing.T, i int, value, wants *Server) {
 	if value.Mem != wants.Mem {
 		t.Errorf("Server.Mem error [%d]: found %#v, wants %#v", i, value.Mem, wants.Mem)
 	}
+
 	if len(value.Meta) != len(wants.Meta) {
 		t.Errorf("Server.Meta error [%d]: found %#v, wants %#v", i, value.Meta, wants.Meta)
 	}
+	for k, w := range wants.Meta {
+		if v, ok := value.Meta[k]; ok {
+			if v != w {
+				t.Errorf("Server.Meta[%q] error [%d]: found %#v, wants %#v", k, i, v, w)
+			}
+		} else {
+			t.Error("Server.Meta[%q] error [%d]: not found in values")
+		}
+	}
+
 	if len(value.NICs) != len(wants.NICs) {
 		t.Errorf("Server.NICs error [%d]: found %#v, wants %#v", i, value.NICs, wants.NICs)
 	}
+	for i := 0; i < len(value.NICs); i++ {
+		if value.NICs[i] != wants.NICs[i] {
+			t.Errorf("Server.NIC error [%d]: found %#v, wants %#v", i, value.NICs[i], wants.NICs[i])
+		}
+	}
+
 	if len(value.Drives) != len(wants.Drives) {
 		t.Errorf("Server.Drives error [%d]: found %#v, wants %#v", i, value.Drives, wants.Drives)
+	}
+	for i := 0; i < len(value.Drives); i++ {
+		if value.Drives[i] != wants.Drives[i] {
+			t.Errorf("Server.Drives error [%d]: found %#v, wants %#v", i, value.Drives[i], wants.Drives[i])
+		}
+	}
+
+	if value.VNCPassword != wants.VNCPassword {
+		t.Errorf("Server.VNCPassword error [%d]: found %#v, wants %#v", i, value.VNCPassword, wants.VNCPassword)
 	}
 }

@@ -50,11 +50,6 @@ func NewClient(endpoint string, username, password string,
 	return client, nil
 }
 
-// Factory returns helper for complex operations
-func (c Client) Factory() Factory {
-	return Factory{&c}
-}
-
 // ConnectTimeout sets connection timeout
 func (c Client) ConnectTimeout(timeout time.Duration) {
 	c.https.ConnectTimeout(timeout)
@@ -90,7 +85,12 @@ func (c Client) Logger(logger https.Logger) {
 	c.https.Logger(logger)
 }
 
-// AllServers in current account
+// Factory for complex operatoins
+//func (c Client) Factory() Factory {
+//	return Factory{&c}
+//}
+
+// Servers in current account
 func (c Client) Servers(detail bool) ([]Server, error) {
 	objs, err := c.getServers(detail)
 	if err != nil {
@@ -121,6 +121,25 @@ func (c Client) Server(uuid string) (Server, error) {
 	}
 
 	return srv, nil
+}
+
+// CreateServer in CloudSigma user account
+func (c Client) CreateServer(components Components) (Server, error) {
+	objs, err := c.createServer(components)
+	if err != nil {
+		return Server{}, err
+	}
+
+	if len(objs) == 0 {
+		return Server{}, errors.New("no servers in response from endpoint")
+	}
+
+	s := Server{
+		client: &c,
+		obj:    &objs[0],
+	}
+
+	return s, nil
 }
 
 // StartServer by uuid of server instance.
@@ -286,6 +305,28 @@ func (c Client) removeServer(uuid, recurse string) error {
 	}
 
 	return nil
+}
+
+func (c Client) createServer(components Components) ([]data.Server, error) {
+	// serialize
+	rr, err := components.marshal()
+	if err != nil {
+		return nil, err
+	}
+
+	// run request
+	u := c.endpoint + "servers/"
+	r, err := c.https.Post(u, nil, rr)
+	if err != nil {
+		return nil, err
+	}
+	defer r.Body.Close()
+
+	if err := r.VerifyJSON(201); err != nil {
+		return nil, NewError(r, err)
+	}
+
+	return data.ReadServers(r.Body)
 }
 
 func (c Client) getDrive(uuid string) (*data.Drive, error) {

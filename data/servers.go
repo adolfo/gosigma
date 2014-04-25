@@ -5,20 +5,6 @@ package data
 
 import "io"
 
-// IPv4 describes properties of IPv4 address
-type IPv4 struct {
-	Conf string   `json:"conf"`
-	IP   Resource `json:"ip"`
-}
-
-// NIC describes properties of network interface card
-type NIC struct {
-	IPv4  IPv4     `json:"ip_v4_conf"`
-	Model string   `json:"model"`
-	MAC   string   `json:"mac"`
-	VLAN  Resource `json:"vlan"`
-}
-
 // ServerDrive describe properties of disk drive
 type ServerDrive struct {
 	BootOrder int      `json:"boot_order"`
@@ -43,11 +29,12 @@ type ServerRecords struct {
 // Server contains detail properties of cloud server instance
 type Server struct {
 	ServerRecord
-	CPU    int64             `json:"cpu"`
-	Mem    int64             `json:"mem"`
-	Meta   map[string]string `json:"meta"`
-	NICs   []NIC             `json:"nics"`
-	Drives []ServerDrive     `json:"drives"`
+	CPU         int64             `json:"cpu"`
+	Mem         int64             `json:"mem"`
+	Meta        map[string]string `json:"meta"`
+	NICs        []NIC             `json:"nics"`
+	Drives      []ServerDrive     `json:"drives"`
+	VNCPassword string            `json:"vnc_password"`
 }
 
 // Servers holds collection of Server objects

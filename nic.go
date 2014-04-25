@@ -5,33 +5,10 @@ package gosigma
 
 import "github.com/Altoros/gosigma/data"
 
-type NetworkInterfaceType int
-
-const (
-	NetworkUnknown NetworkInterfaceType = iota
-	NetworkDynamic
-	NetworkStatic
-	NetworkVLan
-)
-
 // A NIC represents network interface card instance in CloudSigma server instance
 type NIC struct {
 	client *Client
 	obj    *data.NIC
-}
-
-// Type of network interface card
-func (n NIC) Type() NetworkInterfaceType {
-	switch n.obj.IPv4.Conf {
-	case "dhcp":
-		return NetworkDynamic
-	case "static":
-		return NetworkStatic
-	}
-	if n.obj.VLAN.UUID != "" {
-		return NetworkVLan
-	}
-	return NetworkUnknown
 }
 
 // Model of virtual network interface card
