@@ -152,7 +152,8 @@ func (c Client) StopServer(uuid string) error {
 	return c.stopServer(uuid)
 }
 
-// RemoveServer by uuid of server instance with an option recursively removing attached drives
+// RemoveServer by uuid of server instance with an option recursively removing attached drives.
+// See RecurseXXX constants in server.go file.
 func (c Client) RemoveServer(uuid, recurse string) error {
 	return c.removeServer(uuid, recurse)
 }
@@ -167,6 +168,26 @@ func (c Client) Drive(uuid string) (Drive, error) {
 	drv := Drive{
 		client: &c,
 		obj:    obj,
+	}
+
+	return drv, nil
+}
+
+// CloneDrive clones given drive by uuid
+func (c Client) CloneDrive(uuid string, params CloneParams, avoid []string) (Drive, error) {
+	objs, err := c.cloneDrive(uuid, params, avoid)
+
+	if err != nil {
+		return Drive{}, err
+	}
+
+	if len(objs) == 0 {
+		return Drive{}, errors.New("No object was returned from server")
+	}
+
+	drv := Drive{
+		client: &c,
+		obj:    &objs[0],
 	}
 
 	return drv, nil

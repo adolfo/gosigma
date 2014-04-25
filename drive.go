@@ -6,7 +6,6 @@ package gosigma
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 
@@ -128,19 +127,7 @@ func (c *CloneParams) makeJsonReader() (io.Reader, error) {
 
 // Clone drive instance.
 func (d Drive) Clone(params CloneParams, avoid []string) (Drive, error) {
-	objs, err := d.client.cloneDrive(d.UUID(), params, avoid)
-
-	if err != nil {
-		return Drive{}, err
-	}
-
-	if len(objs) == 0 {
-		return Drive{}, errors.New("No object was returned from server")
-	}
-
-	drv := Drive{d.client, &objs[0]}
-
-	return drv, nil
+	return d.client.CloneDrive(d.UUID(), params, avoid)
 }
 
 // Clone drive instance, wait for operation finished.

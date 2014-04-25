@@ -21,16 +21,6 @@ func (n NIC) MAC() string {
 	return n.obj.MAC
 }
 
-// VLAN information
-func (n NIC) VLAN() data.Resource {
-	return n.obj.VLAN
-}
-
-// IPv4 information
-func (n NIC) IPv4() data.IPv4 {
-	return n.obj.IPv4
-}
-
 /*
 // String method is used to print values passed as an operand to any format that
 // accepts a string or to an unformatted printer such as Print.

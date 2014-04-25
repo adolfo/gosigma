@@ -99,6 +99,29 @@ func TestClientLogger(t *testing.T) {
 	}
 }
 
+func TestClientTimeouts(t *testing.T) {
+	cli, err := createTestClient(t)
+	if err != nil || cli == nil {
+		t.Error("NewClient() failed:", err, cli)
+		return
+	}
+
+	cli.ConnectTimeout(100 * time.Millisecond)
+	if v := cli.GetConnectTimeout(); v != 100*time.Millisecond {
+		t.Error("ConnectTimeout check failed")
+	}
+
+	cli.ReadWriteTimeout(200 * time.Millisecond)
+	if v := cli.GetReadWriteTimeout(); v != 200*time.Millisecond {
+		t.Error("ReadWriteTimeout check failed")
+	}
+
+	cli.OperationTimeout(300 * time.Millisecond)
+	if v := cli.GetOperationTimeout(); v != 300*time.Millisecond {
+		t.Error("OperationTimeout check failed")
+	}
+}
+
 func TestClientEmptyUUID(t *testing.T) {
 	cli, err := createTestClient(t)
 	if err != nil || cli == nil {
@@ -115,6 +138,18 @@ func TestClientEmptyUUID(t *testing.T) {
 	if err := cli.StopServer(""); err != errEmptyUUID {
 		t.Error("StopServer('') must fail with errEmptyUUID")
 	}
+	if err := cli.RemoveServer("", RecurseAllDrives); err != errEmptyUUID {
+		t.Error("RemoveServer('') must fail with errEmptyUUID")
+	}
+	if _, err := cli.Drive(""); err != errEmptyUUID {
+		t.Error("Drive('') must fail with errEmptyUUID")
+	}
+	if _, err := cli.Job(""); err != errEmptyUUID {
+		t.Error("Job('') must fail with errEmptyUUID")
+	}
+	if _, err := cli.CloneDrive("", CloneParams{}, nil); err != errEmptyUUID {
+		t.Error("CloneDrive('') must fail with errEmptyUUID")
+	}
 }
 
 func TestClientEndpointUnavailableSoft(t *testing.T) {
@@ -130,21 +165,21 @@ func TestClientEndpointUnavailableSoft(t *testing.T) {
 
 	ssf, err := cli.Servers(false)
 	if err == nil || ssf != nil {
-		t.Error("AllServers(false) returned valid result for unavailable endpoint")
+		t.Errorf("AllServers(false) returned valid result for unavailable endpoint: %#v", ssf)
 		return
 	}
 	t.Log("OK: AllServers(false)", err)
 
 	sst, err := cli.Servers(true)
 	if err == nil || sst != nil {
-		t.Error("AllServers(true) returned valid result for unavailable endpoint")
+		t.Errorf("AllServers(true) returned valid result for unavailable endpoint: %#v", sst)
 		return
 	}
 	t.Log("OK: AllServers(true)", err)
 
 	s, err := cli.Server("uuid")
 	if err == nil {
-		t.Error("Server() returned valid result with for unavailable endpoint: %#v", s)
+		t.Errorf("Server() returned valid result with for unavailable endpoint: %#v", s)
 		return
 	}
 	t.Log("OK, Server():", err)
@@ -168,6 +203,33 @@ func TestClientEndpointUnavailableSoft(t *testing.T) {
 		return
 	}
 	t.Log("OK, StopServer():", err)
+
+	err = cli.RemoveServer("uuid", RecurseAllDrives)
+	if err == nil {
+		t.Error("RemoveServer() returned valid result for unavailable endpoint")
+		return
+	}
+	t.Log("OK, RemoveServer():", err)
+
+	d, err := cli.Drive("uuid")
+	if err == nil {
+		t.Error("Drive() returned valid result for unavailable endpoint: %#v", d)
+		return
+	}
+	t.Log("OK, Drive():", err)
+
+	cd, err := cli.CloneDrive("uuid", CloneParams{}, nil)
+	if err == nil {
+		t.Error("CloneDrive() returned valid result for unavailable endpoint: %#v", cd)
+		return
+	}
+
+	j, err := cli.Job("uuid")
+	if err == nil {
+		t.Error("Job() returned valid result for unavailable endpoint: %#v", j)
+		return
+	}
+	t.Log("OK, Job():", err)
 }
 
 func TestClientEndpointUnavailableHard(t *testing.T) {
@@ -224,4 +286,31 @@ func TestClientEndpointUnavailableHard(t *testing.T) {
 		return
 	}
 	t.Log("OK, StopServer():", err)
+
+	err = cli.RemoveServer("uuid", RecurseAllDrives)
+	if err == nil {
+		t.Error("RemoveServer() returned valid result for unavailable endpoint")
+		return
+	}
+	t.Log("OK, RemoveServer():", err)
+
+	d, err := cli.Drive("uuid")
+	if err == nil {
+		t.Error("Drive() returned valid result for unavailable endpoint: %#v", d)
+		return
+	}
+	t.Log("OK, Drive():", err)
+
+	cd, err := cli.CloneDrive("uuid", CloneParams{}, nil)
+	if err == nil {
+		t.Error("CloneDrive() returned valid result for unavailable endpoint: %#v", cd)
+		return
+	}
+
+	j, err := cli.Job("uuid")
+	if err == nil {
+		t.Error("Job() returned valid result for unavailable endpoint: %#v", j)
+		return
+	}
+	t.Log("OK, Job():", err)
 }
