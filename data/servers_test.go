@@ -86,15 +86,11 @@ func TestDataServersReadServerDetail(t *testing.T) {
 }
 
 func compareNICs(t *testing.T, i int, value, wants *NIC) {
-	if value.IPv4 != nil && wants.IPv4 != nil {
-		if value.IPv4.Conf != wants.IPv4.Conf {
-			t.Errorf("NIC.IPv4.Conf error [%d]: found %#v, wants %#v", i, value.IPv4.Conf, wants.IPv4.Conf)
-		}
-		if value.IPv4.IP != wants.IPv4.IP {
-			t.Errorf("NIC.IPv4.IP error [%d]: found %#v, wants %#v", i, value.IPv4.IP, wants.IPv4.IP)
-		}
-	} else if value.IPv4 != nil || wants.IPv4 != nil {
-		t.Errorf("NIC.IPv4 error [%d]: found %#v, wants %#v", i, value.IPv4, wants.IPv4)
+	if value.IPv4.Conf != wants.IPv4.Conf {
+		t.Errorf("NIC.IPv4.Conf error [%d]: found %#v, wants %#v", i, value.IPv4.Conf, wants.IPv4.Conf)
+	}
+	if value.IPv4.IP != wants.IPv4.IP {
+		t.Errorf("NIC.IPv4.IP error [%d]: found %#v, wants %#v", i, value.IPv4.IP, wants.IPv4.IP)
 	}
 
 	if value.Model != wants.Model {
@@ -103,12 +99,7 @@ func compareNICs(t *testing.T, i int, value, wants *NIC) {
 	if value.MAC != wants.MAC {
 		t.Errorf("NIC.MAC error [%d]: found %#v, wants %#v", i, value.MAC, wants.MAC)
 	}
-
-	if value.VLAN != nil && wants.VLAN != nil {
-		if *value.VLAN != *wants.VLAN {
-			t.Errorf("NIC.VLAN error [%d]: found %#v, wants %#v", i, value.VLAN, wants.VLAN)
-		}
-	} else if value.VLAN != nil || wants.VLAN != nil {
+	if value.VLAN != wants.VLAN {
 		t.Errorf("NIC.VLAN error [%d]: found %#v, wants %#v", i, value.VLAN, wants.VLAN)
 	}
 }

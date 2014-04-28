@@ -22,21 +22,22 @@ type NIC struct {
 
 // Type of virtual network interface card (vlan or ip)
 func (n NIC) Type() string {
-	if n.obj.VLAN != nil && n.obj.VLAN.UUID != "" {
-		return "vlan"
+	if n.obj.VLAN.UUID != "" {
+		return NIC_vlan
 	}
-	if n.obj.IPv4 != nil && n.obj.IPv4.Conf != "" {
-		return "ip"
+	if n.obj.IPv4.Conf != "" {
+		return NIC_ip
 	}
 	return ""
 }
 
-// Conf returns type of network interface card configuration
+// Conf returns type of network interface card configuration. 'vlan' for NIC_vlan type,
+// 'static', 'dhcp', 'manual' for NIC_ip
 func (n NIC) Conf() string {
-	if n.obj.VLAN != nil && n.obj.VLAN.UUID != "" {
+	if n.obj.VLAN.UUID != "" {
 		return "vlan"
 	}
-	if n.obj.IPv4 != nil && n.obj.IPv4.Conf != "" {
+	if n.obj.IPv4.Conf != "" {
 		return n.obj.IPv4.Conf
 	}
 	return ""
@@ -53,11 +54,8 @@ func (n NIC) MAC() string {
 }
 
 // Runtime returns runtime information for network interface card or nil if stopped
-func (n NIC) Runtime() *RuntimeNIC {
-	if n.obj == nil || n.obj.Runtime == nil {
-		return nil
-	}
-	return &RuntimeNIC{*n.obj.Runtime}
+func (n NIC) Runtime() RuntimeNIC {
+	return RuntimeNIC{n.obj.Runtime}
 }
 
 // String method is used to print values passed as an operand to any format that

@@ -5,12 +5,12 @@ package data
 
 // IPv4 describes properties of IPv4 address
 type IPv4 struct {
-	Conf string   `json:"conf"`
-	IP   Resource `json:"ip"`
+	Conf string   `json:"conf,omitempty"`
+	IP   Resource `json:"ip,omitempty"`
 }
 
-// RuntimeNetworkIO describes runtime I/O statistic for network interface card at runtime
-type RuntimeNetworkIO struct {
+// RuntimeNetworkStat describes runtime I/O statistic for network interface card at runtime
+type RuntimeNetworkStat struct {
 	BytesRecv   int64 `json:"bytes_recv"`
 	BytesSent   int64 `json:"bytes_sent"`
 	PacketsRecv int64 `json:"packets_recv"`
@@ -19,16 +19,16 @@ type RuntimeNetworkIO struct {
 
 // RuntimeNetwork describes properties of network interface card at runtime
 type RuntimeNetwork struct {
-	InterfaceType string           `json:"interface_type"`
-	IO            RuntimeNetworkIO `json:"io"`
-	IPv4          *Resource        `json:"ip_v4"`
+	InterfaceType string             `json:"interface_type,omitempty"`
+	IO            RuntimeNetworkStat `json:"io,omitempty"`
+	IPv4          Resource           `json:"ip_v4,omitempty"`
 }
 
 // NIC describes properties of network interface card
 type NIC struct {
-	IPv4    *IPv4           `json:"ip_v4_conf"`
-	Model   string          `json:"model"`
-	MAC     string          `json:"mac"`
-	VLAN    *Resource       `json:"vlan"`
-	Runtime *RuntimeNetwork `json:"runtime"`
+	IPv4    IPv4           `json:"ip_v4_conf,omitempty"`
+	Model   string         `json:"model,omitempty"`
+	MAC     string         `json:"mac,omitempty"`
+	VLAN    Resource       `json:"vlan,omitempty"`
+	Runtime RuntimeNetwork `json:"runtime,omitempty"`
 }

@@ -21,9 +21,6 @@ func (r RuntimeNIC) Type() string {
 
 // IPv4 returns runtime IPv4 address (if any)
 func (r RuntimeNIC) IPv4() string {
-	if r.obj.IPv4 == nil {
-		return ""
-	}
 	return r.obj.IPv4.UUID
 }
 

@@ -103,7 +103,7 @@ var serversDetailData = []Server{
 		Mem: 536870912,
 		NICs: []NIC{
 			NIC{
-				IPv4: &IPv4{
+				IPv4: IPv4{
 					Conf: "static",
 					IP:   Resource{URI: "/api/2.0/ips/31.171.246.37/", UUID: "31.171.246.37"},
 				},
@@ -113,7 +113,7 @@ var serversDetailData = []Server{
 			NIC{
 				Model: "virtio",
 				MAC:   "22:aa:fe:07:48:3b",
-				VLAN: &Resource{
+				VLAN: Resource{
 					URI:  "/api/2.0/vlans/5bc05e7e-6555-4f40-add8-3b8e91447702/",
 					UUID: "5bc05e7e-6555-4f40-add8-3b8e91447702",
 				},
@@ -314,7 +314,7 @@ var serverData = Server{
 		"ssh_public_key": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDDiwTGBsmFKBYHcKaVy5IgsYBR4XVYLS6KP/NKClE7gONlIGURE3+/45BX8TfHJHM5WTN8NBqJejKDHqwfyueR1f2VGoPkJxODGt/X/ZDNftLZLYwPd2DfDBs27ahOadZCk4Cl5l7mU0aoE74UnIcQoNPl6w7axkIFTIXr8+0HMk8DFB0iviBSJK118p1RGwhsoA1Hudn1CsgqARGPmNn6mxwvmQfQY7hZxZoOH9WMcvkNZ7rAFrwS/BuvEpEXkoC95K/JDPvmQVVJk7we+WeHfTYSmApkDFcSaypyjL2HOV8pvE+VntcIIhZccHiOubyjsBAx5aoTI+ueCsoz5AL1 maxim.perenesenko@altoros.com"},
 	NICs: []NIC{
 		NIC{
-			IPv4: &IPv4{
+			IPv4: IPv4{
 				Conf: "static",
 				IP:   Resource{"/api/2.0/ips/31.171.246.37/", "31.171.246.37"},
 			},
@@ -324,7 +324,7 @@ var serverData = Server{
 		NIC{
 			Model: "virtio",
 			MAC:   "22:aa:fe:07:48:3b",
-			VLAN: &Resource{
+			VLAN: Resource{
 				"/api/2.0/vlans/5bc05e7e-6555-4f40-add8-3b8e91447702/",
 				"5bc05e7e-6555-4f40-add8-3b8e91447702",
 			},

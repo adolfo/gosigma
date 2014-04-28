@@ -27,7 +27,15 @@ const (
 
 // A Components contains information to create new server
 type Components struct {
-	m map[string]interface{}
+	name         string             `json:",omitempty"`
+	cpu          int64              `json:",omitempty"`
+	mem          int64              `json:",omitempty"`
+	vnc_password string             `json:",omitempty"`
+	meta         map[string]string  `json:",omitempty"`
+	drives       []data.ServerDrive `json:",omitempty"`
+	nics         []data.NIC         `json:",omitempty"`
+
+	m map[string]interface{} `json:"-"`
 }
 
 // SetName sets name for new server. To unset name, call this function with empty string in the name parameter.
