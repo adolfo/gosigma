@@ -11,21 +11,18 @@ var driveOwner = Resource{
 var drivesData = []Drive{
 	Drive{
 		DriveRecord: DriveRecord{
-			Resource{"/api/2.0/drives/2ef7b7c7-7ec4-47a7-9b69-087c9417c0ff/",
-				"2ef7b7c7-7ec4-47a7-9b69-087c9417c0ff"},
-			driveOwner, "unmounted"},
+			*MakeDriveResource("2ef7b7c7-7ec4-47a7-9b69-087c9417c0ff"),
+			&driveOwner, "unmounted"},
 	},
 	Drive{
 		DriveRecord: DriveRecord{
-			Resource{"/api/2.0/drives/3b30c7ef-1fda-416d-91d1-ba616859360c/",
-				"3b30c7ef-1fda-416d-91d1-ba616859360c"},
-			driveOwner, "unmounted"},
+			*MakeDriveResource("3b30c7ef-1fda-416d-91d1-ba616859360c"),
+			&driveOwner, "unmounted"},
 	},
 	Drive{
 		DriveRecord: DriveRecord{
-			Resource{"/api/2.0/drives/464aed14-8604-4277-be3c-9d53151d53b4/",
-				"464aed14-8604-4277-be3c-9d53151d53b4"},
-			driveOwner, "unmounted"},
+			*MakeDriveResource("464aed14-8604-4277-be3c-9d53151d53b4"),
+			&driveOwner, "unmounted"},
 	},
 }
 
@@ -123,9 +120,8 @@ const jsonDrivesData = `{
 var drivesDetailData = []Drive{
 	Drive{
 		DriveRecord: DriveRecord{
-			Resource{"/api/2.0/drives/2ef7b7c7-7ec4-47a7-9b69-087c9417c0ff/",
-				"2ef7b7c7-7ec4-47a7-9b69-087c9417c0ff"},
-			driveOwner, "unmounted"},
+			*MakeDriveResource("2ef7b7c7-7ec4-47a7-9b69-087c9417c0ff"),
+			&driveOwner, "unmounted"},
 		Media:       "disk",
 		Meta:        nil,
 		Size:        1073741824,
@@ -135,9 +131,8 @@ var drivesDetailData = []Drive{
 	},
 	Drive{
 		DriveRecord: DriveRecord{
-			Resource{"/api/2.0/drives/3b30c7ef-1fda-416d-91d1-ba616859360c/",
-				"3b30c7ef-1fda-416d-91d1-ba616859360c"},
-			driveOwner, "unmounted"},
+			*MakeDriveResource("3b30c7ef-1fda-416d-91d1-ba616859360c"),
+			&driveOwner, "unmounted"},
 		Media:       "disk",
 		Meta:        nil,
 		Size:        10737418240,
@@ -150,9 +145,8 @@ var drivesDetailData = []Drive{
 	},
 	Drive{
 		DriveRecord: DriveRecord{
-			Resource{"/api/2.0/drives/464aed14-8604-4277-be3c-9d53151d53b4/",
-				"464aed14-8604-4277-be3c-9d53151d53b4"},
-			driveOwner, "unmounted"},
+			*MakeDriveResource("464aed14-8604-4277-be3c-9d53151d53b4"),
+			&driveOwner, "unmounted"},
 		Media:       "disk",
 		Meta:        nil,
 		Size:        1073741824,
@@ -429,9 +423,8 @@ const jsonDrivesDetailData = `{
 
 var driveData = Drive{
 	DriveRecord: DriveRecord{
-		Resource{"/api/2.0/drives/2ef7b7c7-7ec4-47a7-9b69-087c9417c0ff/",
-			"2ef7b7c7-7ec4-47a7-9b69-087c9417c0ff"},
-		driveOwner, "unmounted"},
+		*MakeDriveResource("2ef7b7c7-7ec4-47a7-9b69-087c9417c0ff"),
+		&driveOwner, "unmounted"},
 	Media:       "disk",
 	Meta:        nil,
 	Size:        1073741824,
@@ -466,3 +459,45 @@ const jsonDriveData = `{
     "tags": [],
     "uuid": "2ef7b7c7-7ec4-47a7-9b69-087c9417c0ff"
 }`
+
+var libraryDriveData = Drive{
+	DriveRecord: DriveRecord{
+		*MakeLibDriveResource("22bd1b24-ea78-47bb-a59b-a09ed5407867"),
+		nil, "unmounted"},
+	Media:     "cdrom",
+	Size:      536870912,
+	Name:      "Debian 7.1.0 Netinstall",
+	OS:        "linux",
+	Arch:      "64",
+	Paid:      false,
+	ImageType: "install",
+}
+
+const jsonLibraryDriveData = `{
+            "affinities": [],
+            "allow_multimount": false,
+            "arch": "64",
+            "category": [
+                "general"
+            ],
+            "description": "Debian 7.1.0 Netinstall AMD64.",
+            "favourite": false,
+            "image_type": "install",
+            "install_notes": "1. Attach the CD. \\n\r\nPlease be aware that the CD needs to be attached to the server as IDE. \\n\r\n \\n\r\n2. Attach a Drive. \\n\r\nPlease be aware that the minimum drive size where you are going to install the OS should be 5 GB. \\n\r\n \\n\r\n3. Connecting to your server via VNC. \\n\r\na) Go to the \u201cProperties\u201d tab of the server and Turn on the VNC Tunnel by clicking the button right next to it \\n\r\nb) In order to use the inbuilt client click on the icon right next to the VNC link and choose \u201cOpen in Dialog Window\u201d or \u201cOpen in new browser window/tab\u201d \\n\r\nOR \\n\r\nc) Having installed a compatible VNC client, open a VNC connection to your server through the UI.  \\n\r\nd) Enter your VNC url and VNC password as displayed on your Server Properties Window.  \\n\r\n \\n\r\n4. Minimum Hardware Requirements. \\n\r\nThe recommended minimum hardware requirements as published by debian.org are: 1GB RAM and 1GHz CPU",
+            "jobs": [],
+            "licenses": [],
+            "media": "cdrom",
+            "meta": {},
+            "mounted_on": [],
+            "name": "Debian 7.1.0 Netinstall",
+            "os": "linux",
+            "owner": null,
+            "paid": false,
+            "resource_uri": "/api/2.0/libdrives/22bd1b24-ea78-47bb-a59b-a09ed5407867/",
+            "size": 536870912,
+            "status": "unmounted",
+            "storage_type": null,
+            "tags": [],
+            "url": "http://debian.org/",
+            "uuid": "22bd1b24-ea78-47bb-a59b-a09ed5407867"
+        }`

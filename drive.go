@@ -68,6 +68,18 @@ func (d Drive) Get(key string) (v string, ok bool) {
 // IsLibrary returns true if this drive is CloudSigma library drive
 func (d Drive) IsLibrary() bool { return d.library }
 
+// OS returns operating system of the drive (defined for library drives)
+func (d Drive) OS() string { return d.obj.OS }
+
+// Arch returns operating system bit architecture the drive (defined for library drives)
+func (d Drive) Arch() string { return d.obj.Arch }
+
+// Paid image or free (defined for library drives)
+func (d Drive) Paid() bool { return d.obj.Paid }
+
+// ImageType returns type of drive image (defined for library drives)
+func (d Drive) ImageType() string { return d.obj.ImageType }
+
 // Jobs for this drive instance.
 // Every job object in resulting slice carries only UUID and URI.
 // To obtain additional information for job, one should use Job.Refresh() method

@@ -40,3 +40,7 @@ func MakeIPResource(ip string) *Resource {
 func MakeVLanResource(uuid string) *Resource {
 	return MakeResource("vlans", uuid)
 }
+
+func MakeLibDriveResource(uuid string) *Resource {
+	return MakeResource("libdrives", uuid)
+}

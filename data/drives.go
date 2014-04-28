@@ -8,8 +8,8 @@ import "io"
 // DriveRecord contains main properties of cloud server instance
 type DriveRecord struct {
 	Resource
-	Owner  Resource `json:"owner"`
-	Status string   `json:"status"`
+	Owner  *Resource `json:"owner"`
+	Status string    `json:"status"`
 }
 
 // DriveRecords holds collection of DriverRecord objects
@@ -27,6 +27,10 @@ type Drive struct {
 	Size        int64             `json:"size"`
 	StorageType string            `json:"storage_type"`
 	Jobs        []Resource        `json:"jobs"`
+	OS          string            `json:"os"`
+	Arch        string            `json:"arch"`
+	Paid        bool              `json:"paid"`
+	ImageType   string            `json:"image_type"`
 }
 
 // Drives holds collection of Drive objects

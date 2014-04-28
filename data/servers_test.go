@@ -5,6 +5,7 @@ package data
 
 import (
 	"encoding/json"
+	"fmt"
 	"strings"
 	"testing"
 )
@@ -128,18 +129,7 @@ func compareServers(t *testing.T, i int, value, wants *Server) {
 		t.Errorf("Server.Mem error [%d]: found %#v, wants %#v", i, value.Mem, wants.Mem)
 	}
 
-	if len(value.Meta) != len(wants.Meta) {
-		t.Errorf("Server.Meta error [%d]: found %#v, wants %#v", i, value.Meta, wants.Meta)
-	}
-	for k, w := range wants.Meta {
-		if v, ok := value.Meta[k]; ok {
-			if v != w {
-				t.Errorf("Server.Meta[%q] error [%d]: found %#v, wants %#v", k, i, v, w)
-			}
-		} else {
-			t.Error("Server.Meta[%q] error [%d]: not found in values")
-		}
-	}
+	compareMeta(t, fmt.Sprintf("Server.Meta error [%d]", i), value.Meta, wants.Meta)
 
 	if len(value.NICs) != len(wants.NICs) {
 		t.Errorf("Server.NICs error [%d]: found %#v, wants %#v", i, value.NICs, wants.NICs)

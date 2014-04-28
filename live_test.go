@@ -204,6 +204,34 @@ func TestLiveDriveGet(t *testing.T) {
 	t.Logf("%v", d)
 }
 
+func TestLiveDriveList(t *testing.T) {
+	u, p, err := parseCredentials()
+	if u == "" {
+		skipTest(t, err)
+		return
+	}
+
+	cli, err := NewClient(DefaultRegion, u, p, nil)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	if *trace {
+		cli.Logger(t)
+	}
+
+	dd, err := cli.Drives(true, *lib)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	for _, d := range dd {
+		t.Logf("%v", d)
+	}
+}
+
 func TestLiveDriveClone(t *testing.T) {
 	u, p, err := parseCredentials()
 	if u == "" {

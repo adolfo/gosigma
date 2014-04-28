@@ -25,3 +25,18 @@ func verifyResource(t *testing.T, r *Resource, uri, uuid string) {
 		t.Errorf("Resource.UUID = %s, wants %s", r.UUID, uuid)
 	}
 }
+
+func compareMeta(t *testing.T, prefix string, value, wants map[string]string) {
+	if len(value) != len(wants) {
+		t.Errorf(prefix+": found %#v, wants %#v", value, wants)
+	}
+	for k, w := range wants {
+		if v, ok := value[k]; ok {
+			if v != w {
+				t.Errorf(prefix+": [%q] found %#v, wants %#v", k, v, w)
+			}
+		} else {
+			t.Errorf(": [%q] not found in values")
+		}
+	}
+}

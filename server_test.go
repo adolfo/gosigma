@@ -457,6 +457,9 @@ func TestClientCreateServer(t *testing.T) {
 	if v := dd.Device(); v != "virtio" {
 		t.Errorf("ServerDrive.Device: %#v", v)
 	}
+	if v := dd.UUID(); v != "uuid" {
+		t.Errorf("ServerDrive.UUID: %#v", v)
+	}
 
 	ddd := dd.Drive()
 	if v := ddd.UUID(); v != "uuid" {
