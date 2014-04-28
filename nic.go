@@ -22,10 +22,10 @@ type NIC struct {
 
 // Type of virtual network interface card (vlan or ip)
 func (n NIC) Type() string {
-	if n.obj.VLAN.UUID != "" {
+	if n.obj.VLAN != nil && n.obj.VLAN.UUID != "" {
 		return NIC_vlan
 	}
-	if n.obj.IPv4.Conf != "" {
+	if n.obj.IPv4 != nil && n.obj.IPv4.Conf != "" {
 		return NIC_ip
 	}
 	return ""
@@ -34,10 +34,10 @@ func (n NIC) Type() string {
 // Conf returns type of network interface card configuration. 'vlan' for NIC_vlan type,
 // 'static', 'dhcp', 'manual' for NIC_ip
 func (n NIC) Conf() string {
-	if n.obj.VLAN.UUID != "" {
+	if n.obj.VLAN != nil && n.obj.VLAN.UUID != "" {
 		return "vlan"
 	}
-	if n.obj.IPv4.Conf != "" {
+	if n.obj.IPv4 != nil && n.obj.IPv4.Conf != "" {
 		return n.obj.IPv4.Conf
 	}
 	return ""

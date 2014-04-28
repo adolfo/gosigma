@@ -296,7 +296,7 @@ func TestLiveServerClone(t *testing.T) {
 	c.SetVNCPassword("test-vnc-password")
 	c.SetSSHPublicKey(*sshkey)
 	c.SetDescription("test-description")
-	c.AttachDrive(newDrive, 1, "0:0", "virtio")
+	c.AttachDrive(1, "0:0", "virtio", newDrive.UUID())
 	c.NetworkDHCP4(ModelVirtio)
 	c.NetworkVLan(ModelVirtio, *vlan)
 

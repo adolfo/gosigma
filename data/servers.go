@@ -7,17 +7,17 @@ import "io"
 
 // ServerDrive describe properties of disk drive
 type ServerDrive struct {
-	BootOrder int      `json:"boot_order"`
-	Channel   string   `json:"dev_channel"`
-	Device    string   `json:"device"`
-	Drive     Resource `json:"drive"`
+	BootOrder int      `json:"boot_order,omitempty"`
+	Channel   string   `json:"dev_channel,omitempty"`
+	Device    string   `json:"device,omitempty"`
+	Drive     Resource `json:"drive,omitempty"`
 }
 
 // ServerRecord contains main properties of cloud server instance
 type ServerRecord struct {
 	Resource
-	Name   string `json:"name"`
-	Status string `json:"status"`
+	Name   string `json:"name,omitempty"`
+	Status string `json:"status,omitempty"`
 }
 
 // ServerRecords holds collection of ServerRecord objects
@@ -29,12 +29,12 @@ type ServerRecords struct {
 // Server contains detail properties of cloud server instance
 type Server struct {
 	ServerRecord
-	CPU         int64             `json:"cpu"`
-	Mem         int64             `json:"mem"`
-	Meta        map[string]string `json:"meta"`
-	NICs        []NIC             `json:"nics"`
-	Drives      []ServerDrive     `json:"drives"`
-	VNCPassword string            `json:"vnc_password"`
+	CPU         int64             `json:"cpu,omitempty"`
+	Mem         int64             `json:"mem,omitempty"`
+	Meta        map[string]string `json:"meta,omitempty"`
+	NICs        []NIC             `json:"nics,omitempty"`
+	Drives      []ServerDrive     `json:"drives,omitempty"`
+	VNCPassword string            `json:"vnc_password,omitempty"`
 }
 
 // Servers holds collection of Server objects

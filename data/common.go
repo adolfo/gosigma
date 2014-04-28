@@ -14,8 +14,8 @@ type Meta struct {
 
 // Resource describes properties of linked resource
 type Resource struct {
-	URI  string `json:"resource_uri"`
-	UUID string `json:"uuid"`
+	URI  string `json:"resource_uri,omitempty"`
+	UUID string `json:"uuid,omitempty"`
 }
 
 // MakeResource returns Resource structure from given type and UUID

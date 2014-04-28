@@ -3,224 +3,122 @@
 
 package gosigma
 
-import (
-	"errors"
-	"testing"
+import "testing"
 
-	"github.com/Altoros/gosigma/data"
-)
+func testMarshalComponents(t *testing.T, c Components, test, wants string) bool {
+	s, err := c.marshalString()
+	if err != nil {
+		t.Error(t)
+		return false
+	}
+	if s != wants {
+		t.Errorf("invalid %s, s=%v, wants=%v", test, s, wants)
+		return false
+	}
+	return true
+}
+
+func TestComponentsNil(t *testing.T) {
+	var c Components
+	testMarshalComponents(t, c, `marshal empty struct`, `{}`)
+}
 
 func TestComponentsName(t *testing.T) {
 	var c Components
+
 	c.SetName("test")
-	if v, ok := c.m["name"]; !ok || v != "test" {
-		t.Errorf("invalid SetName(\"test\"), ok=%v, v=%v", ok, v)
-	}
+	testMarshalComponents(t, c, `SetName("test")`, `{"name":"test"}`)
+
 	c.SetName("")
-	if v, ok := c.m["name"]; ok || v != nil {
-		t.Errorf("invalid SetName(\"\"), ok=%v, v=%v", ok, v)
-	}
+	testMarshalComponents(t, c, `SetName("")`, `{}`)
 }
 
 func TestComponentsCPU(t *testing.T) {
 	var c Components
+
 	c.SetCPU(2000)
-	if v, ok := c.m["cpu"]; !ok || v != int64(2000) {
-		t.Errorf("invalid SetCPU(2000), ok=%v, v=%v", ok, v)
-	}
+	testMarshalComponents(t, c, `SetCPU(2000)`, `{"cpu":2000}`)
+
 	c.SetCPU(0)
-	if v, ok := c.m["cpu"]; ok || v != nil {
-		t.Errorf("invalid SetCPU(0), ok=%v, v=%v", ok, v)
-	}
+	testMarshalComponents(t, c, `SetCPU(0)`, `{}`)
 }
 
 func TestComponentsMem(t *testing.T) {
 	var c Components
+
 	c.SetMem(5368709120)
-	if v, ok := c.m["mem"]; !ok || v != int64(5368709120) {
-		t.Errorf("invalid SetMem(5368709120), ok=%v, v=%v", ok, v)
-	}
+	testMarshalComponents(t, c, `SetMem(5368709120)`, `{"mem":5368709120}`)
+
 	c.SetMem(0)
-	if v, ok := c.m["mem"]; ok || v != nil {
-		t.Errorf("invalid SetMem(0), ok=%v, v=%v", ok, v)
-	}
+	testMarshalComponents(t, c, `SetMem(0)`, `{}`)
 }
 
 func TestComponentsVNCPassword(t *testing.T) {
 	var c Components
-	c.SetVNCPassword("test")
-	if v, ok := c.m["vnc_password"]; !ok || v != "test" {
-		t.Errorf("invalid SetVNCPassword(\"test\"), ok=%v, v=%v", ok, v)
-	}
+
+	c.SetVNCPassword("password")
+	testMarshalComponents(t, c, `SetVNCPassword("password")`, `{"vnc_password":"password"}`)
+
 	c.SetVNCPassword("")
-	if v, ok := c.m["vnc_password"]; ok || v != nil {
-		t.Errorf("invalid SetVNCPassword(\"\"), ok=%v, v=%v", ok, v)
-	}
+	testMarshalComponents(t, c, `SetVNCPassword("")`, `{}`)
 }
 
 func TestComponentsDescription(t *testing.T) {
 	var c Components
 
-	c.SetDescription("test")
-
-	mi, ok := c.m["meta"]
-	m := mi.(map[string]string)
-	if !ok || m == nil {
-		t.Errorf("invalid SetDescription(\"test\"), ok=%v, v=%v", ok, m)
-	} else {
-		if v, ok := m["description"]; !ok || v != "test" {
-			t.Errorf("invalid SetDescription(\"test\"), ok=%v, v=%v", ok, v)
-		}
-	}
+	c.SetDescription("description")
+	testMarshalComponents(t, c, `SetDescription("description")`, `{"meta":{"description":"description"}}`)
 
 	c.SetDescription("")
-	mi, ok = c.m["meta"]
-	if ok || mi != nil {
-		t.Errorf("invalid SetDescription(\"\"), ok=%v, v=%v", ok, m)
-	}
+	testMarshalComponents(t, c, `SetDescription("")`, `{}`)
 }
 
 func TestComponentsSSHPublicKey(t *testing.T) {
 	var c Components
 
-	c.SetSSHPublicKey("test")
-
-	mi, ok := c.m["meta"]
-	m := mi.(map[string]string)
-	if !ok || m == nil {
-		t.Errorf("invalid SetDescription(\"test\"), ok=%v, v=%v", ok, m)
-	} else {
-		if v, ok := m["ssh_public_key"]; !ok || v != "test" {
-			t.Errorf("invalid SetDescription(\"test\"), ok=%v, v=%v", ok, v)
-		}
-	}
+	c.SetSSHPublicKey("key")
+	testMarshalComponents(t, c, `SetSSHPublicKey("key")`, `{"meta":{"ssh_public_key":"key"}}`)
 
 	c.SetSSHPublicKey("")
-	mi, ok = c.m["meta"]
-	if ok || mi != nil {
-		t.Errorf("invalid SetDescription(\"\"), ok=%v, v=%v", ok, m)
-	}
+	testMarshalComponents(t, c, `SetSSHPublicKey("")`, `{}`)
 }
 
 func TestComponentsAttachDrive(t *testing.T) {
 	var c Components
-	var d = Drive{nil, &data.Drive{
-		DriveRecord: data.DriveRecord{Resource: data.MakeDriveResource("uuid")},
-	}}
-
-	c.AttachDrive(d, 1, "0:0", "virtio")
-
-	di, ok := c.m["drives"]
-	if !ok || di == nil {
-		t.Errorf("invalid AttachDrive call")
-		return
-	}
-
-	dd, ok := di.([]interface{})
-	if !ok || dd == nil {
-		t.Errorf("invalid AttachDrive call")
-		return
-	}
-
-	if len(dd) != 1 {
-		t.Errorf("invalid AttachDrive call")
-		return
-	}
-
-	mi := dd[0]
-	mm, ok := mi.(map[string]interface{})
-	if !ok || mm == nil {
-		t.Errorf("invalid AttachDrive call")
-		return
-	}
-
-	if v, ok := mm["boot_order"]; !ok || v != 1 {
-		t.Errorf("invalid AttachDrive call: ok=%v, v=%v, wants 1", ok, v)
-	}
-	if v, ok := mm["dev_channel"]; !ok || v != "0:0" {
-		t.Errorf("invalid AttachDrive call: ok=%v, v=%v, wants '0:0'", ok, v)
-	}
-	if v, ok := mm["device"]; !ok || v != "virtio" {
-		t.Errorf("invalid AttachDrive call: ok=%v, v=%v, wants 'virtio'", ok, v)
-	}
-
-	dui, ok := mm["drive"]
-	if !ok || dui == nil {
-		t.Errorf("invalid AttachDrive call: ok=%v, dui=%v", ok, dui)
-	}
-
-	du, ok := dui.(data.Resource)
-	if !ok {
-		t.Errorf("invalid AttachDrive call: ok=%v, du=%v", ok, du)
-	}
-
-	duv := data.MakeDriveResource("uuid")
-	if du != duv {
-		t.Errorf("invalid AttachDrive call: resource=%v, wants %v", du, duv)
-	}
-}
-
-func TestComponentsAttachEmptyDrive(t *testing.T) {
-	var c Components
-	var d = Drive{}
-
-	c.AttachDrive(d, 0, "", "")
-
-	di, ok := c.m["drives"]
-	if ok || di != nil {
-		t.Errorf("invalid AttachDrive call")
-		return
-	}
+	c.AttachDrive(1, "0:0", "virtio", "uuid")
+	testMarshalComponents(t, c, "AttachDrive",
+		`{"drives":[{"boot_order":1,"dev_channel":"0:0","device":"virtio","drive":{"resource_uri":"/api/2.0/drives/uuid/","uuid":"uuid"}}]}`)
 }
 
 func TestComponentsNetworkDHCP4(t *testing.T) {
 	var c Components
-
 	c.NetworkDHCP4("virtio")
-
-	if s, err := c.marshalString(); err != nil {
-		t.Error(err)
-	} else if v := `{"nics":[{"ip_v4_conf":{"conf":"dhcp"},"model":"virtio"}]}`; s != v {
-		t.Errorf("invalid AttachNIC, returned `%s`, wants `%s`", s, v)
-	}
+	testMarshalComponents(t, c, `NetworkDHCP4("virtio")`,
+		`{"nics":[{"ip_v4_conf":{"conf":"dhcp"},"model":"virtio"}]}`)
 }
 
 func TestComponentsNetworkStatic4(t *testing.T) {
 	var c Components
-
 	c.NetworkStatic4("virtio", "ipaddr")
-
-	if s, err := c.marshalString(); err != nil {
-		t.Error(err)
-	} else if v := `{"nics":[{"ip_v4_conf":{"conf":"static","ip":{"resource_uri":"/api/2.0/ips/ipaddr/","uuid":"ipaddr"}},"model":"virtio"}]}`; s != v {
-		t.Errorf("invalid AttachNIC, returned `%s`, wants `%s`", s, v)
-	}
+	testMarshalComponents(t, c, `NetworkStatic4("virtio", "ipaddr")`,
+		`{"nics":[{"ip_v4_conf":{"conf":"static","ip":{"resource_uri":"/api/2.0/ips/ipaddr/","uuid":"ipaddr"}},"model":"virtio"}]}`)
 }
 
 func TestComponentsNetworkManual4(t *testing.T) {
 	var c Components
-
 	c.NetworkManual4("virtio")
-
-	if s, err := c.marshalString(); err != nil {
-		t.Error(err)
-	} else if v := `{"nics":[{"ip_v4_conf":{"conf":"manual"},"model":"virtio"}]}`; s != v {
-		t.Errorf("invalid AttachNIC, returned `%s`, wants `%s`", s, v)
-	}
+	testMarshalComponents(t, c, `NetworkManual4("virtio")`,
+		`{"nics":[{"ip_v4_conf":{"conf":"manual"},"model":"virtio"}]}`)
 }
 
 func TestComponentsNetworkVLan(t *testing.T) {
 	var c Components
-
 	c.NetworkVLan("virtio", "vlanuuid")
-
-	if s, err := c.marshalString(); err != nil {
-		t.Error(err)
-	} else if v := `{"nics":[{"model":"virtio","vlan":{"resource_uri":"/api/2.0/vlans/vlanuuid/","uuid":"vlanuuid"}}]}`; s != v {
-		t.Errorf("invalid AttachNIC, returned `%s`, wants `%s`", s, v)
-	}
+	testMarshalComponents(t, c, `NetworkVLan("virtio", "vlanuuid")`,
+		`{"nics":[{"model":"virtio","vlan":{"resource_uri":"/api/2.0/vlans/vlanuuid/","uuid":"vlanuuid"}}]}`)
 }
 
+/*
 type noMarshal int
 
 func (noMarshal) MarshalJSON() ([]byte, error) {
@@ -238,3 +136,4 @@ func TestComponentsMarshalEmpty(t *testing.T) {
 		t.Log(err)
 	}
 }
+*/

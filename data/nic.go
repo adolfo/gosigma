@@ -5,8 +5,8 @@ package data
 
 // IPv4 describes properties of IPv4 address
 type IPv4 struct {
-	Conf string   `json:"conf,omitempty"`
-	IP   Resource `json:"ip,omitempty"`
+	Conf string    `json:"conf,omitempty"`
+	IP   *Resource `json:"ip,omitempty"`
 }
 
 // RuntimeNetworkStat describes runtime I/O statistic for network interface card at runtime
@@ -26,9 +26,9 @@ type RuntimeNetwork struct {
 
 // NIC describes properties of network interface card
 type NIC struct {
-	IPv4    IPv4           `json:"ip_v4_conf,omitempty"`
-	Model   string         `json:"model,omitempty"`
-	MAC     string         `json:"mac,omitempty"`
-	VLAN    Resource       `json:"vlan,omitempty"`
-	Runtime RuntimeNetwork `json:"runtime,omitempty"`
+	IPv4    *IPv4           `json:"ip_v4_conf,omitempty"`
+	Model   string          `json:"model,omitempty"`
+	MAC     string          `json:"mac,omitempty"`
+	VLAN    *Resource       `json:"vlan,omitempty"`
+	Runtime *RuntimeNetwork `json:"runtime,omitempty"`
 }

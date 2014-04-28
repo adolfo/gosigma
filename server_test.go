@@ -357,13 +357,7 @@ func TestClientCreateServer(t *testing.T) {
 	c.NetworkManual4("virtio")
 	c.NetworkStatic4("virtio", "ipaddr")
 	c.NetworkVLan("virtio", "vlanid")
-
-	var d = Drive{nil, &data.Drive{
-		DriveRecord: data.DriveRecord{
-			Resource: data.MakeDriveResource("uuid"),
-		},
-	}}
-	c.AttachDrive(d, 1, "0:0", "virtio")
+	c.AttachDrive(1, "0:0", "virtio", "uuid")
 
 	s, err := cli.CreateServer(c)
 	if err != nil {
@@ -405,9 +399,6 @@ func TestClientCreateServer(t *testing.T) {
 	if n.MAC() != "" {
 		t.Errorf("NIC.MAC [0]: %q", n.MAC())
 	}
-	if n.Runtime() != nil {
-		t.Errorf("NIC.Runtime [0]: %q", n.Runtime())
-	}
 
 	n = nics[1]
 	if n.Type() != "ip" {
@@ -421,9 +412,6 @@ func TestClientCreateServer(t *testing.T) {
 	}
 	if n.MAC() != "" {
 		t.Errorf("NIC.MAC [1]: %q", n.MAC())
-	}
-	if n.Runtime() != nil {
-		t.Errorf("NIC.Runtime [1]: %q", n.Runtime())
 	}
 
 	n = nics[2]
@@ -439,9 +427,6 @@ func TestClientCreateServer(t *testing.T) {
 	if n.MAC() != "" {
 		t.Errorf("NIC.MAC [2]: %q", n.MAC())
 	}
-	if n.Runtime() != nil {
-		t.Errorf("NIC.Runtime [2]: %q", n.Runtime())
-	}
 
 	n = nics[3]
 	if n.Type() != "vlan" {
@@ -455,9 +440,6 @@ func TestClientCreateServer(t *testing.T) {
 	}
 	if n.MAC() != "" {
 		t.Errorf("NIC.MAC [3]: %q", n.MAC())
-	}
-	if n.Runtime() != nil {
-		t.Errorf("NIC.Runtime [3]: %q", n.Runtime())
 	}
 
 	drives := s.Drives()

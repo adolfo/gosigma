@@ -11,17 +11,25 @@ import (
 
 // A RuntimeNIC represents runtime information for network interface card
 type RuntimeNIC struct {
-	obj data.RuntimeNetwork
+	obj *data.RuntimeNetwork
 }
 
 // Type of network interface card (public, private, etc)
 func (r RuntimeNIC) Type() string {
-	return r.obj.InterfaceType
+	if r.obj != nil {
+		return r.obj.InterfaceType
+	} else {
+		return ""
+	}
 }
 
 // IPv4 returns runtime IPv4 address (if any)
 func (r RuntimeNIC) IPv4() string {
-	return r.obj.IPv4.UUID
+	if r.obj != nil {
+		return r.obj.IPv4.UUID
+	} else {
+		return ""
+	}
 }
 
 // String method is used to print values passed as an operand to any format that

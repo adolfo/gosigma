@@ -27,35 +27,31 @@ const (
 
 // A Components contains information to create new server
 type Components struct {
-	name         string             `json:",omitempty"`
-	cpu          int64              `json:",omitempty"`
-	mem          int64              `json:",omitempty"`
-	vnc_password string             `json:",omitempty"`
-	meta         map[string]string  `json:",omitempty"`
-	drives       []data.ServerDrive `json:",omitempty"`
-	nics         []data.NIC         `json:",omitempty"`
-
-	m map[string]interface{} `json:"-"`
+	data *data.Server
 }
 
 // SetName sets name for new server. To unset name, call this function with empty string in the name parameter.
 func (c *Components) SetName(name string) {
-	c.setString("name", name)
+	c.init()
+	c.data.Name = strings.TrimSpace(name)
 }
 
 // SetCPU sets CPU frequency for new server. To unset CPU frequency, call this function with zero in the frequency parameter.
 func (c *Components) SetCPU(frequency int64) {
-	c.setInt("cpu", frequency)
+	c.init()
+	c.data.CPU = frequency
 }
 
 // SetMem sets memory size for new server. To unset this value, call function with zero in the bytes parameter.
 func (c *Components) SetMem(bytes int64) {
-	c.setInt("mem", bytes)
+	c.init()
+	c.data.Mem = bytes
 }
 
 // SetVNCPassword sets VNC password for new server. To unset, call this function with empty string.
 func (c *Components) SetVNCPassword(password string) {
-	c.setString("vnc_password", password)
+	c.init()
+	c.data.VNCPassword = strings.TrimSpace(password)
 }
 
 // SetDescription sets description for new server. To unset, call this function with empty string.
@@ -69,27 +65,16 @@ func (c *Components) SetSSHPublicKey(description string) {
 }
 
 // AttachDriveData attaches drive to components from drive data.
-func (c *Components) AttachDrive(drive Drive, bootOrder int, channel, device string) {
+func (c *Components) AttachDrive(bootOrder int, channel, device, uuid string) {
 	c.init()
 
-	var dm = make(map[string]interface{})
-	if bootOrder > 0 {
-		dm["boot_order"] = bootOrder
-	}
-	if channel != "" {
-		dm["dev_channel"] = channel
-	}
-	if device != "" {
-		dm["device"] = device
-	}
-	if drive.obj != nil && drive.obj.UUID != "" {
-		dm["drive"] = drive.obj.Resource
-	}
+	var sd data.ServerDrive
+	sd.BootOrder = bootOrder
+	sd.Channel = strings.TrimSpace(channel)
+	sd.Device = strings.TrimSpace(device)
+	sd.Drive = data.MakeDriveResource(uuid)
 
-	if len(dm) > 0 {
-		dd, _ := c.m["drives"].([]interface{})
-		c.m["drives"] = append(dd, dm)
-	}
+	c.data.Drives = append(c.data.Drives, sd)
 }
 
 // NetworkDHCP4 attaches NIC, configured with IPv4 DHCP
@@ -111,89 +96,57 @@ func (c *Components) NetworkManual4(model string) {
 func (c *Components) NetworkVLan(model, uuid string) {
 	c.init()
 
-	var nm = make(map[string]interface{})
+	var n data.NIC
 
-	if model != "" {
-		nm["model"] = model
-	}
+	n.Model = strings.TrimSpace(model)
 
-	if uuid != "" {
-		nm["vlan"] = data.MakeVLanResource(uuid)
-	}
+	vlan := data.MakeVLanResource(uuid)
+	n.VLAN = &vlan
 
-	if len(nm) > 0 {
-		nics, _ := c.m["nics"].([]interface{})
-		c.m["nics"] = append(nics, nm)
-	}
+	c.data.NICs = append(c.data.NICs, n)
 }
 
 func (c *Components) network4(model, conf, address string) {
 	c.init()
 
-	var nm = make(map[string]interface{})
+	var n data.NIC
 
-	if model != "" {
-		nm["model"] = model
+	n.Model = strings.TrimSpace(model)
+	n.IPv4 = &data.IPv4{Conf: conf}
+	if address = strings.TrimSpace(address); address != "" {
+		r := data.MakeIPResource(address)
+		n.IPv4.IP = &r
 	}
 
-	var conf4 = map[string]interface{}{"conf": conf}
-	if address != "" {
-		conf4["ip"] = data.MakeIPResource(address)
-	}
-	nm["ip_v4_conf"] = conf4
-
-	nics, _ := c.m["nics"].([]interface{})
-	c.m["nics"] = append(nics, nm)
+	c.data.NICs = append(c.data.NICs, n)
 }
 
 func (c *Components) init() {
-	if c.m == nil {
-		c.m = make(map[string]interface{})
-	}
-}
-
-func (c *Components) setString(name, value string) {
-	c.init()
-	value = strings.TrimSpace(value)
-	if value == "" {
-		delete(c.m, name)
-	} else {
-		c.m[name] = value
-	}
-}
-
-func (c *Components) setInt(name string, value int64) {
-	c.init()
-	if value == 0 {
-		delete(c.m, name)
-	} else {
-		c.m[name] = value
+	if c.data == nil {
+		c.data = &data.Server{
+			Meta: make(map[string]string),
+		}
 	}
 }
 
 func (c *Components) setMeta(name, value string) {
 	c.init()
 
-	mi := c.m["meta"]
-	m, _ := mi.(map[string]string)
+	m := c.data.Meta
 
 	value = strings.TrimSpace(value)
 	if value == "" {
 		delete(m, name)
-		if len(m) == 0 {
-			delete(c.m, "meta")
-		}
 	} else {
-		if m == nil {
-			m = make(map[string]string)
-			c.m["meta"] = m
-		}
 		m[name] = value
 	}
 }
 
 func (c Components) marshal() (io.Reader, error) {
-	bb, err := json.Marshal(c.m)
+	if c.data == nil {
+		return strings.NewReader("{}"), nil
+	}
+	bb, err := json.Marshal(c.data)
 	if err != nil {
 		return nil, err
 	}
