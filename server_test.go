@@ -387,7 +387,7 @@ func TestClientCreateServer(t *testing.T) {
 	}
 
 	n := nics[0]
-	if n.Type() != "ip" {
+	if n.Type() != NIC_public {
 		t.Errorf("NIC.Type [0]: %q", n.Type())
 	}
 	if n.Conf() != "dhcp" {
@@ -401,7 +401,7 @@ func TestClientCreateServer(t *testing.T) {
 	}
 
 	n = nics[1]
-	if n.Type() != "ip" {
+	if n.Type() != NIC_public {
 		t.Errorf("NIC.Type [1]: %q", n.Type())
 	}
 	if n.Conf() != "manual" {
@@ -415,7 +415,7 @@ func TestClientCreateServer(t *testing.T) {
 	}
 
 	n = nics[2]
-	if n.Type() != "ip" {
+	if n.Type() != NIC_public {
 		t.Errorf("NIC.Type [2]: %q", n.Type())
 	}
 	if n.Conf() != "static" {
@@ -429,10 +429,10 @@ func TestClientCreateServer(t *testing.T) {
 	}
 
 	n = nics[3]
-	if n.Type() != "vlan" {
+	if n.Type() != NIC_private {
 		t.Errorf("NIC.Type [3]: %q", n.Type())
 	}
-	if n.Conf() != "vlan" {
+	if n.Conf() != "private" {
 		t.Errorf("NIC.Conf [3]: %q", n.Conf())
 	}
 	if n.Model() != "virtio" {

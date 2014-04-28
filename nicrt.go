@@ -23,9 +23,9 @@ func (r RuntimeNIC) Type() string {
 	}
 }
 
-// IPv4 returns runtime IPv4 address (if any)
-func (r RuntimeNIC) IPv4() string {
-	if r.obj != nil {
+// AddressIPv4 returns runtime IPv4 address (if any)
+func (r RuntimeNIC) AddressIPv4() string {
+	if r.obj != nil && r.obj.IPv4 != nil {
 		return r.obj.IPv4.UUID
 	} else {
 		return ""
@@ -35,5 +35,5 @@ func (r RuntimeNIC) IPv4() string {
 // String method is used to print values passed as an operand to any format that
 // accepts a string or to an unformatted printer such as Print.
 func (r RuntimeNIC) String() string {
-	return fmt.Sprintf(`{Type: %q, Address: %q}`, r.Type(), r.IPv4())
+	return fmt.Sprintf(`{Type: %q, Address: %q}`, r.Type(), r.AddressIPv4())
 }

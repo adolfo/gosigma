@@ -72,7 +72,7 @@ func (c *Components) AttachDrive(bootOrder int, channel, device, uuid string) {
 	sd.BootOrder = bootOrder
 	sd.Channel = strings.TrimSpace(channel)
 	sd.Device = strings.TrimSpace(device)
-	sd.Drive = data.MakeDriveResource(uuid)
+	sd.Drive = *data.MakeDriveResource(uuid)
 
 	c.data.Drives = append(c.data.Drives, sd)
 }
@@ -99,9 +99,7 @@ func (c *Components) NetworkVLan(model, uuid string) {
 	var n data.NIC
 
 	n.Model = strings.TrimSpace(model)
-
-	vlan := data.MakeVLanResource(uuid)
-	n.VLAN = &vlan
+	n.VLAN = data.MakeVLanResource(uuid)
 
 	c.data.NICs = append(c.data.NICs, n)
 }
@@ -114,8 +112,7 @@ func (c *Components) network4(model, conf, address string) {
 	n.Model = strings.TrimSpace(model)
 	n.IPv4 = &data.IPv4{Conf: conf}
 	if address = strings.TrimSpace(address); address != "" {
-		r := data.MakeIPResource(address)
-		n.IPv4.IP = &r
+		n.IPv4.IP = data.MakeIPResource(address)
 	}
 
 	c.data.NICs = append(c.data.NICs, n)

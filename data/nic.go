@@ -21,7 +21,7 @@ type RuntimeNetworkStat struct {
 type RuntimeNetwork struct {
 	InterfaceType string             `json:"interface_type,omitempty"`
 	IO            RuntimeNetworkStat `json:"io,omitempty"`
-	IPv4          Resource           `json:"ip_v4,omitempty"`
+	IPv4          *Resource          `json:"ip_v4,omitempty"`
 }
 
 // NIC describes properties of network interface card

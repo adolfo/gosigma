@@ -10,8 +10,8 @@ import (
 )
 
 const (
-	NIC_vlan = "vlan"
-	NIC_ip   = "ip"
+	NIC_private = "private"
+	NIC_public  = "public"
 )
 
 // A NIC represents network interface card instance in CloudSigma server instance
@@ -20,47 +20,70 @@ type NIC struct {
 	obj    *data.NIC
 }
 
-// Type of virtual network interface card (vlan or ip)
+// Type of virtual network interface card (private, public)
 func (n NIC) Type() string {
-	if n.obj.VLAN != nil && n.obj.VLAN.UUID != "" {
-		return NIC_vlan
+	if n.obj != nil && n.obj.VLAN != nil && n.obj.VLAN.UUID != "" {
+		return NIC_private
 	}
-	if n.obj.IPv4 != nil && n.obj.IPv4.Conf != "" {
-		return NIC_ip
+	if n.obj != nil && n.obj.IPv4 != nil && n.obj.IPv4.Conf != "" {
+		return NIC_public
 	}
 	return ""
 }
 
-// Conf returns type of network interface card configuration. 'vlan' for NIC_vlan type,
+// Conf returns type of network interface card configuration. 'private' for NIC_vlan type,
 // 'static', 'dhcp', 'manual' for NIC_ip
 func (n NIC) Conf() string {
-	if n.obj.VLAN != nil && n.obj.VLAN.UUID != "" {
-		return "vlan"
+	if n.obj != nil && n.obj.VLAN != nil && n.obj.VLAN.UUID != "" {
+		return NIC_private
 	}
-	if n.obj.IPv4 != nil && n.obj.IPv4.Conf != "" {
+	if n.obj != nil && n.obj.IPv4 != nil && n.obj.IPv4.Conf != "" {
 		return n.obj.IPv4.Conf
+	}
+	return ""
+}
+
+// Address returns address configured for network interface card
+func (n NIC) Address() string {
+	if n.obj != nil && n.obj.VLAN != nil && n.obj.VLAN.UUID != "" {
+		return n.obj.VLAN.UUID
+	}
+	if n.obj != nil && n.obj.IPv4 != nil && n.obj.IPv4.IP.UUID != "" {
+		return n.obj.IPv4.IP.UUID
 	}
 	return ""
 }
 
 // Model of virtual network interface card
 func (n NIC) Model() string {
-	return n.obj.Model
+	if n.obj != nil {
+		return n.obj.Model
+	} else {
+		return ""
+	}
 }
 
 // MAC address
 func (n NIC) MAC() string {
-	return n.obj.MAC
+	if n.obj != nil {
+		return n.obj.MAC
+	} else {
+		return ""
+	}
 }
 
 // Runtime returns runtime information for network interface card or nil if stopped
 func (n NIC) Runtime() RuntimeNIC {
-	return RuntimeNIC{n.obj.Runtime}
+	if n.obj != nil {
+		return RuntimeNIC{n.obj.Runtime}
+	} else {
+		return RuntimeNIC{}
+	}
 }
 
 // String method is used to print values passed as an operand to any format that
 // accepts a string or to an unformatted printer such as Print.
 func (n NIC) String() string {
-	return fmt.Sprintf(`{Type: %q, Conf: %q, Model: %s, MAC: %q}`,
-		n.Type(), n.Conf(), n.Model(), n.MAC())
+	return fmt.Sprintf(`{Type: %q, Conf: %q, Model: %q, MAC: %q, Address: %q}`,
+		n.Type(), n.Conf(), n.Model(), n.MAC(), n.Address())
 }

@@ -105,7 +105,7 @@ var serversDetailData = []Server{
 			NIC{
 				IPv4: &IPv4{
 					Conf: "static",
-					IP:   &Resource{URI: "/api/2.0/ips/31.171.246.37/", UUID: "31.171.246.37"},
+					IP:   MakeIPResource("31.171.246.37"),
 				},
 				Model: "virtio",
 				MAC:   "22:40:85:4f:d3:ce",
@@ -113,10 +113,7 @@ var serversDetailData = []Server{
 			NIC{
 				Model: "virtio",
 				MAC:   "22:aa:fe:07:48:3b",
-				VLAN: &Resource{
-					URI:  "/api/2.0/vlans/5bc05e7e-6555-4f40-add8-3b8e91447702/",
-					UUID: "5bc05e7e-6555-4f40-add8-3b8e91447702",
-				},
+				VLAN:  MakeVLanResource("5bc05e7e-6555-4f40-add8-3b8e91447702"),
 			},
 		},
 		Drives:      []ServerDrive{},
@@ -316,7 +313,7 @@ var serverData = Server{
 		NIC{
 			IPv4: &IPv4{
 				Conf: "static",
-				IP:   &Resource{"/api/2.0/ips/31.171.246.37/", "31.171.246.37"},
+				IP:   MakeIPResource("31.171.246.37"),
 			},
 			Model: "virtio",
 			MAC:   "22:40:85:4f:d3:ce",
@@ -324,10 +321,7 @@ var serverData = Server{
 		NIC{
 			Model: "virtio",
 			MAC:   "22:aa:fe:07:48:3b",
-			VLAN: &Resource{
-				"/api/2.0/vlans/5bc05e7e-6555-4f40-add8-3b8e91447702/",
-				"5bc05e7e-6555-4f40-add8-3b8e91447702",
-			},
+			VLAN:  MakeVLanResource("5bc05e7e-6555-4f40-add8-3b8e91447702"),
 		},
 	},
 	Drives: []ServerDrive{
@@ -335,10 +329,7 @@ var serverData = Server{
 			BootOrder: 1,
 			Channel:   "0:0",
 			Device:    "virtio",
-			Drive: Resource{
-				URI:  "/api/2.0/drives/ddce5beb-6cfe-4a80-81bd-3ae5f71e0c00/",
-				UUID: "ddce5beb-6cfe-4a80-81bd-3ae5f71e0c00",
-			},
+			Drive:     *MakeDriveResource("ddce5beb-6cfe-4a80-81bd-3ae5f71e0c00"),
 		},
 	},
 	VNCPassword: "Pim3UkEc",
@@ -416,59 +407,3 @@ const jsonServerData = `{
     "vnc_password": "Pim3UkEc"
 }
 `
-
-/*
-var jsonTestServerCreateData = Server{
-	ServerRecord: ServerRecord{
-		Resource{
-			"/api/2.0/servers/472835d5-2bbb-4d87-9d08-7364bc373691/",
-			"472835d5-2bbb-4d87-9d08-7364bc373691"},
-		"test",
-		"starting",
-	},
-	CPU: 2000,
-	Mem: 2147483648,
-	Meta: map[string]string{"description": "trusty-server-cloudimg-amd64",
-		"ssh_public_key": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDDiwTGBsmFKBYHcKaVy5IgsYBR4XVYLS6KP/NKClE7gONlIGURE3+/45BX8TfHJHM5WTN8NBqJejKDHqwfyueR1f2VGoPkJxODGt/X/ZDNftLZLYwPd2DfDBs27ahOadZCk4Cl5l7mU0aoE74UnIcQoNPl6w7axkIFTIXr8+0HMk8DFB0iviBSJK118p1RGwhsoA1Hudn1CsgqARGPmNn6mxwvmQfQY7hZxZoOH9WMcvkNZ7rAFrwS/BuvEpEXkoC95K/JDPvmQVVJk7we+WeHfTYSmApkDFcSaypyjL2HOV8pvE+VntcIIhZccHiOubyjsBAx5aoTI+ueCsoz5AL1 maxim.perenesenko@altoros.com"},
-	NICs: []NIC{
-		NIC{
-			IPv4:  &IPv4{Conf: "dhcp"},
-			Model: "virtio",
-		},
-		NIC{
-			IPv4:  &IPv4{Conf: "manual"},
-			Model: "virtio",
-		},
-		NIC{
-			IPv4: &IPv4{
-				Conf: "static",
-				IP:   Resource{"/api/2.0/ips/31.171.246.37/", "31.171.246.37"},
-			},
-			Model: "virtio",
-			MAC:   "22:40:85:4f:d3:ce",
-		},
-		NIC{
-			Model: "virtio",
-			MAC:   "22:aa:fe:07:48:3b",
-			VLAN: &Resource{
-				"/api/2.0/vlans/5bc05e7e-6555-4f40-add8-3b8e91447702/",
-				"5bc05e7e-6555-4f40-add8-3b8e91447702",
-			},
-		},
-	},
-	Drives: []ServerDrive{
-		ServerDrive{
-			BootOrder: 1,
-			Channel:   "0:0",
-			Device:    "virtio",
-			Drive: Resource{
-				URI:  "/api/2.0/drives/ddce5beb-6cfe-4a80-81bd-3ae5f71e0c00/",
-				UUID: "ddce5beb-6cfe-4a80-81bd-3ae5f71e0c00",
-			},
-		},
-	},
-	VNCPassword: "Pim3UkEc",
-}
-
-const jsonTestServerCreateRequestj = `{"cpu":2000,"mem":2147483648,"name":"test","nics":[{"ip_v4_conf":{"conf":"dhcp"},"model":"virtio"},{"ip_v4_conf":{"conf":"manual"},"model":"virtio"},{"ip_v4_conf":{"conf":"static","ip":"ipaddr"},"model":"virtio"},{"model":"virtio","vlan":"vlanid"}],"vnc_password":"testserver"}`
-*/
