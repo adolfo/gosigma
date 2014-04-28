@@ -117,23 +117,3 @@ func TestComponentsNetworkVLan(t *testing.T) {
 	testMarshalComponents(t, c, `NetworkVLan("virtio", "vlanuuid")`,
 		`{"nics":[{"model":"virtio","vlan":{"resource_uri":"/api/2.0/vlans/vlanuuid/","uuid":"vlanuuid"}}]}`)
 }
-
-/*
-type noMarshal int
-
-func (noMarshal) MarshalJSON() ([]byte, error) {
-	return nil, errors.New("error")
-}
-
-func TestComponentsMarshalEmpty(t *testing.T) {
-	var c Components
-	c.init()
-	c.m["bad"] = noMarshal(0)
-	s, err := c.marshalString()
-	if err == nil {
-		t.Error(err, s)
-	} else {
-		t.Log(err)
-	}
-}
-*/
