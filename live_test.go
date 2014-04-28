@@ -16,7 +16,8 @@ var suid = flag.String("suid", "", "uuid of server at CloudSigma to run server s
 var duid = flag.String("duid", "", "uuid of drive at CloudSigma to run drive specific tests")
 var vlan = flag.String("vlan", "", "uuid of vlan at CloudSigma to run server specific tests")
 var sshkey = flag.String("sshkey", "", "public ssh key to run server specific tests")
-var force = flag.String("force", "n", "force start/stop live tests")
+var force = flag.Bool("force", false, "force start/stop live tests")
+var lib = flag.Bool("lib", false, "duid is library drive")
 
 func parseCredentials() (u string, p string, e error) {
 	if *live == "" {
@@ -55,7 +56,7 @@ func TestLiveServers(t *testing.T) {
 		return
 	}
 
-	if *trace != "n" {
+	if *trace {
 		cli.Logger(t)
 	}
 
@@ -85,7 +86,7 @@ func TestLiveServerGet(t *testing.T) {
 		return
 	}
 
-	if *trace != "n" {
+	if *trace {
 		cli.Logger(t)
 	}
 
@@ -115,7 +116,7 @@ func TestLiveServerStart(t *testing.T) {
 		return
 	}
 
-	if *trace != "n" {
+	if *trace {
 		cli.Logger(t)
 	}
 
@@ -125,7 +126,7 @@ func TestLiveServerStart(t *testing.T) {
 		return
 	}
 
-	if s.Status() != ServerStopped && *force == "n" {
+	if s.Status() != ServerStopped && !*force {
 		t.Skip("wrong server status", s.Status())
 		return
 	}
@@ -153,7 +154,7 @@ func TestLiveServerStop(t *testing.T) {
 		return
 	}
 
-	if *trace != "n" {
+	if *trace {
 		cli.Logger(t)
 	}
 
@@ -163,7 +164,7 @@ func TestLiveServerStop(t *testing.T) {
 		return
 	}
 
-	if s.Status() != ServerRunning && *force == "n" {
+	if s.Status() != ServerRunning && !*force {
 		t.Skip("wrong server status", s.Status())
 		return
 	}
@@ -191,11 +192,11 @@ func TestLiveDriveGet(t *testing.T) {
 		return
 	}
 
-	if *trace != "n" {
+	if *trace {
 		cli.Logger(t)
 	}
 
-	d, err := cli.Drive(*duid)
+	d, err := cli.Drive(*duid, *lib)
 	if err != nil {
 		t.Error(err)
 		return
@@ -221,11 +222,11 @@ func TestLiveDriveClone(t *testing.T) {
 		return
 	}
 
-	if *trace != "n" {
+	if *trace {
 		cli.Logger(t)
 	}
 
-	d, err := cli.Drive(*duid)
+	d, err := cli.Drive(*duid, *lib)
 	if err != nil {
 		t.Error(err)
 		return
@@ -269,11 +270,11 @@ func TestLiveServerClone(t *testing.T) {
 		return
 	}
 
-	if *trace != "n" {
+	if *trace {
 		cli.Logger(t)
 	}
 
-	originalDrive, err := cli.Drive(*duid)
+	originalDrive, err := cli.Drive(*duid, *lib)
 	if err != nil {
 		t.Error(err)
 		return
@@ -328,7 +329,7 @@ func TestLiveServerRemove(t *testing.T) {
 		return
 	}
 
-	if *trace != "n" {
+	if *trace {
 		cli.Logger(t)
 	}
 

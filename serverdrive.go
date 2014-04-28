@@ -5,6 +5,7 @@ package gosigma
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/Altoros/gosigma/data"
 )
@@ -56,9 +57,10 @@ func (sd ServerDrive) UUID() string {
 func (sd ServerDrive) Drive() Drive {
 	if sd.obj != nil {
 		obj := data.Drive{DriveRecord: data.DriveRecord{Resource: sd.obj.Drive}}
-		return Drive{sd.client, &obj}
+		libdrive := strings.Contains(sd.obj.Drive.UUID, "libdrives")
+		return Drive{sd.client, &obj, libdrive}
 	} else {
-		return Drive{sd.client, nil}
+		return Drive{sd.client, nil, false}
 	}
 }
 

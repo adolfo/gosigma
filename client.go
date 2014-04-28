@@ -153,24 +153,44 @@ func (c Client) RemoveServer(uuid, recurse string) error {
 	return c.removeServer(uuid, recurse)
 }
 
+// Drives returns list of drives
+func (c Client) Drives(detail, library bool) ([]Drive, error) {
+	objs, err := c.getDrives(detail, library)
+	if err != nil {
+		return nil, err
+	}
+
+	drives := make([]Drive, len(objs))
+	for i := 0; i < len(objs); i++ {
+		drives[i] = Drive{
+			client:  &c,
+			obj:     &objs[i],
+			library: library,
+		}
+	}
+
+	return drives, nil
+}
+
 // Drive returns given drive by uuid
-func (c Client) Drive(uuid string) (Drive, error) {
-	obj, err := c.getDrive(uuid)
+func (c Client) Drive(uuid string, library bool) (Drive, error) {
+	obj, err := c.getDrive(uuid, library)
 	if err != nil {
 		return Drive{}, err
 	}
 
 	drv := Drive{
-		client: &c,
-		obj:    obj,
+		client:  &c,
+		obj:     obj,
+		library: library,
 	}
 
 	return drv, nil
 }
 
 // CloneDrive clones given drive by uuid
-func (c Client) CloneDrive(uuid string, params CloneParams, avoid []string) (Drive, error) {
-	objs, err := c.cloneDrive(uuid, params, avoid)
+func (c Client) CloneDrive(uuid string, library bool, params CloneParams, avoid []string) (Drive, error) {
+	objs, err := c.cloneDrive(uuid, library, params, avoid)
 
 	if err != nil {
 		return Drive{}, err
@@ -181,8 +201,9 @@ func (c Client) CloneDrive(uuid string, params CloneParams, avoid []string) (Dri
 	}
 
 	drv := Drive{
-		client: &c,
-		obj:    &objs[0],
+		client:  &c,
+		obj:     &objs[0],
+		library: library,
 	}
 
 	return drv, nil
@@ -345,13 +366,43 @@ func (c Client) createServer(components Components) ([]data.Server, error) {
 	return data.ReadServers(r.Body)
 }
 
-func (c Client) getDrive(uuid string) (*data.Drive, error) {
+func (c Client) getDrives(detail, library bool) ([]data.Drive, error) {
+	u := c.endpoint
+	if library {
+		u += "libdrives"
+	} else {
+		u += "drives"
+	}
+	if detail {
+		u += "/detail"
+	}
+
+	r, err := c.https.Get(u, url.Values{"limit": {"0"}})
+	if err != nil {
+		return nil, err
+	}
+	defer r.Body.Close()
+
+	if err := r.VerifyJSON(200); err != nil {
+		return nil, NewError(r, err)
+	}
+
+	return data.ReadDrives(r.Body)
+}
+
+func (c Client) getDrive(uuid string, library bool) (*data.Drive, error) {
 	uuid = strings.TrimSpace(uuid)
 	if uuid == "" {
 		return nil, errEmptyUUID
 	}
 
-	u := c.endpoint + "drives/" + uuid + "/"
+	u := c.endpoint
+	if library {
+		u += "libdrives/"
+	} else {
+		u += "drives/"
+	}
+	u += uuid + "/"
 
 	r, err := c.https.Get(u, nil)
 	if err != nil {
@@ -366,13 +417,19 @@ func (c Client) getDrive(uuid string) (*data.Drive, error) {
 	return data.ReadDrive(r.Body)
 }
 
-func (c Client) cloneDrive(uuid string, params CloneParams, avoid []string) ([]data.Drive, error) {
+func (c Client) cloneDrive(uuid string, library bool, params CloneParams, avoid []string) ([]data.Drive, error) {
 	uuid = strings.TrimSpace(uuid)
 	if uuid == "" {
 		return nil, errEmptyUUID
 	}
 
-	u := c.endpoint + "drives/" + uuid + "/action/"
+	u := c.endpoint
+	if library {
+		u += "libdrives/"
+	} else {
+		u += "drives/"
+	}
+	u += uuid + "/action/"
 
 	var qq = make(url.Values)
 	qq["do"] = []string{"clone"}

@@ -33,8 +33,9 @@ const (
 
 // A Drive represents drive instance in CloudSigma account
 type Drive struct {
-	client *Client
-	obj    *data.Drive
+	client  *Client
+	obj     *data.Drive
+	library bool
 }
 
 // Name of drive instance
@@ -64,6 +65,9 @@ func (d Drive) Get(key string) (v string, ok bool) {
 	return
 }
 
+// IsLibrary returns true if this drive is CloudSigma library drive
+func (d Drive) IsLibrary() bool { return d.library }
+
 // Jobs for this drive instance.
 // Every job object in resulting slice carries only UUID and URI.
 // To obtain additional information for job, one should use Job.Refresh() method
@@ -86,7 +90,7 @@ func (d Drive) String() string {
 
 // Refresh information about drive instance
 func (d *Drive) Refresh() error {
-	obj, err := d.client.getDrive(d.UUID())
+	obj, err := d.client.getDrive(d.UUID(), d.IsLibrary())
 	if err != nil {
 		return err
 	}
@@ -127,7 +131,7 @@ func (c *CloneParams) makeJsonReader() (io.Reader, error) {
 
 // Clone drive instance.
 func (d Drive) Clone(params CloneParams, avoid []string) (Drive, error) {
-	return d.client.CloneDrive(d.UUID(), params, avoid)
+	return d.client.CloneDrive(d.UUID(), d.IsLibrary(), params, avoid)
 }
 
 // Clone drive instance, wait for operation finished.

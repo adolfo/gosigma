@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-var trace = flag.String("trace", "n", "trace test requests/responses")
+var trace = flag.Bool("trace", false, "trace test requests/responses")
 
 func TestVersionStringMatches(t *testing.T) {
 	if vs, vns := Version(), VersionNumber().String(); vs != vns {
