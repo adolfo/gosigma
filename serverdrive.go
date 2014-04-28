@@ -3,7 +3,11 @@
 
 package gosigma
 
-import "github.com/Altoros/gosigma/data"
+import (
+	"fmt"
+
+	"github.com/Altoros/gosigma/data"
+)
 
 // A ServerDrive represents drive, connected to server instance
 type ServerDrive struct {
@@ -13,39 +17,54 @@ type ServerDrive struct {
 
 // BootOrder of drive
 func (sd ServerDrive) BootOrder() int {
-	return sd.obj.BootOrder
+	if sd.obj != nil {
+		return sd.obj.BootOrder
+	} else {
+		return 0
+	}
 }
 
 // Channel of drive
 func (sd ServerDrive) Channel() string {
-	return sd.obj.Channel
+	if sd.obj != nil {
+		return sd.obj.Channel
+	} else {
+		return ""
+	}
 }
 
 // Device name of drive
 func (sd ServerDrive) Device() string {
-	return sd.obj.Device
+	if sd.obj != nil {
+		return sd.obj.Device
+	} else {
+		return ""
+	}
+}
+
+// UUID of drive
+func (sd ServerDrive) UUID() string {
+	if sd.obj != nil {
+		return sd.obj.Drive.UUID
+	} else {
+		return ""
+	}
 }
 
 // Drive object. Note, returned Drive object carries only UUID and URI, so it needs
 // to perform Drive.Refresh to access additional information.
 func (sd ServerDrive) Drive() Drive {
-	obj := data.Drive{DriveRecord: data.DriveRecord{Resource: sd.obj.Drive}}
-	return Drive{sd.client, &obj}
+	if sd.obj != nil {
+		obj := data.Drive{DriveRecord: data.DriveRecord{Resource: sd.obj.Drive}}
+		return Drive{sd.client, &obj}
+	} else {
+		return Drive{sd.client, nil}
+	}
 }
 
-/*
 // String method is used to print values passed as an operand to any format that
 // accepts a string or to an unformatted printer such as Print.
 func (sd ServerDrive) String() string {
-	return fmt.Sprintf(`{UUID: %q
-Operation: %s
-State: %s
-Progress: %d,
-Resources: %v}`,
-		j.obj.UUID,
-		j.obj.Operation,
-		j.obj.State,
-		j.obj.Data.Progress,
-		j.obj.Resources)
+	return fmt.Sprintf(`{BootOrder: %d, Channel: %q, Device: %q, UUID: %q}`,
+		sd.BootOrder(), sd.Channel(), sd.Device(), sd.UUID())
 }
-*/

@@ -85,11 +85,6 @@ func (c Client) Logger(logger https.Logger) {
 	c.https.Logger(logger)
 }
 
-// Factory for complex operatoins
-//func (c Client) Factory() Factory {
-//	return Factory{&c}
-//}
-
 // Servers in current account
 func (c Client) Servers(detail bool) ([]Server, error) {
 	objs, err := c.getServers(detail)
