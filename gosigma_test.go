@@ -15,18 +15,3 @@ func TestVersionStringMatches(t *testing.T) {
 		t.Errorf("Version() != VersionNumber().String(): '%s' != '%s'", vs, vns)
 	}
 }
-
-func TestGetRegionEndpoint(t *testing.T) {
-	check := func(ep string, url string) {
-		ep, err := ResolveEndpoint(ep)
-		if err != nil {
-			t.Error(err)
-		}
-		if ep != url {
-			t.Errorf("ep value = '%s', wants '%s'", ep, url)
-		}
-	}
-
-	check("zrh", "https://zrh.cloudsigma.com/api/2.0/")
-	check("lvs", "https://lvs.cloudsigma.com/api/2.0/")
-}
