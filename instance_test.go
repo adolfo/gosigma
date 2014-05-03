@@ -36,4 +36,9 @@ func TestReadContext(t *testing.T) {
 	}
 
 	t.Logf("%#v", ctx.obj)
+
+	nics := ctx.NICs()
+	for i, n := range nics {
+		t.Logf("nic #%d: %s", i, n)
+	}
 }
