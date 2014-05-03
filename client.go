@@ -537,5 +537,5 @@ func (c Client) readContext() (*data.Server, error) {
 		return nil, fmt.Errorf("invalid write length %d, wants %d", n, len(REQUEST))
 	}
 
-	return data.ReadServer(f)
+	return data.ReadServer(r)
 }
