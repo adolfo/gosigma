@@ -509,12 +509,14 @@ func (c Client) readContext() (*data.Server, error) {
 
 	logger := c.logger
 
+	// open server ctx device
 	f, err := os.OpenFile(DEVICE, os.O_RDWR, 0)
 	if err != nil {
 		return nil, fmt.Errorf("OpenFile: %s", err)
 	}
 	defer f.Close()
 
+	// schedule timeout, if defined
 	readWriteTimeout := c.GetReadWriteTimeout()
 	if readWriteTimeout > 0 {
 		timer := time.AfterFunc(readWriteTimeout, func() {
@@ -523,33 +525,41 @@ func (c Client) readContext() (*data.Server, error) {
 		defer timer.Stop()
 	}
 
+	// writing request to service
 	n, err := f.WriteString(REQUEST)
 	if err != nil {
 		return nil, fmt.Errorf("WriteString: %s", err)
 	}
 
+	// check the request was written
 	if n != len(REQUEST) {
 		return nil, fmt.Errorf("invalid write length %d, wants %d", n, len(REQUEST))
 	}
 
+	// prepare buffered I/O object
 	r := bufio.NewReader(f)
 
+	// read until End-Of-Transfer (EOT) symbol or EOF
 	bb, err := r.ReadBytes(EOT)
 	if err != nil && err != io.EOF {
 		return nil, fmt.Errorf("ReadBytes: %s", err)
 	}
 
+	// if EOT was read, truncate it
 	if last := len(bb) - 1; bb[last] == EOT {
 		bb = bb[:last]
 	}
 
+	// log server context as raw content
 	if logger != nil {
 		logger.Log()
 		logger.Log(string(bb))
 		logger.Log()
 	}
 
+	// prepare reader around raw content
 	rr := bytes.NewReader(bb)
 
+	// parse server context JSON to the data.Server object
 	return data.ReadServer(rr)
 }
