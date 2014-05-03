@@ -202,7 +202,7 @@ func TestClientServerNotFound(t *testing.T) {
 	}
 }
 
-func TestClientServersDetail(t *testing.T) {
+func TestClientServersShort(t *testing.T) {
 	mock.ResetServers()
 
 	ds := newDataServer()

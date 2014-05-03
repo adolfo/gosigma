@@ -40,23 +40,46 @@ type Server struct {
 	obj    *data.Server
 }
 
-// Name of server instance
-func (s Server) Name() string { return s.obj.Name }
-
-// URI of server instance
-func (s Server) URI() string { return s.obj.URI }
-
-// Status of server instance
-func (s Server) Status() string { return s.obj.Status }
-
-// UUID of server instance
-func (s Server) UUID() string { return s.obj.UUID }
+// Context serial device enabled for server instance
+func (s Server) Context() bool { return s.obj.Context }
 
 // Cpu frequency in MHz
 func (s Server) Cpu() int64 { return s.obj.CPU }
 
+// Drives for this server instance.
+func (s Server) Drives() []ServerDrive {
+	r := make([]ServerDrive, 0, len(s.obj.Drives))
+	for i := range s.obj.Drives {
+		drive := ServerDrive{s.client, &s.obj.Drives[i]}
+		r = append(r, drive)
+	}
+	return r
+}
+
 // Mem capacity in bytes
 func (s Server) Mem() int64 { return s.obj.Mem }
+
+// Name of server instance
+func (s Server) Name() string { return s.obj.Name }
+
+// NICs for this server instance.
+func (s Server) NICs() []NIC {
+	r := make([]NIC, 0, len(s.obj.NICs))
+	for i := range s.obj.NICs {
+		nic := NIC{s.client, &s.obj.NICs[i]}
+		r = append(r, nic)
+	}
+	return r
+}
+
+// Status of server instance
+func (s Server) Status() string { return s.obj.Status }
+
+// URI of server instance
+func (s Server) URI() string { return s.obj.URI }
+
+// UUID of server instance
+func (s Server) UUID() string { return s.obj.UUID }
 
 // VNCPassword to accerss the server
 func (s Server) VNCPassword() string { return s.obj.VNCPassword }
@@ -115,26 +138,6 @@ func (s *Server) StopWait() error {
 // Remove server instance
 func (s Server) Remove(recurse string) error {
 	return s.client.removeServer(s.UUID(), recurse)
-}
-
-// NICs for this server instance.
-func (s Server) NICs() []NIC {
-	r := make([]NIC, 0, len(s.obj.NICs))
-	for i := range s.obj.NICs {
-		nic := NIC{s.client, &s.obj.NICs[i]}
-		r = append(r, nic)
-	}
-	return r
-}
-
-// Drives for this server instance.
-func (s Server) Drives() []ServerDrive {
-	r := make([]ServerDrive, 0, len(s.obj.Drives))
-	for i := range s.obj.Drives {
-		drive := ServerDrive{s.client, &s.obj.Drives[i]}
-		r = append(r, drive)
-	}
-	return r
 }
 
 func (s *Server) waitStatus(status string) error {

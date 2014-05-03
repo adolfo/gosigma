@@ -3,26 +3,23 @@
 
 package data
 
-var driveOwner = Resource{
-	"/api/2.0/user/80cb30fb-0ea3-43db-b27b-a125752cc0bf/",
-	"80cb30fb-0ea3-43db-b27b-a125752cc0bf",
-}
+var driveOwner = MakeUserResource("80cb30fb-0ea3-43db-b27b-a125752cc0bf")
 
 var drivesData = []Drive{
 	Drive{
-		DriveRecord: DriveRecord{
-			*MakeDriveResource("2ef7b7c7-7ec4-47a7-9b69-087c9417c0ff"),
-			&driveOwner, "unmounted"},
+		Resource: *MakeDriveResource("2ef7b7c7-7ec4-47a7-9b69-087c9417c0ff"),
+		Owner:    driveOwner,
+		Status:   "unmounted",
 	},
 	Drive{
-		DriveRecord: DriveRecord{
-			*MakeDriveResource("3b30c7ef-1fda-416d-91d1-ba616859360c"),
-			&driveOwner, "unmounted"},
+		Resource: *MakeDriveResource("3b30c7ef-1fda-416d-91d1-ba616859360c"),
+		Owner:    driveOwner,
+		Status:   "unmounted",
 	},
 	Drive{
-		DriveRecord: DriveRecord{
-			*MakeDriveResource("464aed14-8604-4277-be3c-9d53151d53b4"),
-			&driveOwner, "unmounted"},
+		Resource: *MakeDriveResource("464aed14-8604-4277-be3c-9d53151d53b4"),
+		Owner:    driveOwner,
+		Status:   "unmounted",
 	},
 }
 
@@ -119,40 +116,41 @@ const jsonDrivesData = `{
 
 var drivesDetailData = []Drive{
 	Drive{
-		DriveRecord: DriveRecord{
-			*MakeDriveResource("2ef7b7c7-7ec4-47a7-9b69-087c9417c0ff"),
-			&driveOwner, "unmounted"},
+		Resource:    *MakeDriveResource("2ef7b7c7-7ec4-47a7-9b69-087c9417c0ff"),
+		Jobs:        nil,
 		Media:       "disk",
 		Meta:        nil,
-		Size:        1073741824,
-		StorageType: "dssd",
-		Jobs:        nil,
 		Name:        "test_drive_2",
-	},
-	Drive{
-		DriveRecord: DriveRecord{
-			*MakeDriveResource("3b30c7ef-1fda-416d-91d1-ba616859360c"),
-			&driveOwner, "unmounted"},
-		Media:       "disk",
-		Meta:        nil,
-		Size:        10737418240,
-		StorageType: "dssd",
-		Jobs: []Resource{
-			Resource{URI: "/api/2.0/jobs/fbe05708-fd42-43d5-814c-9cb805edd4cb/", UUID: "fbe05708-fd42-43d5-814c-9cb805edd4cb"},
-			Resource{URI: "/api/2.0/jobs/32513930-6815-4cd4-ae8e-2eb89733c206/", UUID: "32513930-6815-4cd4-ae8e-2eb89733c206"},
-		},
-		Name: "atom",
-	},
-	Drive{
-		DriveRecord: DriveRecord{
-			*MakeDriveResource("464aed14-8604-4277-be3c-9d53151d53b4"),
-			&driveOwner, "unmounted"},
-		Media:       "disk",
-		Meta:        nil,
+		Owner:       driveOwner,
 		Size:        1073741824,
+		Status:      "unmounted",
 		StorageType: "dssd",
+	},
+	Drive{
+		Resource: *MakeDriveResource("3b30c7ef-1fda-416d-91d1-ba616859360c"),
+		Jobs: []Resource{
+			*MakeJobResource("fbe05708-fd42-43d5-814c-9cb805edd4cb"),
+			*MakeJobResource("32513930-6815-4cd4-ae8e-2eb89733c206"),
+		},
+
+		Media:       "disk",
+		Meta:        nil,
+		Name:        "atom",
+		Owner:       driveOwner,
+		Size:        10737418240,
+		Status:      "unmounted",
+		StorageType: "dssd",
+	},
+	Drive{
+		Resource:    *MakeDriveResource("464aed14-8604-4277-be3c-9d53151d53b4"),
 		Jobs:        nil,
+		Media:       "disk",
+		Meta:        nil,
 		Name:        "test_drive_1",
+		Owner:       driveOwner,
+		Size:        1073741824,
+		Status:      "unmounted",
+		StorageType: "dssd",
 	},
 }
 
@@ -422,15 +420,15 @@ const jsonDrivesDetailData = `{
 }`
 
 var driveData = Drive{
-	DriveRecord: DriveRecord{
-		*MakeDriveResource("2ef7b7c7-7ec4-47a7-9b69-087c9417c0ff"),
-		&driveOwner, "unmounted"},
+	Resource:    *MakeDriveResource("2ef7b7c7-7ec4-47a7-9b69-087c9417c0ff"),
+	Jobs:        nil,
 	Media:       "disk",
 	Meta:        nil,
-	Size:        1073741824,
-	StorageType: "dssd",
-	Jobs:        nil,
 	Name:        "test_drive_2",
+	Owner:       driveOwner,
+	Size:        1073741824,
+	Status:      "unmounted",
+	StorageType: "dssd",
 }
 
 const jsonDriveData = `{
@@ -461,16 +459,17 @@ const jsonDriveData = `{
 }`
 
 var libraryDriveData = Drive{
-	DriveRecord: DriveRecord{
-		*MakeLibDriveResource("22bd1b24-ea78-47bb-a59b-a09ed5407867"),
-		nil, "unmounted"},
-	Media:     "cdrom",
-	Size:      536870912,
-	Name:      "Debian 7.1.0 Netinstall",
-	OS:        "linux",
+	Resource: *MakeLibDriveResource("22bd1b24-ea78-47bb-a59b-a09ed5407867"),
+	Media:    "cdrom",
+	Name:     "Debian 7.1.0 Netinstall",
+	Owner:    nil,
+	Status:   "unmounted",
+	Size:     536870912,
+
 	Arch:      "64",
-	Paid:      false,
 	ImageType: "install",
+	OS:        "linux",
+	Paid:      false,
 }
 
 const jsonLibraryDriveData = `{

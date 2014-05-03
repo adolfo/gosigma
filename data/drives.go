@@ -5,32 +5,25 @@ package data
 
 import "io"
 
-// DriveRecord contains main properties of cloud server instance
-type DriveRecord struct {
-	Resource
-	Owner  *Resource `json:"owner"`
-	Status string    `json:"status"`
-}
-
-// DriveRecords holds collection of DriverRecord objects
-type DriveRecords struct {
-	Meta    Meta          `json:"meta"`
-	Objects []DriveRecord `json:"objects"`
-}
-
 // Drive contains detail properties of cloud server instance
 type Drive struct {
-	DriveRecord
-	Media       string            `json:"media"`
-	Meta        map[string]string `json:"meta"`
-	Name        string            `json:"name"`
-	Size        int64             `json:"size"`
-	StorageType string            `json:"storage_type"`
-	Jobs        []Resource        `json:"jobs"`
-	OS          string            `json:"os"`
-	Arch        string            `json:"arch"`
-	Paid        bool              `json:"paid"`
-	ImageType   string            `json:"image_type"`
+	Resource
+	Jobs        []Resource        `json:"jobs,omitempty"`
+	Media       string            `json:"media,omitempty"`
+	Meta        map[string]string `json:"meta,omitempty"`
+	Name        string            `json:"name,omitempty"`
+	Owner       *Resource         `json:"owner,omitempty"`
+	Size        int64             `json:"size,omitempty"`
+	Status      string            `json:"status,omitempty"`
+	StorageType string            `json:"storage_type,omitempty"`
+
+	//
+	// specific for media library drives
+
+	Arch      string `json:"arch,omitempty"`
+	ImageType string `json:"image_type,omitempty"`
+	OS        string `json:"os,omitempty"`
+	Paid      bool   `json:"paid,omitempty"`
 }
 
 // Drives holds collection of Drive objects

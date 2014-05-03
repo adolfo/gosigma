@@ -85,49 +85,57 @@ func TestDataDrivesLibDrive(t *testing.T) {
 }
 
 func compareDrives(t *testing.T, i int, value, wants *Drive) {
-	if value.DriveRecord.Resource != wants.DriveRecord.Resource {
-		t.Errorf("DriveRecord.Resource error [%d]: found %#v, wants %#v", i, value.DriveRecord.Resource, wants.DriveRecord.Resource)
-	}
-	if value.DriveRecord.Owner != nil && wants.DriveRecord.Owner != nil {
-		if *value.DriveRecord.Owner != *wants.DriveRecord.Owner {
-			t.Errorf("DriveRecord.Owner error [%d]: found %#v, wants %#v", i, value.DriveRecord.Owner, wants.DriveRecord.Owner)
-		}
-	} else if value.DriveRecord.Owner != nil || wants.DriveRecord.Owner != nil {
-		t.Errorf("DriveRecord.Owner error [%d]: found %#v, wants %#v", i, value.DriveRecord.Owner, wants.DriveRecord.Owner)
-	}
-	if value.DriveRecord.Status != wants.DriveRecord.Status {
-		t.Errorf("DriveRecord.Status error [%d]: found %#v, wants %#v", i, value.DriveRecord.Status, wants.DriveRecord.Status)
+	if value.Resource != wants.Resource {
+		t.Errorf("Drive.Resource error [%d]: found %#v, wants %#v", i, value.Resource, wants.Resource)
 	}
 
 	if len(value.Jobs) != len(wants.Jobs) {
 		t.Errorf("Drive.Jobs error [%d]: found %#v, wants %#v", i, value.Jobs, wants.Jobs)
 	}
+
 	if value.Media != wants.Media {
 		t.Errorf("Drive.Media error [%d]: found %#v, wants %#v", i, value.Media, wants.Media)
-	}
-	if value.Name != wants.Name {
-		t.Errorf("Drive.Name error [%d]: found %#v, wants %#v", i, value.Name, wants.Name)
 	}
 
 	compareMeta(t, fmt.Sprintf("Drive.Meta error [%d]", i), value.Meta, wants.Meta)
 
+	if value.Name != wants.Name {
+		t.Errorf("Drive.Name error [%d]: found %#v, wants %#v", i, value.Name, wants.Name)
+	}
+
+	if value.Owner != nil && wants.Owner != nil {
+		if *value.Owner != *wants.Owner {
+			t.Errorf("Drive.Owner error [%d]: found %#v, wants %#v", i, value.Owner, wants.Owner)
+		}
+	} else if value.Owner != nil || wants.Owner != nil {
+		t.Errorf("Drive.Owner error [%d]: found %#v, wants %#v", i, value.Owner, wants.Owner)
+	}
+
 	if value.Size != wants.Size {
 		t.Errorf("Drive.Size error [%d]: found %#v, wants %#v", i, value.Size, wants.Size)
 	}
+
+	if value.Status != wants.Status {
+		t.Errorf("Drive.Status error [%d]: found %#v, wants %#v", i, value.Status, wants.Status)
+	}
+
 	if value.StorageType != wants.StorageType {
 		t.Errorf("Drive.StorageType error [%d]: found %#v, wants %#v", i, value.StorageType, wants.StorageType)
 	}
 
-	if value.OS != wants.OS {
-		t.Errorf("Drive.OS error [%d]: found %#v, wants %#v", i, value.OS, wants.OS)
-	}
+	//
+	// specific for media library drives
+
 	if value.Arch != wants.Arch {
 		t.Errorf("Drive.Arch error [%d]: found %#v, wants %#v", i, value.Arch, wants.Arch)
 	}
-	if value.Paid != wants.Paid {
-		t.Errorf("Drive.Paid error [%d]: found %#v, wants %#v", i, value.Paid, wants.Paid)
-	}
 	if value.ImageType != wants.ImageType {
 		t.Errorf("Drive.ImageType error [%d]: found %#v, wants %#v", i, value.ImageType, wants.ImageType)
+	}
+	if value.OS != wants.OS {
+		t.Errorf("Drive.OS error [%d]: found %#v, wants %#v", i, value.OS, wants.OS)
+	}
+	if value.Paid != wants.Paid {
+		t.Errorf("Drive.Paid error [%d]: found %#v, wants %#v", i, value.Paid, wants.Paid)
 	}
 }

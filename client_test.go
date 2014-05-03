@@ -20,12 +20,10 @@ func init() {
 
 func newDataServer() *data.Server {
 	return &data.Server{
-		ServerRecord: data.ServerRecord{
-			Resource: data.Resource{URI: "uri", UUID: "uuid"},
-			Name:     "name",
-			Status:   "status",
-		},
-		Meta: map[string]string{"key1": "value1", "key2": "value2"},
+		Resource: data.Resource{URI: "uri", UUID: "uuid"},
+		Meta:     map[string]string{"key1": "value1", "key2": "value2"},
+		Name:     "name",
+		Status:   "status",
 	}
 }
 

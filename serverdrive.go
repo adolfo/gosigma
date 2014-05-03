@@ -56,7 +56,7 @@ func (sd ServerDrive) UUID() string {
 // to perform Drive.Refresh to access additional information.
 func (sd ServerDrive) Drive() Drive {
 	if sd.obj != nil {
-		obj := data.Drive{DriveRecord: data.DriveRecord{Resource: sd.obj.Drive}}
+		obj := data.Drive{Resource: sd.obj.Drive}
 		libdrive := strings.Contains(sd.obj.Drive.UUID, "libdrives")
 		return Drive{sd.client, &obj, libdrive}
 	} else {

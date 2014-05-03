@@ -119,23 +119,18 @@ func compareNICs(t *testing.T, i int, value, wants *NIC) {
 }
 
 func compareServers(t *testing.T, i int, value, wants *Server) {
-	if value.ServerRecord != wants.ServerRecord {
-		t.Errorf("ServerRecord error [%d]: found %#v, wants %#v", i, value.ServerRecord, wants.ServerRecord)
+	if value.Resource != wants.Resource {
+		t.Errorf("Resource error [%d]: found %#v, wants %#v", i, value.Resource, wants.Resource)
+	}
+
+	if value.Context != wants.Context {
+		t.Errorf("Server.Context error [%d]: found %#v, wants %#v", i, value.Context, wants.Context)
 	}
 	if value.CPU != wants.CPU {
 		t.Errorf("Server.CPU error [%d]: found %#v, wants %#v", i, value.CPU, wants.CPU)
 	}
-	if value.Mem != wants.Mem {
-		t.Errorf("Server.Mem error [%d]: found %#v, wants %#v", i, value.Mem, wants.Mem)
-	}
-
-	compareMeta(t, fmt.Sprintf("Server.Meta error [%d]", i), value.Meta, wants.Meta)
-
-	if len(value.NICs) != len(wants.NICs) {
-		t.Errorf("Server.NICs error [%d]: found %#v, wants %#v", i, value.NICs, wants.NICs)
-	}
-	for i := 0; i < len(value.NICs); i++ {
-		compareNICs(t, i, &value.NICs[i], &wants.NICs[i])
+	if value.CPUModel != wants.CPUModel {
+		t.Errorf("Server.CPUModel error [%d]: found %#v, wants %#v", i, value.CPUModel, wants.CPUModel)
 	}
 
 	if len(value.Drives) != len(wants.Drives) {
@@ -145,6 +140,27 @@ func compareServers(t *testing.T, i int, value, wants *Server) {
 		if value.Drives[i] != wants.Drives[i] {
 			t.Errorf("Server.Drives error [%d]: found %#v, wants %#v", i, value.Drives[i], wants.Drives[i])
 		}
+	}
+
+	if value.Mem != wants.Mem {
+		t.Errorf("Server.Mem error [%d]: found %#v, wants %#v", i, value.Mem, wants.Mem)
+	}
+
+	compareMeta(t, fmt.Sprintf("Server.Meta error [%d]", i), value.Meta, wants.Meta)
+
+	if value.Name != wants.Name {
+		t.Errorf("Name error [%d]: found %#v, wants %#v", i, value.Name, wants.Name)
+	}
+
+	if len(value.NICs) != len(wants.NICs) {
+		t.Errorf("Server.NICs error [%d]: found %#v, wants %#v", i, value.NICs, wants.NICs)
+	}
+	for i := 0; i < len(value.NICs); i++ {
+		compareNICs(t, i, &value.NICs[i], &wants.NICs[i])
+	}
+
+	if value.Status != wants.Status {
+		t.Errorf("Status error [%d]: found %#v, wants %#v", i, value.Status, wants.Status)
 	}
 
 	if value.VNCPassword != wants.VNCPassword {

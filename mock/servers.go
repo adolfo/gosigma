@@ -171,11 +171,15 @@ func handleServers(w http.ResponseWriter, r *http.Request) {
 	syncServers.Lock()
 	defer syncServers.Unlock()
 
-	var ss data.ServerRecords
+	var ss data.Servers
 	ss.Meta.TotalCount = len(servers)
-	ss.Objects = make([]data.ServerRecord, 0, len(servers))
+	ss.Objects = make([]data.Server, 0, len(servers))
 	for _, s := range servers {
-		ss.Objects = append(ss.Objects, s.ServerRecord)
+		var srv data.Server
+		srv.Resource = s.Resource
+		srv.Name = s.Name
+		srv.Status = s.Status
+		ss.Objects = append(ss.Objects, srv)
 	}
 
 	data, err := json.Marshal(&ss)

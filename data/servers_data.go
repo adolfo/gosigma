@@ -5,22 +5,14 @@ package data
 
 var serversData = []Server{
 	Server{
-		ServerRecord: ServerRecord{
-			Resource{
-				"/api/2.0/servers/43b1110a-31c5-41cc-a3e7-0b806076a913/",
-				"43b1110a-31c5-41cc-a3e7-0b806076a913"},
-			"test_server_4",
-			"stopped",
-		},
+		Resource: *MakeServerResource("43b1110a-31c5-41cc-a3e7-0b806076a913"),
+		Name:     "test_server_4",
+		Status:   "stopped",
 	},
 	Server{
-		ServerRecord: ServerRecord{
-			Resource{
-				"/api/2.0/servers/3be1ebc6-1d03-4c4b-88ff-02557b940d19/",
-				"3be1ebc6-1d03-4c4b-88ff-02557b940d19"},
-			"test_server_2",
-			"stopped",
-		},
+		Resource: *MakeServerResource("3be1ebc6-1d03-4c4b-88ff-02557b940d19"),
+		Name:     "test_server_2",
+		Status:   "stopped",
 	},
 }
 
@@ -92,15 +84,12 @@ const jsonServersData = `{
 
 var serversDetailData = []Server{
 	Server{
-		ServerRecord: ServerRecord{
-			Resource{
-				"/api/2.0/servers/43b1110a-31c5-41cc-a3e7-0b806076a913/",
-				"43b1110a-31c5-41cc-a3e7-0b806076a913"},
-			"test_server_4",
-			"stopped",
-		},
-		CPU: 1000,
-		Mem: 536870912,
+		Resource: *MakeServerResource("43b1110a-31c5-41cc-a3e7-0b806076a913"),
+		Context:  true,
+		CPU:      1000,
+		Drives:   []ServerDrive{},
+		Mem:      536870912,
+		Name:     "test_server_4",
 		NICs: []NIC{
 			NIC{
 				IPv4: &IPv4{
@@ -116,7 +105,7 @@ var serversDetailData = []Server{
 				VLAN:  MakeVLanResource("5bc05e7e-6555-4f40-add8-3b8e91447702"),
 			},
 		},
-		Drives:      []ServerDrive{},
+		Status:      "stopped",
 		VNCPassword: "testserver",
 	},
 }
@@ -298,17 +287,21 @@ const jsonServersDetailData = `{
 `
 
 var serverData = Server{
-	ServerRecord: ServerRecord{
-		Resource{
-			"/api/2.0/servers/472835d5-2bbb-4d87-9d08-7364bc373691/",
-			"472835d5-2bbb-4d87-9d08-7364bc373691"},
-		"trusty-server-cloudimg-amd64",
-		"starting",
+	Resource: *MakeServerResource("472835d5-2bbb-4d87-9d08-7364bc373691"),
+	Context:  true,
+	CPU:      2000,
+	Drives: []ServerDrive{
+		ServerDrive{
+			BootOrder: 1,
+			Channel:   "0:0",
+			Device:    "virtio",
+			Drive:     *MakeDriveResource("ddce5beb-6cfe-4a80-81bd-3ae5f71e0c00"),
+		},
 	},
-	CPU: 2000,
 	Mem: 2147483648,
 	Meta: map[string]string{"description": "trusty-server-cloudimg-amd64",
 		"ssh_public_key": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDDiwTGBsmFKBYHcKaVy5IgsYBR4XVYLS6KP/NKClE7gONlIGURE3+/45BX8TfHJHM5WTN8NBqJejKDHqwfyueR1f2VGoPkJxODGt/X/ZDNftLZLYwPd2DfDBs27ahOadZCk4Cl5l7mU0aoE74UnIcQoNPl6w7axkIFTIXr8+0HMk8DFB0iviBSJK118p1RGwhsoA1Hudn1CsgqARGPmNn6mxwvmQfQY7hZxZoOH9WMcvkNZ7rAFrwS/BuvEpEXkoC95K/JDPvmQVVJk7we+WeHfTYSmApkDFcSaypyjL2HOV8pvE+VntcIIhZccHiOubyjsBAx5aoTI+ueCsoz5AL1 maxim.perenesenko@altoros.com"},
+	Name: "trusty-server-cloudimg-amd64",
 	NICs: []NIC{
 		NIC{
 			IPv4: &IPv4{
@@ -324,14 +317,7 @@ var serverData = Server{
 			VLAN:  MakeVLanResource("5bc05e7e-6555-4f40-add8-3b8e91447702"),
 		},
 	},
-	Drives: []ServerDrive{
-		ServerDrive{
-			BootOrder: 1,
-			Channel:   "0:0",
-			Device:    "virtio",
-			Drive:     *MakeDriveResource("ddce5beb-6cfe-4a80-81bd-3ae5f71e0c00"),
-		},
-	},
+	Status:      "starting",
 	VNCPassword: "Pim3UkEc",
 }
 

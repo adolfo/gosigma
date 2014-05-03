@@ -13,27 +13,18 @@ type ServerDrive struct {
 	Drive     Resource `json:"drive,omitempty"`
 }
 
-// ServerRecord contains main properties of cloud server instance
-type ServerRecord struct {
-	Resource
-	Name   string `json:"name,omitempty"`
-	Status string `json:"status,omitempty"`
-}
-
-// ServerRecords holds collection of ServerRecord objects
-type ServerRecords struct {
-	Meta    Meta           `json:"meta"`
-	Objects []ServerRecord `json:"objects"`
-}
-
 // Server contains detail properties of cloud server instance
 type Server struct {
-	ServerRecord
+	Resource
+	Context     bool              `json:"context,omitempty"`
 	CPU         int64             `json:"cpu,omitempty"`
+	CPUModel    string            `json:"cpu_model,omitempty"`
+	Drives      []ServerDrive     `json:"drives,omitempty"`
 	Mem         int64             `json:"mem,omitempty"`
 	Meta        map[string]string `json:"meta,omitempty"`
+	Name        string            `json:"name,omitempty"`
 	NICs        []NIC             `json:"nics,omitempty"`
-	Drives      []ServerDrive     `json:"drives,omitempty"`
+	Status      string            `json:"status,omitempty"`
 	VNCPassword string            `json:"vnc_password,omitempty"`
 }
 

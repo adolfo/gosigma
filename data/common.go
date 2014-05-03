@@ -31,16 +31,32 @@ func MakeDriveResource(uuid string) *Resource {
 	return MakeResource("drives", uuid)
 }
 
+// MakeJobResource returns job Resource structure for given UUID
+func MakeJobResource(uuid string) *Resource {
+	return MakeResource("jobs", uuid)
+}
+
 // MakeIPResource returns IP Resource structure for given IP address
 func MakeIPResource(ip string) *Resource {
 	return MakeResource("ips", ip)
 }
 
+// MakeLibDriveResource returns library drive Resource structure for given UUID
+func MakeLibDriveResource(uuid string) *Resource {
+	return MakeResource("libdrives", uuid)
+}
+
+// MakeServerResource returns server Resource structure for given UUID
+func MakeServerResource(uuid string) *Resource {
+	return MakeResource("servers", uuid)
+}
+
+// MakeUserResource returns user Resource structure for given UUID
+func MakeUserResource(uuid string) *Resource {
+	return MakeResource("user", uuid)
+}
+
 // MakeVLanResource returns VLan Resource structure for given UUID
 func MakeVLanResource(uuid string) *Resource {
 	return MakeResource("vlans", uuid)
-}
-
-func MakeLibDriveResource(uuid string) *Resource {
-	return MakeResource("libdrives", uuid)
 }
