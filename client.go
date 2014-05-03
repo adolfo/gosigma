@@ -4,12 +4,12 @@
 package gosigma
 
 import (
+	"bufio"
 	"bytes"
 	"crypto/tls"
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/url"
 	"os"
 	"strings"
@@ -514,28 +514,37 @@ func (c Client) readContext() (*data.Server, error) {
 	}
 	defer f.Close()
 
+	readWriteTimeout := c.GetReadWriteTimeout()
+	if readWriteTimeout > 0 {
+		timer := time.AfterFunc(readWriteTimeout, func() {
+			f.Close()
+		})
+		defer timer.Stop()
+	}
+
 	n, err := f.WriteString(REQUEST)
 	if err != nil {
 		return nil, fmt.Errorf("WriteString: %s", err)
-	}
-
-	var r io.Reader = f
-	if logger != nil {
-		bb, err := ioutil.ReadAll(r)
-		if err != nil {
-			return nil, fmt.Errorf("ReadAll: %s", err)
-		}
-
-		logger.Log()
-		logger.Log(string(bb))
-		logger.Log()
-
-		r = bytes.NewReader(bb)
 	}
 
 	if n != len(REQUEST) {
 		return nil, fmt.Errorf("invalid write length %d, wants %d", n, len(REQUEST))
 	}
 
-	return data.ReadServer(r)
+	r := bufio.NewReader(f)
+
+	bb, err := r.ReadBytes('\x04')
+	if err != nil && err != io.EOF {
+		return nil, fmt.Errorf("ReadBytes: %s", err)
+	}
+
+	if logger != nil {
+		logger.Log()
+		logger.Log(string(bb))
+		logger.Log()
+	}
+
+	rr := bytes.NewReader(bb)
+
+	return data.ReadServer(rr)
 }

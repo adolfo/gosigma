@@ -6,6 +6,7 @@ package gosigma
 import (
 	"flag"
 	"testing"
+	"time"
 )
 
 var instance = flag.Bool("instance", false, "run instance tests, should be run inside CloudSigma server instance")
@@ -25,6 +26,8 @@ func TestReadContext(t *testing.T) {
 	if *trace {
 		client.Logger(t)
 	}
+
+	client.ReadWriteTimeout(2 * time.Second)
 
 	ctx, err := client.Context()
 	if err != nil {
