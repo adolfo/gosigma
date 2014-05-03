@@ -35,7 +35,7 @@ const (
 type Drive struct {
 	client  *Client
 	obj     *data.Drive
-	library bool
+	library LibrarySpec
 }
 
 // Name of drive instance
@@ -66,7 +66,7 @@ func (d Drive) Get(key string) (v string, ok bool) {
 }
 
 // IsLibrary returns true if this drive is CloudSigma library drive
-func (d Drive) IsLibrary() bool { return d.library }
+func (d Drive) Library() LibrarySpec { return d.library }
 
 // OS returns operating system of the drive (defined for library drives)
 func (d Drive) OS() string { return d.obj.OS }
@@ -102,7 +102,7 @@ func (d Drive) String() string {
 
 // Refresh information about drive instance
 func (d *Drive) Refresh() error {
-	obj, err := d.client.getDrive(d.UUID(), d.IsLibrary())
+	obj, err := d.client.getDrive(d.UUID(), d.Library())
 	if err != nil {
 		return err
 	}
@@ -143,7 +143,7 @@ func (c *CloneParams) makeJsonReader() (io.Reader, error) {
 
 // Clone drive instance.
 func (d Drive) Clone(params CloneParams, avoid []string) (Drive, error) {
-	return d.client.CloneDrive(d.UUID(), d.IsLibrary(), params, avoid)
+	return d.client.CloneDrive(d.UUID(), d.Library(), params, avoid)
 }
 
 // Clone drive instance, wait for operation finished.

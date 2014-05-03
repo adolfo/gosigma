@@ -11,6 +11,20 @@ import (
 	"github.com/Altoros/gosigma/https"
 )
 
+type RequestSpec bool
+
+const (
+	RequestShort  RequestSpec = false
+	RequestDetail RequestSpec = true
+)
+
+type LibrarySpec bool
+
+const (
+	LibraryAccount LibrarySpec = false
+	LibraryMedia   LibrarySpec = true
+)
+
 // A Client sends and receives requests to CloudSigma endpoint
 type Client struct {
 	endpoint         string
@@ -85,8 +99,8 @@ func (c *Client) Logger(logger https.Logger) {
 }
 
 // Servers in current account
-func (c Client) Servers(detail bool) ([]Server, error) {
-	objs, err := c.getServers(detail)
+func (c Client) Servers(rqspec RequestSpec) ([]Server, error) {
+	objs, err := c.getServers(rqspec)
 	if err != nil {
 		return nil, err
 	}
@@ -153,8 +167,8 @@ func (c Client) RemoveServer(uuid, recurse string) error {
 }
 
 // Drives returns list of drives
-func (c Client) Drives(detail, library bool) ([]Drive, error) {
-	objs, err := c.getDrives(detail, library)
+func (c Client) Drives(rqspec RequestSpec, libspec LibrarySpec) ([]Drive, error) {
+	objs, err := c.getDrives(rqspec, libspec)
 	if err != nil {
 		return nil, err
 	}
@@ -164,7 +178,7 @@ func (c Client) Drives(detail, library bool) ([]Drive, error) {
 		drives[i] = Drive{
 			client:  &c,
 			obj:     &objs[i],
-			library: library,
+			library: libspec,
 		}
 	}
 
@@ -172,8 +186,8 @@ func (c Client) Drives(detail, library bool) ([]Drive, error) {
 }
 
 // Drive returns given drive by uuid
-func (c Client) Drive(uuid string, library bool) (Drive, error) {
-	obj, err := c.getDrive(uuid, library)
+func (c Client) Drive(uuid string, libspec LibrarySpec) (Drive, error) {
+	obj, err := c.getDrive(uuid, libspec)
 	if err != nil {
 		return Drive{}, err
 	}
@@ -181,15 +195,15 @@ func (c Client) Drive(uuid string, library bool) (Drive, error) {
 	drv := Drive{
 		client:  &c,
 		obj:     obj,
-		library: library,
+		library: libspec,
 	}
 
 	return drv, nil
 }
 
 // CloneDrive clones given drive by uuid
-func (c Client) CloneDrive(uuid string, library bool, params CloneParams, avoid []string) (Drive, error) {
-	objs, err := c.cloneDrive(uuid, library, params, avoid)
+func (c Client) CloneDrive(uuid string, libspec LibrarySpec, params CloneParams, avoid []string) (Drive, error) {
+	objs, err := c.cloneDrive(uuid, libspec, params, avoid)
 
 	if err != nil {
 		return Drive{}, err
@@ -202,7 +216,7 @@ func (c Client) CloneDrive(uuid string, library bool, params CloneParams, avoid 
 	drv := Drive{
 		client:  &c,
 		obj:     &objs[0],
-		library: library,
+		library: libspec,
 	}
 
 	return drv, nil

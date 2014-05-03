@@ -58,7 +58,11 @@ func (sd ServerDrive) Drive() Drive {
 	if sd.obj != nil {
 		obj := data.Drive{Resource: sd.obj.Drive}
 		libdrive := strings.Contains(sd.obj.Drive.UUID, "libdrives")
-		return Drive{sd.client, &obj, libdrive}
+		if libdrive {
+			return Drive{sd.client, &obj, LibraryMedia}
+		} else {
+			return Drive{sd.client, &obj, LibraryAccount}
+		}
 	} else {
 		return Drive{sd.client, nil, false}
 	}

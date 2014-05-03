@@ -19,6 +19,14 @@ var sshkey = flag.String("sshkey", "", "public ssh key to run server specific te
 var force = flag.Bool("force", false, "force start/stop live tests")
 var lib = flag.Bool("lib", false, "duid is library drive")
 
+func libFlag() LibrarySpec {
+	if *lib {
+		return LibraryMedia
+	} else {
+		return LibraryAccount
+	}
+}
+
 func parseCredentials() (u string, p string, e error) {
 	if *live == "" {
 		return
@@ -196,7 +204,7 @@ func TestLiveDriveGet(t *testing.T) {
 		cli.Logger(t)
 	}
 
-	d, err := cli.Drive(*duid, *lib)
+	d, err := cli.Drive(*duid, libFlag())
 	if err != nil {
 		t.Error(err)
 		return
@@ -221,7 +229,7 @@ func TestLiveDriveList(t *testing.T) {
 		cli.Logger(t)
 	}
 
-	dd, err := cli.Drives(true, *lib)
+	dd, err := cli.Drives(true, libFlag())
 	if err != nil {
 		t.Error(err)
 		return
@@ -254,7 +262,7 @@ func TestLiveDriveClone(t *testing.T) {
 		cli.Logger(t)
 	}
 
-	d, err := cli.Drive(*duid, *lib)
+	d, err := cli.Drive(*duid, libFlag())
 	if err != nil {
 		t.Error(err)
 		return
@@ -302,7 +310,7 @@ func TestLiveServerClone(t *testing.T) {
 		cli.Logger(t)
 	}
 
-	originalDrive, err := cli.Drive(*duid, *lib)
+	originalDrive, err := cli.Drive(*duid, libFlag())
 	if err != nil {
 		t.Error(err)
 		return

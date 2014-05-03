@@ -16,9 +16,9 @@ import (
 	"github.com/Altoros/gosigma/data"
 )
 
-func (c Client) getServers(detail bool) ([]data.Server, error) {
+func (c Client) getServers(rqspec RequestSpec) ([]data.Server, error) {
 	u := c.endpoint + "servers"
-	if detail {
+	if rqspec == RequestDetail {
 		u += "/detail"
 	}
 
@@ -158,14 +158,14 @@ func (c Client) createServer(components Components) ([]data.Server, error) {
 	return data.ReadServers(r.Body)
 }
 
-func (c Client) getDrives(detail, library bool) ([]data.Drive, error) {
+func (c Client) getDrives(rqspec RequestSpec, libspec LibrarySpec) ([]data.Drive, error) {
 	u := c.endpoint
-	if library {
+	if libspec == LibraryMedia {
 		u += "libdrives"
 	} else {
 		u += "drives"
 	}
-	if detail {
+	if rqspec == RequestDetail {
 		u += "/detail"
 	}
 
@@ -182,14 +182,14 @@ func (c Client) getDrives(detail, library bool) ([]data.Drive, error) {
 	return data.ReadDrives(r.Body)
 }
 
-func (c Client) getDrive(uuid string, library bool) (*data.Drive, error) {
+func (c Client) getDrive(uuid string, libspec LibrarySpec) (*data.Drive, error) {
 	uuid = strings.TrimSpace(uuid)
 	if uuid == "" {
 		return nil, errEmptyUUID
 	}
 
 	u := c.endpoint
-	if library {
+	if libspec == LibraryMedia {
 		u += "libdrives/"
 	} else {
 		u += "drives/"
@@ -209,14 +209,14 @@ func (c Client) getDrive(uuid string, library bool) (*data.Drive, error) {
 	return data.ReadDrive(r.Body)
 }
 
-func (c Client) cloneDrive(uuid string, library bool, params CloneParams, avoid []string) ([]data.Drive, error) {
+func (c Client) cloneDrive(uuid string, libspec LibrarySpec, params CloneParams, avoid []string) ([]data.Drive, error) {
 	uuid = strings.TrimSpace(uuid)
 	if uuid == "" {
 		return nil, errEmptyUUID
 	}
 
 	u := c.endpoint
-	if library {
+	if libspec == LibraryMedia {
 		u += "libdrives/"
 	} else {
 		u += "drives/"

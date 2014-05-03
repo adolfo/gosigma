@@ -19,8 +19,8 @@ func TestClientServersEmpty(t *testing.T) {
 		return
 	}
 
-	check := func(detail bool) {
-		servers, err := cli.Servers(detail)
+	check := func(rqspec RequestSpec) {
+		servers, err := cli.Servers(rqspec)
 		if err != nil {
 			t.Error(err)
 		}
@@ -29,8 +29,8 @@ func TestClientServersEmpty(t *testing.T) {
 		}
 	}
 
-	check(false)
-	check(true)
+	check(RequestShort)
+	check(RequestDetail)
 }
 
 func TestClientServers(t *testing.T) {
