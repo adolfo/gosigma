@@ -7,6 +7,7 @@ import (
 	"crypto/tls"
 	"errors"
 	"time"
+
 	"github.com/Altoros/gosigma/https"
 )
 
@@ -92,7 +93,7 @@ func (c Client) Servers(detail bool) ([]Server, error) {
 
 	servers := make([]Server, len(objs))
 	for i := 0; i < len(objs); i++ {
-		servers[i] = Server{
+		servers[i] = &server{
 			client: &c,
 			obj:    &objs[i],
 		}
@@ -105,10 +106,10 @@ func (c Client) Servers(detail bool) ([]Server, error) {
 func (c Client) Server(uuid string) (Server, error) {
 	obj, err := c.getServer(uuid)
 	if err != nil {
-		return Server{}, err
+		return nil, err
 	}
 
-	srv := Server{
+	srv := &server{
 		client: &c,
 		obj:    obj,
 	}
@@ -120,14 +121,14 @@ func (c Client) Server(uuid string) (Server, error) {
 func (c Client) CreateServer(components Components) (Server, error) {
 	objs, err := c.createServer(components)
 	if err != nil {
-		return Server{}, err
+		return nil, err
 	}
 
 	if len(objs) == 0 {
-		return Server{}, errors.New("no servers in response from endpoint")
+		return nil, errors.New("no servers in response from endpoint")
 	}
 
-	s := Server{
+	s := &server{
 		client: &c,
 		obj:    &objs[0],
 	}
@@ -222,17 +223,14 @@ func (c Client) Job(uuid string) (Job, error) {
 	return job, nil
 }
 
-// Context reads and returns context of current server
-func (c Client) Context() (Server, error) {
+// ReadContext reads and returns context of current server
+func (c Client) ReadContext() (Context, error) {
 	obj, err := c.readContext()
 	if err != nil {
-		return Server{}, err
+		return nil, err
 	}
 
-	server := Server{
-		client: &c,
-		obj:    obj,
-	}
+	ctx := context{obj: obj}
 
-	return server, nil
+	return ctx, nil
 }

@@ -29,13 +29,13 @@ func TestReadContext(t *testing.T) {
 
 	client.ReadWriteTimeout(2 * time.Second)
 
-	ctx, err := client.Context()
+	ctx, err := client.ReadContext()
 	if err != nil {
 		t.Error(err)
 		return
 	}
 
-	t.Logf("%#v", ctx.obj)
+	t.Log(ctx)
 
 	nics := ctx.NICs()
 	for i, n := range nics {

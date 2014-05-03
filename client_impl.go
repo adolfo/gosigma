@@ -269,7 +269,7 @@ func (c Client) getJob(uuid string) (*data.Job, error) {
 	return data.ReadJob(r.Body)
 }
 
-func (c Client) readContext() (*data.Server, error) {
+func (c Client) readContext() (*data.Context, error) {
 
 	const (
 		DEVICE  = "/dev/ttyS1"
@@ -330,6 +330,6 @@ func (c Client) readContext() (*data.Server, error) {
 	// prepare reader around raw content
 	rr := bytes.NewReader(bb)
 
-	// parse server context JSON to the data.Server object
-	return data.ReadServer(rr)
+	// parse server context JSON to the data.Context object
+	return data.ReadContext(rr)
 }
