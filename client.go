@@ -504,6 +504,7 @@ func (c Client) readContext() (*data.Server, error) {
 	const (
 		DEVICE  = "/dev/ttyS1"
 		REQUEST = "<\n\n>"
+		EOT     = '\x04'
 	)
 
 	logger := c.logger
@@ -533,9 +534,13 @@ func (c Client) readContext() (*data.Server, error) {
 
 	r := bufio.NewReader(f)
 
-	bb, err := r.ReadBytes('\x04')
+	bb, err := r.ReadBytes(EOT)
 	if err != nil && err != io.EOF {
 		return nil, fmt.Errorf("ReadBytes: %s", err)
+	}
+
+	if last := len(bb) - 1; bb[last] == EOT {
+		bb = bb[:last]
 	}
 
 	if logger != nil {
