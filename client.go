@@ -503,13 +503,13 @@ func (c Client) readContext() (*data.Server, error) {
 
 	f, err := os.OpenFile(DEVICE, os.O_RDWR, 0)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("OpenFile: %s", err)
 	}
 	defer f.Close()
 
 	n, err := f.WriteString(REQUEST)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("WriteString: %s", err)
 	}
 
 	if n != len(REQUEST) {
