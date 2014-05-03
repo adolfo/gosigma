@@ -6,7 +6,9 @@ package gosigma
 import (
 	"crypto/tls"
 	"errors"
+	"fmt"
 	"net/url"
+	"os"
 	"strings"
 	"time"
 
@@ -222,6 +224,21 @@ func (c Client) Job(uuid string) (Job, error) {
 	}
 
 	return job, nil
+}
+
+// Context reads and returns context of current server
+func (c Client) Context() (Server, error) {
+	obj, err := c.readContext()
+	if err != nil {
+		return Server{}, err
+	}
+
+	server := Server{
+		client: &c,
+		obj:    obj,
+	}
+
+	return server, nil
 }
 
 func (c Client) getServers(detail bool) ([]data.Server, error) {
@@ -475,4 +492,29 @@ func (c Client) getJob(uuid string) (*data.Job, error) {
 	}
 
 	return data.ReadJob(r.Body)
+}
+
+func (c Client) readContext() (*data.Server, error) {
+
+	const (
+		DEVICE  = "/dev/ttyS1"
+		REQUEST = "<\n\n>"
+	)
+
+	f, err := os.OpenFile(DEVICE, os.O_RDWR, 0)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+
+	n, err := f.WriteString(REQUEST)
+	if err != nil {
+		return nil, err
+	}
+
+	if n != len(REQUEST) {
+		return nil, fmt.Errorf("invalid write length %d, wants %d", n, len(REQUEST))
+	}
+
+	return data.ReadServer(f)
 }
