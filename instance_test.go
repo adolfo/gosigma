@@ -35,5 +35,5 @@ func TestReadContext(t *testing.T) {
 		return
 	}
 
-	t.Logf("%#v", ctx)
+	t.Logf(ctx)
 }
