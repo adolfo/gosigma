@@ -116,6 +116,27 @@ func (c Client) Servers(rqspec RequestSpec) ([]Server, error) {
 	return servers, nil
 }
 
+// ServersFiltered in current account with filter applied
+func (c Client) ServersFiltered(rqspec RequestSpec, filter func(s Server) bool) ([]Server, error) {
+	objs, err := c.getServers(rqspec)
+	if err != nil {
+		return nil, err
+	}
+
+	servers := make([]Server, len(objs))
+	for i := 0; i < len(objs); i++ {
+		s := &server{
+			client: &c,
+			obj:    &objs[i],
+		}
+		if filter(s) {
+			servers[i] = s
+		}
+	}
+
+	return servers, nil
+}
+
 // Server returns given server by uuid
 func (c Client) Server(uuid string) (Server, error) {
 	obj, err := c.getServer(uuid)
