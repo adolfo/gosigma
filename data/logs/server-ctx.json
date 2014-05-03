@@ -1,0 +1,76 @@
+{
+    "cpu": 2000,
+    "cpu_model": null,
+    "cpus_instead_of_cores": false,
+    "drives": [
+        {
+            "boot_order": 1,
+            "dev_channel": "0:0",
+            "device": "virtio",
+            "drive": {
+                "affinities": [],
+                "allow_multimount": false,
+                "licenses": [],
+                "media": "disk",
+                "meta": {
+                    "description": "dev-ubuntu-14.04-server-cloudimg-amd64"
+                },
+                "name": "dev-ubuntu-14.04-server-cloudimg-amd64",
+                "size": 5368709120,
+                "tags": [],
+                "uuid": "a8b6d0e6-4b4d-46e4-9e43-47142f8276ba"
+            }
+        }
+    ],
+    "enable_numa": false,
+    "global_context": {},
+    "hv_relaxed": false,
+    "hv_tsc": false,
+    "mem": 2147483648,
+    "meta": {
+        "description": "dev-ubuntu-14.04-server-1",
+        "ssh_public_key": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDDiwTGBsmFKBYHcKaVy5IgsYBR4XVYLS6KP/NKClE7gONlIGURE3+/45BX8TfHJHM5WTN8NBqJejKDHqwfyueR1f2VGoPkJxODGt/X/ZDNftLZLYwPd2DfDBs27ahOadZCk4Cl5l7mU0aoE74UnIcQoNPl6w7axkIFTIXr8+0HMk8DFB0iviBSJK118p1RGwhsoA1Hudn1CsgqARGPmNn6mxwvmQfQY7hZxZoOH9WMcvkNZ7rAFrwS/BuvEpEXkoC95K/JDPvmQVVJk7we+WeHfTYSmApkDFcSaypyjL2HOV8pvE+VntcIIhZccHiOubyjsBAx5aoTI+ueCsoz5AL1 maxim.perenesenko@altoros.comnssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDbn9jQiel9Vya/kGQl2fPUcIHzsFiP0epAKqBPYW9zUERicuW8sUPkaZ7YrFNSMdjCa57lEtfwaNFdlA+AMS0qweEyrTg+eX1loSEgno+m9/WnfFn8LiA9QmPW8eCr1ct04ZF+9DEcUWJ5viv7/NGRbgqQYsnL6zcJo9PrnupTMROI49vK1XXK20o9UTBOFIJBgZUkppRhRCXiOtfOBi5KTdjdNYwl2JSTMGZFlyTNd+11zybPP62t86wfo12X5MrzOvDSgunh1A01WNxCOwkzzUAYROcQ2aiwaX3GdWQdhM2+Q/1hIzJL7G0unJ6r6JlZxxanirqoQ3bzcS8EBy0Z juju-client-key"
+    },
+    "name": "dev-ubuntu-14.04-server-1",
+    "nics": [
+        {
+            "boot_order": null,
+            "ip_v4_conf": {
+                "conf": "static",
+                "ip": {
+                    "gateway": "31.171.244.1",
+                    "meta": {},
+                    "nameservers": [
+                        "178.22.66.167",
+                        "178.22.71.56",
+                        "8.8.8.8"
+                    ],
+                    "netmask": 22,
+                    "tags": [],
+                    "uuid": "31.171.246.37"
+                }
+            },
+            "ip_v6_conf": null,
+            "mac": "22:8d:4a:5a:26:74",
+            "model": "virtio",
+            "vlan": null
+        },
+        {
+            "boot_order": null,
+            "ip_v4_conf": null,
+            "ip_v6_conf": null,
+            "mac": "22:cf:c2:42:e1:78",
+            "model": "virtio",
+            "vlan": {
+                "meta": {},
+                "tags": [],
+                "uuid": "5bc05e7e-6555-4f40-add8-3b8e91447702"
+            }
+        }
+    ],
+    "requirements": [],
+    "smp": 1,
+    "tags": [],
+    "uuid": "c03beeb8-79db-4df6-8c0e-5524899cc3bf",
+    "vnc_password": "ArVosIs"
+}
