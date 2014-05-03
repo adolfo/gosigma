@@ -91,6 +91,14 @@ func compareDrives(t *testing.T, i int, value, wants *Drive) {
 
 	if len(value.Jobs) != len(wants.Jobs) {
 		t.Errorf("Drive.Jobs error [%d]: found %#v, wants %#v", i, value.Jobs, wants.Jobs)
+	} else {
+		for j := 0; j < len(value.Jobs); j++ {
+			v := value.Jobs[j]
+			w := wants.Jobs[j]
+			if v != w {
+				t.Errorf("Drive.Jobs error [%d]: at %d found %#v, wants %#v", i, j, v, w)
+			}
+		}
 	}
 
 	if value.Media != wants.Media {
