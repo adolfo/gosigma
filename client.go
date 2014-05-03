@@ -4,9 +4,12 @@
 package gosigma
 
 import (
+	"bytes"
 	"crypto/tls"
 	"errors"
 	"fmt"
+	"io"
+	"io/ioutil"
 	"net/url"
 	"os"
 	"strings"
@@ -20,6 +23,7 @@ import (
 type Client struct {
 	endpoint         string
 	https            *https.Client
+	logger           https.Logger
 	operationTimeout time.Duration
 }
 
@@ -83,7 +87,8 @@ func (c Client) GetOperationTimeout() time.Duration {
 }
 
 // Logger sets logger for http traces
-func (c Client) Logger(logger https.Logger) {
+func (c *Client) Logger(logger https.Logger) {
+	c.logger = logger
 	c.https.Logger(logger)
 }
 
@@ -501,6 +506,8 @@ func (c Client) readContext() (*data.Server, error) {
 		REQUEST = "<\n\n>"
 	)
 
+	logger := c.logger
+
 	f, err := os.OpenFile(DEVICE, os.O_RDWR, 0)
 	if err != nil {
 		return nil, fmt.Errorf("OpenFile: %s", err)
@@ -510,6 +517,20 @@ func (c Client) readContext() (*data.Server, error) {
 	n, err := f.WriteString(REQUEST)
 	if err != nil {
 		return nil, fmt.Errorf("WriteString: %s", err)
+	}
+
+	var r io.Reader = f
+	if logger != nil {
+		bb, err := ioutil.ReadAll(r)
+		if err != nil {
+			return nil, fmt.Errorf("ReadAll: %s", err)
+		}
+
+		logger.Log()
+		logger.Log(string(bb))
+		logger.Log()
+
+		r = bytes.NewReader(bb)
 	}
 
 	if n != len(REQUEST) {

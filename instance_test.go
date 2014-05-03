@@ -22,6 +22,10 @@ func TestReadContext(t *testing.T) {
 		return
 	}
 
+	if *trace {
+		client.Logger(t)
+	}
+
 	ctx, err := client.Context()
 	if err != nil {
 		t.Error(err)
