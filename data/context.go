@@ -17,7 +17,7 @@ type ContextIPv4_ struct {
 	Gateway     string            `json:"gateway"`
 	Meta        map[string]string `json:"meta"`
 	Nameservers []string          `json:"nameservers"`
-	Netmask     string            `json:"netmask"`
+	Netmask     int               `json:"netmask"`
 	UUID        string            `json:"uuid"`
 }
 

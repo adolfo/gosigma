@@ -21,7 +21,7 @@ type ContextIPv4 interface {
 	fmt.Stringer
 	Gateway() string
 	Nameservers() []string
-	Netmask() string
+	Netmask() int
 	UUID() string
 }
 
@@ -72,7 +72,7 @@ var _ ContextIPv4 = contextIPv4{}
 
 func (ci contextIPv4) Gateway() string       { return ci.obj.IP.Gateway }
 func (ci contextIPv4) Nameservers() []string { return ci.obj.IP.Nameservers }
-func (ci contextIPv4) Netmask() string       { return ci.obj.IP.Netmask }
+func (ci contextIPv4) Netmask() int          { return ci.obj.IP.Netmask }
 func (ci contextIPv4) UUID() string          { return ci.obj.IP.UUID }
 
 func (ci contextIPv4) String() string {
