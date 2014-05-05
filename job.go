@@ -19,8 +19,8 @@ const (
 
 // A Job interface represents job instance in CloudSigma account
 type Job interface {
-	// Convert to string
-	fmt.Stringer
+	// CloudSigma resource
+	Resource
 
 	// Children of this job instance
 	Children() []string
@@ -45,12 +45,6 @@ type Job interface {
 
 	// State of this job instance
 	State() string
-
-	// URI of job instance
-	URI() string
-
-	// UUID of job instance
-	UUID() string
 
 	// Wait job is finished
 	Wait() error
@@ -78,6 +72,12 @@ Resources: %v}`,
 		j.Progress(),
 		j.Resources())
 }
+
+// URI of job instance
+func (j job) URI() string { return j.obj.URI }
+
+// UUID of job instance
+func (j job) UUID() string { return j.obj.UUID }
 
 // Children of this job instance
 func (j job) Children() []string {
@@ -117,12 +117,6 @@ func (j job) Resources() []string {
 
 // State of this job instance
 func (j job) State() string { return j.obj.State }
-
-// URI of job instance
-func (j job) URI() string { return j.obj.URI }
-
-// UUID of job instance
-func (j job) UUID() string { return j.obj.UUID }
 
 // Wait job is finished
 func (j *job) Wait() error {

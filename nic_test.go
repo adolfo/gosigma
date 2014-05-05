@@ -11,30 +11,25 @@ import (
 
 func TestNIC_Empty(t *testing.T) {
 	var n NIC = nic{client: nil, obj: &data.NIC{}}
-	if v := n.Type(); v != "" {
-		t.Errorf("invalid type %q, must be empty", v)
-	}
-	if v := n.Conf(); v != "" {
-		t.Errorf("invalid conf %q, must be empty", v)
-	}
-	if v := n.Model(); v != "" {
-		t.Errorf("invalid model %q, must be empty", v)
+	if v := n.IPv4(); v != nil {
+		t.Errorf("invalid NIC.IPv4 %v, must be nil", v)
 	}
 	if v := n.MAC(); v != "" {
-		t.Errorf("invalid MAC %q, must be empty", v)
+		t.Errorf("invalid NIC.MAC %q, must be empty", v)
 	}
-	if v := n.Address(); v != "" {
-		t.Errorf("invalid address %q, must be empty", v)
+	if v := n.Model(); v != "" {
+		t.Errorf("invalid NIC.Model %q, must be empty", v)
+	}
+	if v := n.Runtime(); v != nil {
+		t.Errorf("invalid NIC.Runtime %v, must be nil", v)
+	}
+	if v := n.VLAN(); v != nil {
+		t.Errorf("invalid NIC.VLAN %v, must be nil", v)
 	}
 
-	const str = `{Type: "", Conf: "", Model: "", MAC: "", Address: ""}`
+	const str = `{Model: "", MAC: "", IPv4: <nil>, VLAN: <nil>, Runtime: <nil>}`
 	if v := n.String(); v != str {
 		t.Errorf("invalid String() result: %q, must be %s", v, str)
-	}
-
-	r := n.Runtime()
-	if r != nil {
-		t.Error("not nil runtime object")
 	}
 }
 
@@ -42,18 +37,29 @@ func TestNIC_DataIP(t *testing.T) {
 	var d = data.NIC{
 		IPv4: &data.IPv4{
 			Conf: "static",
-			IP:   &data.Resource{"/api/2.0/ips/31.171.246.37/", "31.171.246.37"},
+			IP:   data.MakeIPResource("31.171.246.37"),
 		},
 		Model: "virtio",
 		MAC:   "22:40:85:4f:d3:ce",
 	}
 	var n = nic{obj: &d}
 
-	if v := n.Type(); v != NIC_public {
-		t.Errorf("invalid type %q, must be %s", v, NIC_public)
-	}
-	if v := n.Conf(); v != "static" {
-		t.Errorf("invalid conf %q, must be static", v)
+	if v := n.IPv4(); v == nil {
+		t.Errorf("invalid NIC.IPv4, must be not nil")
+	} else {
+		if c := v.Conf(); c != "static" {
+			t.Errorf("invalid NIC.IPv4.Conf %q, must be static", c)
+		}
+		if r := v.Resource(); r == nil {
+			t.Errorf("invalid NIC.IPv4.Resource, must be not nil", r)
+		} else {
+			if uuid := r.UUID(); uuid != "31.171.246.37" {
+				t.Errorf("invalid NIC.IPv4.Resource.UUID %q", uuid)
+			}
+			if uri := r.URI(); uri != "/api/2.0/ips/31.171.246.37/" {
+				t.Errorf("invalid NIC.IPv4.Resource.URI %q", uri)
+			}
+		}
 	}
 	if v := n.Model(); v != "virtio" {
 		t.Errorf("invalid model %q, must be virtio", v)
@@ -61,18 +67,18 @@ func TestNIC_DataIP(t *testing.T) {
 	if v := n.MAC(); v != "22:40:85:4f:d3:ce" {
 		t.Errorf("invalid MAC %q, must be 22:40:85:4f:d3:ce", v)
 	}
-	if v := n.Address(); v != "31.171.246.37" {
-		t.Errorf("invalid address %q, must be 31.171.246.37", v)
-	}
 
-	const str = `{Type: "public", Conf: "static", Model: "virtio", MAC: "22:40:85:4f:d3:ce", Address: "31.171.246.37"}`
+	const str = `{Model: "virtio", MAC: "22:40:85:4f:d3:ce", IPv4: {Conf: "static", {URI: "/api/2.0/ips/31.171.246.37/", UUID: "31.171.246.37"}}, VLAN: <nil>, Runtime: <nil>}`
 	if v := n.String(); v != str {
 		t.Errorf("invalid String() result: %q, must be %s", v, str)
 	}
 
-	r := n.Runtime()
-	if r != nil {
-		t.Error("not nil runtime object")
+	if r := n.Runtime(); r != nil {
+		t.Errorf("invalid NIC.Runtime, must be nil, %v", r)
+	}
+
+	if v := n.VLAN(); v != nil {
+		t.Errorf("invalid NIC.VLAN, must be nil, %v", v)
 	}
 }
 
@@ -87,29 +93,32 @@ func TestNIC_DataVLan(t *testing.T) {
 	}
 	var n = nic{obj: &d}
 
-	if v := n.Type(); v != NIC_private {
-		t.Errorf("invalid type %q, must be %s", v, NIC_private)
-	}
-	if v := n.Conf(); v != NIC_private {
-		t.Errorf("invalid conf %q, must be %s", v, NIC_private)
-	}
 	if v := n.Model(); v != "virtio" {
 		t.Errorf("invalid model %q, must be virtio", v)
 	}
 	if v := n.MAC(); v != "22:40:85:4f:d3:ce" {
 		t.Errorf("invalid MAC %q, must be 22:40:85:4f:d3:ce", v)
 	}
-	if v := n.Address(); v != "5bc05e7e-6555-4f40-add8-3b8e91447702" {
-		t.Errorf("invalid address %q, must be 5bc05e7e-6555-4f40-add8-3b8e91447702", v)
-	}
 
-	const str = `{Type: "private", Conf: "private", Model: "virtio", MAC: "22:40:85:4f:d3:ce", Address: "5bc05e7e-6555-4f40-add8-3b8e91447702"}`
+	const str = `{Model: "virtio", MAC: "22:40:85:4f:d3:ce", IPv4: <nil>, VLAN: {URI: "/api/2.0/vlans/5bc05e7e-6555-4f40-add8-3b8e91447702/", UUID: "5bc05e7e-6555-4f40-add8-3b8e91447702"}, Runtime: <nil>}`
 	if v := n.String(); v != str {
 		t.Errorf("invalid String() result: %q, must be %s", v, str)
 	}
 
-	r := n.Runtime()
-	if r != nil {
-		t.Error("not nil runtime object")
+	if i := n.IPv4(); i != nil {
+		t.Errorf("invalid NIC.IPv4, must be nil, %v", i)
+	}
+	if r := n.Runtime(); r != nil {
+		t.Errorf("invalid NIC.Runtime, must be nil, %v", r)
+	}
+	if v := n.VLAN(); v == nil {
+		t.Error("invalid NIC.VLAN, must be not nil")
+	} else {
+		if uuid := v.UUID(); uuid != "5bc05e7e-6555-4f40-add8-3b8e91447702" {
+			t.Errorf("invalid NIC.VLAN.UUID %q", uuid)
+		}
+		if uri := v.URI(); uri != "/api/2.0/vlans/5bc05e7e-6555-4f40-add8-3b8e91447702/" {
+			t.Errorf("invalid NIC.VLAN.URI %q", uri)
+		}
 	}
 }

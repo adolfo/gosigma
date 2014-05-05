@@ -12,8 +12,8 @@ import (
 
 // A ServerDrive interface represents drive, connected to server instance
 type ServerDrive interface {
-	// Convert to string
-	fmt.Stringer
+	// CloudSigma resource
+	Resource
 
 	// BootOrder of drive
 	BootOrder() int
@@ -27,9 +27,6 @@ type ServerDrive interface {
 	// Drive object. Note, returned Drive object carries only UUID and URI, so it needs
 	// to perform Drive.Refresh to access additional information.
 	Drive() Drive
-
-	// UUID of drive
-	UUID() string
 }
 
 // A serverDrive implements drive, connected to server instance
@@ -47,54 +44,29 @@ func (sd serverDrive) String() string {
 		sd.BootOrder(), sd.Channel(), sd.Device(), sd.UUID())
 }
 
+// URI of instance
+func (sd serverDrive) URI() string { return sd.obj.Drive.URI }
+
+// UUID of drive
+func (sd serverDrive) UUID() string { return sd.obj.Drive.UUID }
+
 // BootOrder of drive
-func (sd serverDrive) BootOrder() int {
-	if sd.obj != nil {
-		return sd.obj.BootOrder
-	} else {
-		return 0
-	}
-}
+func (sd serverDrive) BootOrder() int { return sd.obj.BootOrder }
 
 // Channel of drive
-func (sd serverDrive) Channel() string {
-	if sd.obj != nil {
-		return sd.obj.Channel
-	} else {
-		return ""
-	}
-}
+func (sd serverDrive) Channel() string { return sd.obj.Channel }
 
 // Device name of drive
-func (sd serverDrive) Device() string {
-	if sd.obj != nil {
-		return sd.obj.Device
-	} else {
-		return ""
-	}
-}
+func (sd serverDrive) Device() string { return sd.obj.Device }
 
 // Drive object. Note, returned Drive object carries only UUID and URI, so it needs
 // to perform Drive.Refresh to access additional information.
 func (sd serverDrive) Drive() Drive {
-	if sd.obj != nil {
-		obj := data.Drive{Resource: sd.obj.Drive}
-		libdrive := strings.Contains(sd.obj.Drive.UUID, "libdrives")
-		if libdrive {
-			return Drive{sd.client, &obj, LibraryMedia}
-		} else {
-			return Drive{sd.client, &obj, LibraryAccount}
-		}
+	obj := data.Drive{Resource: sd.obj.Drive}
+	libdrive := strings.Contains(sd.obj.Drive.UUID, "libdrives")
+	if libdrive {
+		return &drive{sd.client, &obj, LibraryMedia}
 	} else {
-		return Drive{sd.client, nil, false}
-	}
-}
-
-// UUID of drive
-func (sd serverDrive) UUID() string {
-	if sd.obj != nil {
-		return sd.obj.Drive.UUID
-	} else {
-		return ""
+		return &drive{sd.client, &obj, LibraryAccount}
 	}
 }

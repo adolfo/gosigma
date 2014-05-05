@@ -36,8 +36,8 @@ const (
 
 // A Server interface represents server instance in CloudSigma account
 type Server interface {
-	// Convert to string
-	fmt.Stringer
+	// CloudSigma resource
+	Resource
 
 	// Context serial device enabled for server instance
 	Context() bool
@@ -59,12 +59,6 @@ type Server interface {
 
 	// Status of server instance
 	Status() string
-
-	// URI of server instance
-	URI() string
-
-	// UUID of server instance
-	UUID() string
 
 	// VNCPassword to access the server
 	VNCPassword() string
@@ -107,6 +101,12 @@ func (s server) String() string {
 		s.Name(), s.URI(), s.Status(), s.UUID())
 }
 
+// URI of server instance
+func (s server) URI() string { return s.obj.URI }
+
+// UUID of server instance
+func (s server) UUID() string { return s.obj.UUID }
+
 // Context serial device enabled for server instance
 func (s server) Context() bool { return s.obj.Context }
 
@@ -141,12 +141,6 @@ func (s server) NICs() []NIC {
 
 // Status of server instance
 func (s server) Status() string { return s.obj.Status }
-
-// URI of server instance
-func (s server) URI() string { return s.obj.URI }
-
-// UUID of server instance
-func (s server) UUID() string { return s.obj.UUID }
 
 // VNCPassword to access the server
 func (s server) VNCPassword() string { return s.obj.VNCPassword }

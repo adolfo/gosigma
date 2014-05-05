@@ -14,8 +14,8 @@ type RuntimeNIC interface {
 	// Convert to string
 	fmt.Stringer
 
-	// AddressIPv4 returns runtime IPv4 address (if any)
-	AddressIPv4() string
+	// IPv4 configuration
+	IPv4() Resource
 
 	// Type of network interface card (public, private, etc)
 	Type() string
@@ -31,23 +31,17 @@ var _ RuntimeNIC = runtimeNIC{}
 // String method is used to print values passed as an operand to any format that
 // accepts a string or to an unformatted printer such as Print.
 func (r runtimeNIC) String() string {
-	return fmt.Sprintf(`{Type: %q, Address: %q}`, r.Type(), r.AddressIPv4())
+	return fmt.Sprintf(`{Type: %q, IPv4: %v}`, r.Type(), r.IPv4())
 }
 
-// AddressIPv4 returns runtime IPv4 address (if any)
-func (r runtimeNIC) AddressIPv4() string {
-	if r.obj != nil && r.obj.IPv4 != nil {
-		return r.obj.IPv4.UUID
+// IPv4 configuration
+func (r runtimeNIC) IPv4() Resource {
+	if r.obj.IPv4 != nil {
+		return resource{r.obj.IPv4}
 	} else {
-		return ""
+		return nil
 	}
 }
 
 // Type of network interface card (public, private, etc)
-func (r runtimeNIC) Type() string {
-	if r.obj != nil {
-		return r.obj.InterfaceType
-	} else {
-		return ""
-	}
-}
+func (r runtimeNIC) Type() string { return r.obj.InterfaceType }

@@ -123,14 +123,14 @@ func (c Client) ServersFiltered(rqspec RequestSpec, filter func(s Server) bool) 
 		return nil, err
 	}
 
-	servers := make([]Server, len(objs))
+	servers := make([]Server, 0, len(objs))
 	for i := 0; i < len(objs); i++ {
 		s := &server{
 			client: &c,
 			obj:    &objs[i],
 		}
 		if filter(s) {
-			servers[i] = s
+			servers = append(servers, s)
 		}
 	}
 
@@ -196,7 +196,7 @@ func (c Client) Drives(rqspec RequestSpec, libspec LibrarySpec) ([]Drive, error)
 
 	drives := make([]Drive, len(objs))
 	for i := 0; i < len(objs); i++ {
-		drives[i] = Drive{
+		drives[i] = &drive{
 			client:  &c,
 			obj:     &objs[i],
 			library: libspec,
@@ -210,10 +210,10 @@ func (c Client) Drives(rqspec RequestSpec, libspec LibrarySpec) ([]Drive, error)
 func (c Client) Drive(uuid string, libspec LibrarySpec) (Drive, error) {
 	obj, err := c.getDrive(uuid, libspec)
 	if err != nil {
-		return Drive{}, err
+		return nil, err
 	}
 
-	drv := Drive{
+	drv := &drive{
 		client:  &c,
 		obj:     obj,
 		library: libspec,
@@ -227,14 +227,14 @@ func (c Client) CloneDrive(uuid string, libspec LibrarySpec, params CloneParams,
 	objs, err := c.cloneDrive(uuid, libspec, params, avoid)
 
 	if err != nil {
-		return Drive{}, err
+		return nil, err
 	}
 
 	if len(objs) == 0 {
-		return Drive{}, errors.New("No object was returned from server")
+		return nil, errors.New("No object was returned from server")
 	}
 
-	drv := Drive{
+	drv := &drive{
 		client:  &c,
 		obj:     &objs[0],
 		library: libspec,

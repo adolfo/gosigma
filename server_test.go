@@ -387,11 +387,8 @@ func TestClientCreateServer(t *testing.T) {
 	}
 
 	n := nics[0]
-	if n.Type() != NIC_public {
-		t.Errorf("NIC.Type [0]: %q", n.Type())
-	}
-	if n.Conf() != "dhcp" {
-		t.Errorf("NIC.Conf [0]: %q", n.Conf())
+	if c := n.IPv4().Conf(); c != "dhcp" {
+		t.Errorf("NIC.Conf [0]: %q", c)
 	}
 	if n.Model() != "virtio" {
 		t.Errorf("NIC.Model [0]: %q", n.Model())
@@ -399,13 +396,13 @@ func TestClientCreateServer(t *testing.T) {
 	if n.MAC() != "" {
 		t.Errorf("NIC.MAC [0]: %q", n.MAC())
 	}
+	if v := n.VLAN(); v != nil {
+		t.Error("NIC.VLAN [0] must be nil, %v", v)
+	}
 
 	n = nics[1]
-	if n.Type() != NIC_public {
-		t.Errorf("NIC.Type [1]: %q", n.Type())
-	}
-	if n.Conf() != "manual" {
-		t.Errorf("NIC.Conf [1]: %q", n.Conf())
+	if c := n.IPv4().Conf(); c != "manual" {
+		t.Errorf("NIC.Conf [1]: %q", c)
 	}
 	if n.Model() != "virtio" {
 		t.Errorf("NIC.Model [1]: %q", n.Model())
@@ -413,13 +410,13 @@ func TestClientCreateServer(t *testing.T) {
 	if n.MAC() != "" {
 		t.Errorf("NIC.MAC [1]: %q", n.MAC())
 	}
+	if v := n.VLAN(); v != nil {
+		t.Error("NIC.VLAN [1] must be nil, %v", v)
+	}
 
 	n = nics[2]
-	if n.Type() != NIC_public {
-		t.Errorf("NIC.Type [2]: %q", n.Type())
-	}
-	if n.Conf() != "static" {
-		t.Errorf("NIC.Conf [2]: %q", n.Conf())
+	if c := n.IPv4().Conf(); c != "static" {
+		t.Errorf("NIC.Conf [2]: %q", c)
 	}
 	if n.Model() != "virtio" {
 		t.Errorf("NIC.Model [2]: %q", n.Model())
@@ -427,19 +424,22 @@ func TestClientCreateServer(t *testing.T) {
 	if n.MAC() != "" {
 		t.Errorf("NIC.MAC [2]: %q", n.MAC())
 	}
+	if v := n.VLAN(); v != nil {
+		t.Error("NIC.VLAN [2] must be nil, %v", v)
+	}
 
 	n = nics[3]
-	if n.Type() != NIC_private {
-		t.Errorf("NIC.Type [3]: %q", n.Type())
-	}
-	if n.Conf() != "private" {
-		t.Errorf("NIC.Conf [3]: %q", n.Conf())
+	if v := n.IPv4(); v != nil {
+		t.Errorf("NIC.IPV4 [3]: %q", v)
 	}
 	if n.Model() != "virtio" {
 		t.Errorf("NIC.Model [3]: %q", n.Model())
 	}
 	if n.MAC() != "" {
 		t.Errorf("NIC.MAC [3]: %q", n.MAC())
+	}
+	if v := n.VLAN(); v == nil {
+		t.Error("NIC.VLAN [3] must be not nil")
 	}
 
 	drives := s.Drives()

@@ -11,8 +11,8 @@ import (
 
 // A Context interface represents server instance context in CloudSigma account
 type Context interface {
-	// Convert to string
-	fmt.Stringer
+	// CloudSigma resource
+	Resource
 
 	// Cpu frequency in MHz
 	Cpu() int64
@@ -28,9 +28,6 @@ type Context interface {
 
 	// NICs for this context instance
 	NICs() []ContextNIC
-
-	// UUID of server instance
-	UUID() string
 
 	// VNCPassword to access the server
 	VNCPassword() string
@@ -48,6 +45,12 @@ var _ Context = context{}
 func (c context) String() string {
 	return fmt.Sprintf("{Name: %q\nUUID: %q}", c.Name(), c.UUID())
 }
+
+// URI of instance
+func (c context) URI() string { return fmt.Sprintf("/api/2.0/servers/%s/", c.UUID()) }
+
+// UUID of server instance
+func (c context) UUID() string { return c.obj.UUID }
 
 // Cpu frequency in MHz
 func (c context) Cpu() int64 { return c.obj.CPU }
@@ -73,9 +76,6 @@ func (c context) NICs() []ContextNIC {
 	}
 	return r
 }
-
-// UUID of server instance
-func (c context) UUID() string { return c.obj.UUID }
 
 // VNCPassword to access the server
 func (c context) VNCPassword() string { return c.obj.VNCPassword }

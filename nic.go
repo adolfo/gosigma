@@ -9,22 +9,13 @@ import (
 	"github.com/Altoros/gosigma/data"
 )
 
-const (
-	NIC_private = "private"
-	NIC_public  = "public"
-)
-
 // A NIC interface represents network interface card instance
 type NIC interface {
 	// Convert to string
 	fmt.Stringer
 
-	// Address returns address configured for network interface card
-	Address() string
-
-	// Conf returns type of network interface card configuration. 'private' for NIC_vlan type,
-	// 'static', 'dhcp', 'manual' for NIC_ip
-	Conf() string
+	// IPv4 configuration
+	IPv4() IPv4
 
 	// MAC address
 	MAC() string
@@ -35,8 +26,8 @@ type NIC interface {
 	// Runtime returns runtime information for network interface card or nil if stopped
 	Runtime() RuntimeNIC
 
-	// Type of virtual network interface card (private, public)
-	Type() string
+	// Virtual LAN resource
+	VLAN() Resource
 }
 
 // A nic implements network interface card instance in CloudSigma
@@ -50,31 +41,17 @@ var _ NIC = nic{}
 // String method is used to print values passed as an operand to any format that
 // accepts a string or to an unformatted printer such as Print.
 func (n nic) String() string {
-	return fmt.Sprintf(`{Type: %q, Conf: %q, Model: %q, MAC: %q, Address: %q}`,
-		n.Type(), n.Conf(), n.Model(), n.MAC(), n.Address())
+	return fmt.Sprintf(`{Model: %q, MAC: %q, IPv4: %v, VLAN: %v, Runtime: %v}`,
+		n.Model(), n.MAC(), n.IPv4(), n.VLAN(), n.Runtime())
 }
 
-// Address returns address configured for network interface card
-func (n nic) Address() string {
-	if n.obj.VLAN != nil && n.obj.VLAN.UUID != "" {
-		return n.obj.VLAN.UUID
+// IPv4 configuration
+func (n nic) IPv4() IPv4 {
+	if n.obj.IPv4 != nil {
+		return ipv4{n.client, n.obj.IPv4}
+	} else {
+		return nil
 	}
-	if n.obj.IPv4 != nil && n.obj.IPv4.IP.UUID != "" {
-		return n.obj.IPv4.IP.UUID
-	}
-	return ""
-}
-
-// Conf returns type of network interface card configuration. 'private' for NIC_vlan type,
-// 'static', 'dhcp', 'manual' for NIC_ip
-func (n nic) Conf() string {
-	if n.obj.VLAN != nil && n.obj.VLAN.UUID != "" {
-		return NIC_private
-	}
-	if n.obj.IPv4 != nil && n.obj.IPv4.Conf != "" {
-		return n.obj.IPv4.Conf
-	}
-	return ""
 }
 
 // MAC address
@@ -92,13 +69,11 @@ func (n nic) Runtime() RuntimeNIC {
 	}
 }
 
-// Type of virtual network interface card (private, public)
-func (n nic) Type() string {
-	if n.obj.VLAN != nil && n.obj.VLAN.UUID != "" {
-		return NIC_private
+// Virtual LAN resource
+func (n nic) VLAN() Resource {
+	if n.obj.VLAN != nil {
+		return resource{n.obj.VLAN}
+	} else {
+		return nil
 	}
-	if n.obj.IPv4 != nil && n.obj.IPv4.Conf != "" {
-		return NIC_public
-	}
-	return ""
 }
