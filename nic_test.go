@@ -10,7 +10,7 @@ import (
 )
 
 func TestNIC_Empty(t *testing.T) {
-	var n NIC
+	var n NIC = nic{client: nil, obj: &data.NIC{}}
 	if v := n.Type(); v != "" {
 		t.Errorf("invalid type %q, must be empty", v)
 	}
@@ -33,8 +33,8 @@ func TestNIC_Empty(t *testing.T) {
 	}
 
 	r := n.Runtime()
-	if r.obj != nil {
-		t.Error("invalid runtime object")
+	if r != nil {
+		t.Error("not nil runtime object")
 	}
 }
 
@@ -47,7 +47,7 @@ func TestNIC_DataIP(t *testing.T) {
 		Model: "virtio",
 		MAC:   "22:40:85:4f:d3:ce",
 	}
-	var n = NIC{obj: &d}
+	var n = nic{obj: &d}
 
 	if v := n.Type(); v != NIC_public {
 		t.Errorf("invalid type %q, must be %s", v, NIC_public)
@@ -71,8 +71,8 @@ func TestNIC_DataIP(t *testing.T) {
 	}
 
 	r := n.Runtime()
-	if r.obj != nil {
-		t.Error("invalid runtime object")
+	if r != nil {
+		t.Error("not nil runtime object")
 	}
 }
 
@@ -85,7 +85,7 @@ func TestNIC_DataVLan(t *testing.T) {
 			"5bc05e7e-6555-4f40-add8-3b8e91447702",
 		},
 	}
-	var n = NIC{obj: &d}
+	var n = nic{obj: &d}
 
 	if v := n.Type(); v != NIC_private {
 		t.Errorf("invalid type %q, must be %s", v, NIC_private)
@@ -109,7 +109,7 @@ func TestNIC_DataVLan(t *testing.T) {
 	}
 
 	r := n.Runtime()
-	if r.obj != nil {
-		t.Error("invalid runtime object")
+	if r != nil {
+		t.Error("not nil runtime object")
 	}
 }

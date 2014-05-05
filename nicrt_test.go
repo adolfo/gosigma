@@ -10,7 +10,7 @@ import (
 )
 
 func TestRuntimeNIC_Empty(t *testing.T) {
-	var n RuntimeNIC
+	var n RuntimeNIC = runtimeNIC{}
 	if v := n.Type(); v != "" {
 		t.Errorf("invalid type %q, must be empty", v)
 	}
@@ -29,7 +29,7 @@ func TestRuntimeNIC_Public(t *testing.T) {
 		InterfaceType: "public",
 		IPv4:          data.MakeIPResource("10.11.12.13"),
 	}
-	var n = RuntimeNIC{obj: &obj}
+	var n RuntimeNIC = runtimeNIC{obj: &obj}
 	if v := n.Type(); v != "public" {
 		t.Errorf("invalid type %q, must be public", v)
 	}
@@ -47,7 +47,7 @@ func TestRuntimeNIC_Private(t *testing.T) {
 	var obj = data.RuntimeNetwork{
 		InterfaceType: "private",
 	}
-	var n = RuntimeNIC{obj: &obj}
+	var n RuntimeNIC = runtimeNIC{obj: &obj}
 	if v := n.Type(); v != "private" {
 		t.Errorf("invalid type %q, must be private", v)
 	}

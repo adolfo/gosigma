@@ -16,6 +16,8 @@ type Error struct {
 	ServiceError  *data.Error // Error response object from CloudSigma endpoint
 }
 
+var _ error = Error{}
+
 func NewError(r *https.Response, e error) *Error {
 	if r == nil {
 		if e == nil {

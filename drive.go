@@ -87,8 +87,8 @@ func (d Drive) ImageType() string { return d.obj.ImageType }
 func (d Drive) Jobs() []Job {
 	r := make([]Job, 0, len(d.obj.Jobs))
 	for _, j := range d.obj.Jobs {
-		job := Job{d.client, &data.Job{Resource: j}}
-		r = append(r, job)
+		j := &job{d.client, &data.Job{Resource: j}}
+		r = append(r, j)
 	}
 	return r
 }

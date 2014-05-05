@@ -41,38 +41,54 @@ type Server interface {
 
 	// Context serial device enabled for server instance
 	Context() bool
+
 	// Cpu frequency in MHz
 	Cpu() int64
+
 	// Drives for this server instance
 	Drives() []ServerDrive
+
 	// Mem capacity in bytes
 	Mem() int64
+
 	// Name of server instance
 	Name() string
+
 	// NICs for this server instance
 	NICs() []NIC
+
 	// Status of server instance
 	Status() string
+
 	// URI of server instance
 	URI() string
+
 	// UUID of server instance
 	UUID() string
+
 	// VNCPassword to access the server
 	VNCPassword() string
+
 	// Get meta-information value stored in the server instance
 	Get(key string) (string, bool)
+
 	// Refresh information about server instance
 	Refresh() error
+
 	// Start server instance. This method does not check current server status,
 	// start command is issued to the endpoint in case of any value cached in Status().
 	Start() error
+
 	// Stop server instance. This method does not check current server status,
 	// stop command is issued to the endpoint in case of any value cached in Status().
 	Stop() error
+
 	// Start server instance and waits for status ServerRunning with timeout
 	StartWait() error
+
 	// Stop server instance and waits for status ServerStopped with timeout
 	StopWait() error
+
 	// Remove server instance
 	Remove(recurse string) error
 }
@@ -101,7 +117,7 @@ func (s server) Cpu() int64 { return s.obj.CPU }
 func (s server) Drives() []ServerDrive {
 	r := make([]ServerDrive, 0, len(s.obj.Drives))
 	for i := range s.obj.Drives {
-		drive := ServerDrive{s.client, &s.obj.Drives[i]}
+		drive := &serverDrive{s.client, &s.obj.Drives[i]}
 		r = append(r, drive)
 	}
 	return r
@@ -117,8 +133,8 @@ func (s server) Name() string { return s.obj.Name }
 func (s server) NICs() []NIC {
 	r := make([]NIC, 0, len(s.obj.NICs))
 	for i := range s.obj.NICs {
-		nic := NIC{s.client, &s.obj.NICs[i]}
-		r = append(r, nic)
+		n := nic{s.client, &s.obj.NICs[i]}
+		r = append(r, n)
 	}
 	return r
 }

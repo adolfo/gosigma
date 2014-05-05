@@ -247,15 +247,15 @@ func (c Client) CloneDrive(uuid string, libspec LibrarySpec, params CloneParams,
 func (c Client) Job(uuid string) (Job, error) {
 	obj, err := c.getJob(uuid)
 	if err != nil {
-		return Job{}, err
+		return nil, err
 	}
 
-	job := Job{
+	j := &job{
 		client: &c,
 		obj:    obj,
 	}
 
-	return job, nil
+	return j, nil
 }
 
 // ReadContext reads and returns context of current server
