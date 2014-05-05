@@ -231,7 +231,7 @@ func (c Client) CloneDrive(uuid string, libspec LibrarySpec, params CloneParams,
 	}
 
 	if len(objs) == 0 {
-		return nil, errors.New("No object was returned from server")
+		return nil, errors.New("no object was returned from server")
 	}
 
 	drv := &drive{
