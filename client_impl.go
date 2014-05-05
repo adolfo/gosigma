@@ -322,9 +322,9 @@ func (c Client) readContext() (*data.Context, error) {
 
 	// log server context as raw content
 	if logger != nil {
-		logger.Log()
-		logger.Log(string(bb))
-		logger.Log()
+		logger.Logf("")
+		logger.Logf("%s", string(bb))
+		logger.Logf("")
 	}
 
 	// prepare reader around raw content

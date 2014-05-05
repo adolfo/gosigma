@@ -19,7 +19,6 @@ import (
 
 // A Logger represents an active logging object to log Client communication
 type Logger interface {
-	Log(args ...interface{})
 	Logf(format string, args ...interface{})
 }
 
@@ -164,8 +163,8 @@ func (c Client) do(r *http.Request) (*Response, error) {
 	logger := c.logger
 	if logger != nil {
 		if buf, err := httputil.DumpRequest(r, true); err == nil {
-			logger.Log(string(buf))
-			logger.Log()
+			logger.Logf("%s", string(buf))
+			logger.Logf("")
 		}
 	}
 
@@ -185,18 +184,18 @@ func (c Client) do(r *http.Request) (*Response, error) {
 	if logger != nil {
 		logger.Logf("HTTP/%s", resp.Status)
 		for header, values := range resp.Header {
-			logger.Log(header+":", strings.Join(values, ","))
+			logger.Logf("%s: %s", header, strings.Join(values, ","))
 		}
 
 		bb, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
-			logger.Log("failed to read body", err)
+			logger.Logf("failed to read body %s", err)
 			return nil, err
 		}
 
-		logger.Log()
-		logger.Log(string(bb))
-		logger.Log()
+		logger.Logf("")
+		logger.Logf("%s", string(bb))
+		logger.Logf("")
 
 		resp.Body = ioutil.NopCloser(bytes.NewReader(bb))
 	}

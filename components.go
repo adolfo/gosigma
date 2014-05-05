@@ -54,14 +54,28 @@ func (c *Components) SetVNCPassword(password string) {
 	c.data.VNCPassword = strings.TrimSpace(password)
 }
 
+// SetMeta information for new server
+func (c *Components) SetMeta(name, value string) {
+	c.init()
+
+	m := c.data.Meta
+
+	value = strings.TrimSpace(value)
+	if value == "" {
+		delete(m, name)
+	} else {
+		m[name] = value
+	}
+}
+
 // SetDescription sets description for new server. To unset, call this function with empty string.
 func (c *Components) SetDescription(description string) {
-	c.setMeta("description", description)
+	c.SetMeta("description", description)
 }
 
 // SetPublicSSHKey sets public SSH key for new server. To unset, call this function with empty string.
 func (c *Components) SetSSHPublicKey(description string) {
-	c.setMeta("ssh_public_key", description)
+	c.SetMeta("ssh_public_key", description)
 }
 
 // AttachDriveData attaches drive to components from drive data.
@@ -123,19 +137,6 @@ func (c *Components) init() {
 		c.data = &data.Server{
 			Meta: make(map[string]string),
 		}
-	}
-}
-
-func (c *Components) setMeta(name, value string) {
-	c.init()
-
-	m := c.data.Meta
-
-	value = strings.TrimSpace(value)
-	if value == "" {
-		delete(m, name)
-	} else {
-		m[name] = value
 	}
 }
 
