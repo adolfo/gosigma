@@ -8,7 +8,6 @@ import (
 	"errors"
 	"time"
 
-	"github.com/Altoros/gosigma/data"
 	"github.com/Altoros/gosigma/https"
 )
 
@@ -225,23 +224,14 @@ func (c Client) Drive(uuid string, libspec LibrarySpec) (Drive, error) {
 
 // CloneDrive clones given drive by uuid
 func (c Client) CloneDrive(uuid string, libspec LibrarySpec, params CloneParams, avoid []string) (Drive, error) {
-	objs, err := c.cloneDrive(uuid, libspec, params, avoid)
-
+	obj, err := c.cloneDrive(uuid, libspec, params, avoid)
 	if err != nil {
 		return nil, err
 	}
 
-	if len(objs) == 0 {
-		return nil, errors.New("no object was returned from server")
-	}
-
-	// fix CloudSigma API problem
-	obj := objs[0]
-	obj.Resource = *data.MakeDriveResource(obj.Resource.UUID)
-
 	drv := &drive{
 		client:  &c,
-		obj:     &obj,
+		obj:     obj,
 		library: LibraryAccount,
 	}
 

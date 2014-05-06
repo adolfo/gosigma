@@ -465,11 +465,12 @@ var libraryDriveData = Drive{
 	Owner:    nil,
 	Status:   "unmounted",
 	Size:     536870912,
-
-	Arch:      "64",
-	ImageType: "install",
-	OS:        "linux",
-	Paid:      false,
+	LibraryDrive: LibraryDrive{
+		Arch:      "64",
+		ImageType: "install",
+		OS:        "linux",
+		Paid:      false,
+	},
 }
 
 const jsonLibraryDriveData = `{

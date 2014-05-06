@@ -129,6 +129,9 @@ func compareServers(t *testing.T, i int, value, wants *Server) {
 	if value.CPU != wants.CPU {
 		t.Errorf("Server.CPU error [%d]: found %#v, wants %#v", i, value.CPU, wants.CPU)
 	}
+	if value.CPUs_instead_of_cores != wants.CPUs_instead_of_cores {
+		t.Errorf("Server.CPUs_instead_of_cores error [%d]: found %#v, wants %#v", i, value.CPUs_instead_of_cores, wants.CPUs_instead_of_cores)
+	}
 	if value.CPUModel != wants.CPUModel {
 		t.Errorf("Server.CPUModel error [%d]: found %#v, wants %#v", i, value.CPUModel, wants.CPUModel)
 	}
@@ -157,6 +160,10 @@ func compareServers(t *testing.T, i int, value, wants *Server) {
 	}
 	for i := 0; i < len(value.NICs); i++ {
 		compareNICs(t, i, &value.NICs[i], &wants.NICs[i])
+	}
+
+	if value.SMP != wants.SMP {
+		t.Errorf("Server.SMP error [%d]: found %#v, wants %#v", i, value.SMP, wants.SMP)
 	}
 
 	if value.Status != wants.Status {

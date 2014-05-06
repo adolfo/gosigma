@@ -43,7 +43,17 @@ type Server interface {
 	Context() bool
 
 	// Cpu frequency in MHz
-	Cpu() int64
+	CPU() int64
+
+	// Selects whether the SMP is exposed as cores of a single CPU or separate CPUs.
+	// This should be set to false for Windows, because there are license
+	// requirements for multiple CPUs.
+	CPUs_instead_of_cores() bool
+
+	// Virtual CPU model, for mitigating compatibility issues between the guest operating system
+	// and the underlying host's CPU. If not specified, all of the hypervisor's CPUs
+	// capabilities are passed directly to the virtual machine.
+	CPU_Model() string
 
 	// Drives for this server instance
 	Drives() []ServerDrive
@@ -56,6 +66,9 @@ type Server interface {
 
 	// NICs for this server instance
 	NICs() []NIC
+
+	// Symmetric Multiprocessing (SMP) i.e. number of CPU cores
+	SMP() int
 
 	// Status of server instance
 	Status() string
@@ -111,7 +124,17 @@ func (s server) UUID() string { return s.obj.UUID }
 func (s server) Context() bool { return s.obj.Context }
 
 // Cpu frequency in MHz
-func (s server) Cpu() int64 { return s.obj.CPU }
+func (s server) CPU() int64 { return s.obj.CPU }
+
+// Selects whether the SMP is exposed as cores of a single CPU or separate CPUs.
+// This should be set to false for Windows, because there are license
+// requirements for multiple CPUs.
+func (s server) CPUs_instead_of_cores() bool { return s.obj.CPUs_instead_of_cores }
+
+// Virtual CPU model, for mitigating compatibility issues between the guest operating system
+// and the underlying host's CPU. If not specified, all of the hypervisor's CPUs
+// capabilities are passed directly to the virtual machine.
+func (s server) CPU_Model() string { return s.obj.CPUModel }
 
 // Drives for this server instance
 func (s server) Drives() []ServerDrive {
@@ -138,6 +161,9 @@ func (s server) NICs() []NIC {
 	}
 	return r
 }
+
+// Symmetric Multiprocessing (SMP) i.e. number of CPU cores
+func (s server) SMP() int { return s.obj.SMP }
 
 // Status of server instance
 func (s server) Status() string { return s.obj.Status }

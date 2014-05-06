@@ -197,16 +197,46 @@ func (c *CloneParams) makeJsonReader() (io.Reader, error) {
 	return bytes.NewReader(bb), nil
 }
 
+func (d drive) clone(params CloneParams, avoid []string) (*data.Drive, error) {
+	obj, err := d.client.cloneDrive(d.UUID(), d.Library(), params, avoid)
+	if err != nil {
+		return nil, err
+	}
+
+	if d.Library() == LibraryMedia {
+		obj.LibraryDrive = d.obj.LibraryDrive
+	}
+
+	return obj, nil
+}
+
 // Clone drive instance.
 func (d drive) Clone(params CloneParams, avoid []string) (Drive, error) {
-	return d.client.CloneDrive(d.UUID(), d.Library(), params, avoid)
+	obj, err := d.clone(params, avoid)
+	if err != nil {
+		return nil, err
+	}
+
+	newDrive := &drive{
+		client:  d.client,
+		obj:     obj,
+		library: LibraryAccount,
+	}
+
+	return newDrive, nil
 }
 
 // Clone drive instance, wait for operation finished.
 func (d drive) CloneWait(params CloneParams, avoid []string) (Drive, error) {
-	newDrive, err := d.Clone(params, avoid)
+	obj, err := d.clone(params, avoid)
 	if err != nil {
 		return nil, err
+	}
+
+	newDrive := &drive{
+		client:  d.client,
+		obj:     obj,
+		library: LibraryAccount,
 	}
 
 	jj := newDrive.Jobs()
@@ -222,6 +252,10 @@ func (d drive) CloneWait(params CloneParams, avoid []string) (Drive, error) {
 
 	if err := newDrive.Refresh(); err != nil {
 		return nil, err
+	}
+
+	if d.Library() == LibraryMedia {
+		obj.LibraryDrive = d.obj.LibraryDrive
 	}
 
 	return newDrive, nil

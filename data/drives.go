@@ -5,9 +5,19 @@ package data
 
 import "io"
 
-// Drive contains detail properties of cloud server instance
+// LibraryDrive contains properties of cloud drive instance specific for CloudSigma
+// media library drives
+type LibraryDrive struct {
+	Arch      string `json:"arch,omitempty"`
+	ImageType string `json:"image_type,omitempty"`
+	OS        string `json:"os,omitempty"`
+	Paid      bool   `json:"paid,omitempty"`
+}
+
+// Drive contains properties of cloud drive instance
 type Drive struct {
 	Resource
+	LibraryDrive
 	Jobs        []Resource        `json:"jobs,omitempty"`
 	Media       string            `json:"media,omitempty"`
 	Meta        map[string]string `json:"meta,omitempty"`
@@ -16,14 +26,6 @@ type Drive struct {
 	Size        int64             `json:"size,omitempty"`
 	Status      string            `json:"status,omitempty"`
 	StorageType string            `json:"storage_type,omitempty"`
-
-	//
-	// specific for media library drives
-
-	Arch      string `json:"arch,omitempty"`
-	ImageType string `json:"image_type,omitempty"`
-	OS        string `json:"os,omitempty"`
-	Paid      bool   `json:"paid,omitempty"`
 }
 
 // Drives holds collection of Drive objects

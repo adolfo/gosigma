@@ -368,7 +368,7 @@ func TestClientCreateServer(t *testing.T) {
 	if s.Name() != "test" {
 		t.Error("Invalid name")
 	}
-	if s.Cpu() != 2000 {
+	if s.CPU() != 2000 {
 		t.Error("Invalid cpu")
 	}
 	if s.Mem() != 2147483648 {

@@ -105,6 +105,7 @@ var serversDetailData = []Server{
 				VLAN:  MakeVLanResource("5bc05e7e-6555-4f40-add8-3b8e91447702"),
 			},
 		},
+		SMP:         1,
 		Status:      "stopped",
 		VNCPassword: "testserver",
 	},
@@ -317,6 +318,7 @@ var serverData = Server{
 			VLAN:  MakeVLanResource("5bc05e7e-6555-4f40-add8-3b8e91447702"),
 		},
 	},
+	SMP:         1,
 	Status:      "starting",
 	VNCPassword: "Pim3UkEc",
 }

@@ -6,6 +6,7 @@ package gosigma
 import (
 	"bufio"
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"net/url"
@@ -209,7 +210,7 @@ func (c Client) getDrive(uuid string, libspec LibrarySpec) (*data.Drive, error) 
 	return data.ReadDrive(r.Body)
 }
 
-func (c Client) cloneDrive(uuid string, libspec LibrarySpec, params CloneParams, avoid []string) ([]data.Drive, error) {
+func (c Client) cloneDrive(uuid string, libspec LibrarySpec, params CloneParams, avoid []string) (*data.Drive, error) {
 	uuid = strings.TrimSpace(uuid)
 	if uuid == "" {
 		return nil, errEmptyUUID
@@ -245,7 +246,23 @@ func (c Client) cloneDrive(uuid string, libspec LibrarySpec, params CloneParams,
 		return nil, NewError(r, err)
 	}
 
-	return data.ReadDrives(r.Body)
+	objs, err := data.ReadDrives(r.Body)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if len(objs) == 0 {
+		return nil, errors.New("no object was returned from server")
+	}
+
+	if libspec == LibraryMedia {
+		// fix CloudSigma API result, disk has URI pointed to libdrive - must be drives
+		uuid := objs[0].Resource.UUID
+		objs[0].Resource = *data.MakeDriveResource(uuid)
+	}
+
+	return &objs[0], nil
 }
 
 func (c Client) getJob(uuid string) (*data.Job, error) {
