@@ -99,7 +99,7 @@ func (c *Client) Logger(logger https.Logger) {
 }
 
 // Servers in current account
-func (c Client) Servers(rqspec RequestSpec) ([]Server, error) {
+func (c *Client) Servers(rqspec RequestSpec) ([]Server, error) {
 	objs, err := c.getServers(rqspec)
 	if err != nil {
 		return nil, err
@@ -108,7 +108,7 @@ func (c Client) Servers(rqspec RequestSpec) ([]Server, error) {
 	servers := make([]Server, len(objs))
 	for i := 0; i < len(objs); i++ {
 		servers[i] = &server{
-			client: &c,
+			client: c,
 			obj:    &objs[i],
 		}
 	}
@@ -117,7 +117,7 @@ func (c Client) Servers(rqspec RequestSpec) ([]Server, error) {
 }
 
 // ServersFiltered in current account with filter applied
-func (c Client) ServersFiltered(rqspec RequestSpec, filter func(s Server) bool) ([]Server, error) {
+func (c *Client) ServersFiltered(rqspec RequestSpec, filter func(s Server) bool) ([]Server, error) {
 	objs, err := c.getServers(rqspec)
 	if err != nil {
 		return nil, err
@@ -126,7 +126,7 @@ func (c Client) ServersFiltered(rqspec RequestSpec, filter func(s Server) bool) 
 	servers := make([]Server, 0, len(objs))
 	for i := 0; i < len(objs); i++ {
 		s := &server{
-			client: &c,
+			client: c,
 			obj:    &objs[i],
 		}
 		if filter(s) {
@@ -137,15 +137,15 @@ func (c Client) ServersFiltered(rqspec RequestSpec, filter func(s Server) bool) 
 	return servers, nil
 }
 
-// Server returns given server by uuid
-func (c Client) Server(uuid string) (Server, error) {
+// Server returns given server by uuid, requesting endpoint for server information
+func (c *Client) Server(uuid string) (Server, error) {
 	obj, err := c.getServer(uuid)
 	if err != nil {
 		return nil, err
 	}
 
 	srv := &server{
-		client: &c,
+		client: c,
 		obj:    obj,
 	}
 
@@ -153,7 +153,7 @@ func (c Client) Server(uuid string) (Server, error) {
 }
 
 // CreateServer in CloudSigma user account
-func (c Client) CreateServer(components Components) (Server, error) {
+func (c *Client) CreateServer(components Components) (Server, error) {
 	objs, err := c.createServer(components)
 	if err != nil {
 		return nil, err
@@ -164,7 +164,7 @@ func (c Client) CreateServer(components Components) (Server, error) {
 	}
 
 	s := &server{
-		client: &c,
+		client: c,
 		obj:    &objs[0],
 	}
 
@@ -188,7 +188,7 @@ func (c Client) RemoveServer(uuid, recurse string) error {
 }
 
 // Drives returns list of drives
-func (c Client) Drives(rqspec RequestSpec, libspec LibrarySpec) ([]Drive, error) {
+func (c *Client) Drives(rqspec RequestSpec, libspec LibrarySpec) ([]Drive, error) {
 	objs, err := c.getDrives(rqspec, libspec)
 	if err != nil {
 		return nil, err
@@ -197,7 +197,7 @@ func (c Client) Drives(rqspec RequestSpec, libspec LibrarySpec) ([]Drive, error)
 	drives := make([]Drive, len(objs))
 	for i := 0; i < len(objs); i++ {
 		drives[i] = &drive{
-			client:  &c,
+			client:  c,
 			obj:     &objs[i],
 			library: libspec,
 		}
@@ -207,14 +207,14 @@ func (c Client) Drives(rqspec RequestSpec, libspec LibrarySpec) ([]Drive, error)
 }
 
 // Drive returns given drive by uuid
-func (c Client) Drive(uuid string, libspec LibrarySpec) (Drive, error) {
+func (c *Client) Drive(uuid string, libspec LibrarySpec) (Drive, error) {
 	obj, err := c.getDrive(uuid, libspec)
 	if err != nil {
 		return nil, err
 	}
 
 	drv := &drive{
-		client:  &c,
+		client:  c,
 		obj:     obj,
 		library: libspec,
 	}
@@ -223,14 +223,14 @@ func (c Client) Drive(uuid string, libspec LibrarySpec) (Drive, error) {
 }
 
 // CloneDrive clones given drive by uuid
-func (c Client) CloneDrive(uuid string, libspec LibrarySpec, params CloneParams, avoid []string) (Drive, error) {
+func (c *Client) CloneDrive(uuid string, libspec LibrarySpec, params CloneParams, avoid []string) (Drive, error) {
 	obj, err := c.cloneDrive(uuid, libspec, params, avoid)
 	if err != nil {
 		return nil, err
 	}
 
 	drv := &drive{
-		client:  &c,
+		client:  c,
 		obj:     obj,
 		library: LibraryAccount,
 	}
@@ -239,14 +239,14 @@ func (c Client) CloneDrive(uuid string, libspec LibrarySpec, params CloneParams,
 }
 
 // Job returns job object by uuid
-func (c Client) Job(uuid string) (Job, error) {
+func (c *Client) Job(uuid string) (Job, error) {
 	obj, err := c.getJob(uuid)
 	if err != nil {
 		return nil, err
 	}
 
 	j := &job{
-		client: &c,
+		client: c,
 		obj:    obj,
 	}
 

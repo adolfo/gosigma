@@ -333,14 +333,16 @@ func (c Client) readContext() (*data.Context, error) {
 	}
 
 	// if EOT was read, truncate it
-	if last := len(bb) - 1; bb[last] == EOT {
-		bb = bb[:last]
+	if len(bb) > 0 {
+		if last := len(bb) - 1; bb[last] == EOT {
+			bb = bb[:last]
+		}
 	}
 
 	// log server context as raw content
 	if logger != nil {
 		logger.Logf("")
-		logger.Logf("%s", string(bb))
+		logger.Logf("server context:\n%s", string(bb))
 		logger.Logf("")
 	}
 

@@ -144,6 +144,44 @@ func TestLiveServerStart(t *testing.T) {
 	}
 }
 
+func TestLiveServerStartWait(t *testing.T) {
+	u, p, err := parseCredentials()
+	if u == "" {
+		skipTest(t, err)
+		return
+	}
+
+	if *suid == "" {
+		t.Skip("-suid=<server-uuid> must be specified")
+		return
+	}
+
+	cli, err := NewClient(DefaultRegion, u, p, nil)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	if *trace {
+		cli.Logger(t)
+	}
+
+	s, err := cli.Server(*suid)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	if s.Status() != ServerStopped && !*force {
+		t.Skip("wrong server status", s.Status())
+		return
+	}
+
+	if err := s.StartWait(); err != nil {
+		t.Error(err)
+	}
+}
+
 func TestLiveServerStop(t *testing.T) {
 	u, p, err := parseCredentials()
 	if u == "" {

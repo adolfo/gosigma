@@ -98,6 +98,9 @@ type Server interface {
 
 	// Remove server instance
 	Remove(recurse string) error
+
+	// Wait for user-defined event
+	Wait(stop func(Server) bool) error
 }
 
 // A server implements server instance in CloudSigma account
@@ -204,7 +207,9 @@ func (s *server) StartWait() error {
 	if err := s.Start(); err != nil {
 		return err
 	}
-	return s.waitStatus(ServerRunning)
+	return s.Wait(func(srv Server) bool {
+		return srv.Status() == ServerRunning
+	})
 }
 
 // Stop server instance and waits for status ServerStopped with timeout
@@ -212,7 +217,9 @@ func (s *server) StopWait() error {
 	if err := s.Stop(); err != nil {
 		return err
 	}
-	return s.waitStatus(ServerStopped)
+	return s.Wait(func(srv Server) bool {
+		return srv.Status() == ServerStopped
+	})
 }
 
 // Remove server instance
@@ -220,20 +227,21 @@ func (s server) Remove(recurse string) error {
 	return s.client.removeServer(s.UUID(), recurse)
 }
 
-func (s *server) waitStatus(status string) error {
-	var stop = false
+// Wait for user-defined event
+func (s *server) Wait(stop func(srv Server) bool) error {
+	var timedout = false
 
 	timeout := s.client.GetOperationTimeout()
 	if timeout > 0 {
-		timer := time.AfterFunc(timeout, func() { stop = true })
+		timer := time.AfterFunc(timeout, func() { timedout = true })
 		defer timer.Stop()
 	}
 
-	for s.Status() != status {
+	for !stop(s) {
 		if err := s.Refresh(); err != nil {
 			return err
 		}
-		if stop {
+		if timedout {
 			return ErrOperationTimeout
 		}
 	}
