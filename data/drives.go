@@ -3,7 +3,10 @@
 
 package data
 
-import "io"
+import (
+	"encoding/json"
+	"io"
+)
 
 // LibraryDrive contains properties of cloud drive instance specific for CloudSigma
 // media library drives
@@ -52,4 +55,19 @@ func ReadDrive(r io.Reader) (*Drive, error) {
 		return nil, err
 	}
 	return &drive, nil
+}
+
+// WriteDrive marshals single drive object to JSON stream
+func WriteDrive(obj *Drive) (io.Reader, error) {
+	r, w := io.Pipe()
+
+	e := json.NewEncoder(w)
+	defer w.Close()
+
+	if err := e.Encode(obj); err != nil {
+		r.Close()
+		return nil, err
+	}
+
+	return r, nil
 }

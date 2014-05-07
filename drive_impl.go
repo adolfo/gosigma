@@ -35,16 +35,23 @@ func (d *drive) resize(newSize uint64) error {
 		return nil
 	}
 
+	// check the library
+	if d.Library() == LibraryMedia {
+		return errors.New("can not resize drive from media library")
+	}
+
 	// check the drive status
 	if d.Status() != DriveUnmounted {
 		return errors.New("drive size can be changed only for unmounted drives")
 	}
 
-	obj, err := d.client.resizeDrive(d.UUID(), newSize)
+	// do the resize
+	obj, err := d.client.resizeDrive(*d.obj, newSize)
 	if err != nil {
 		return err
 	}
 
+	// update drive data
 	d.obj = obj
 
 	return nil

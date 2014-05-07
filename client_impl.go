@@ -65,14 +65,14 @@ func (c Client) startServer(uuid string, avoid []string) error {
 
 	u := c.endpoint + "servers/" + uuid + "/action/"
 
-	var params = make(url.Values)
-	params["do"] = []string{"start"}
+	var qq = make(url.Values)
+	qq["do"] = []string{"start"}
 
 	if len(avoid) > 0 {
-		params["avoid"] = []string{strings.Join(avoid, ",")}
+		qq["avoid"] = []string{strings.Join(avoid, ",")}
 	}
 
-	r, err := c.https.Post(u, params, nil)
+	r, err := c.https.Post(u, qq, nil)
 	if err != nil {
 		return err
 	}
@@ -93,10 +93,10 @@ func (c Client) stopServer(uuid string) error {
 
 	u := c.endpoint + "servers/" + uuid + "/action/"
 
-	var params = make(url.Values)
-	params["do"] = []string{"stop"}
+	var qq = make(url.Values)
+	qq["do"] = []string{"stop"}
 
-	r, err := c.https.Post(u, params, nil)
+	r, err := c.https.Post(u, qq, nil)
 	if err != nil {
 		return err
 	}
@@ -353,6 +353,46 @@ func (c Client) readContext() (*data.Context, error) {
 	return data.ReadContext(rr)
 }
 
-func (c Client) resizeDrive(uuid string, newSize uint64) (*data.Drive, error) {
-	return nil, nil
+func (c Client) resizeDrive(obj data.Drive, newSize uint64) (*data.Drive, error) {
+
+	// prepare endpoint URL
+	u := c.endpoint + "drives/" + obj.UUID + "/action/"
+
+	// prepare request query params
+	var qq = make(url.Values)
+	qq["do"] = []string{"resize"}
+
+	// prepare request body
+	obj.Size = newSize
+	rr, err := data.WriteDrive(&obj)
+	if err != nil {
+		return nil, err
+	}
+
+	// do request
+	r, err := c.https.Post(u, qq, rr)
+	if err != nil {
+		return nil, err
+	}
+	defer r.Body.Close()
+
+	// verify reply
+	if err := r.VerifyJSON(202); err != nil {
+		return nil, NewError(r, err)
+	}
+
+	// read and parse reply body
+	objs, err := data.ReadDrives(r.Body)
+
+	if err != nil {
+		return nil, err
+	}
+
+	// verify reply body content
+	if len(objs) == 0 {
+		return nil, errors.New("no object was returned from server")
+	}
+
+	// return result
+	return &objs[0], nil
 }
