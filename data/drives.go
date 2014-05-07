@@ -25,7 +25,7 @@ type Drive struct {
 	Meta            map[string]string `json:"meta,omitempty"`
 	Name            string            `json:"name,omitempty"`
 	Owner           *Resource         `json:"owner,omitempty"`
-	Size            int64             `json:"size,omitempty"`
+	Size            uint64            `json:"size,omitempty"`
 	Status          string            `json:"status,omitempty"`
 	StorageType     string            `json:"storage_type,omitempty"`
 }

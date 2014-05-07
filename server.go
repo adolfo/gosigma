@@ -43,7 +43,7 @@ type Server interface {
 	Context() bool
 
 	// Cpu frequency in MHz
-	CPU() int64
+	CPU() uint64
 
 	// Selects whether the SMP is exposed as cores of a single CPU or separate CPUs.
 	// This should be set to false for Windows, because there are license
@@ -59,7 +59,7 @@ type Server interface {
 	Drives() []ServerDrive
 
 	// Mem capacity in bytes
-	Mem() int64
+	Mem() uint64
 
 	// Name of server instance
 	Name() string
@@ -68,7 +68,7 @@ type Server interface {
 	NICs() []NIC
 
 	// Symmetric Multiprocessing (SMP) i.e. number of CPU cores
-	SMP() int
+	SMP() uint
 
 	// Status of server instance
 	Status() string
@@ -127,7 +127,7 @@ func (s server) UUID() string { return s.obj.UUID }
 func (s server) Context() bool { return s.obj.Context }
 
 // Cpu frequency in MHz
-func (s server) CPU() int64 { return s.obj.CPU }
+func (s server) CPU() uint64 { return s.obj.CPU }
 
 // Selects whether the SMP is exposed as cores of a single CPU or separate CPUs.
 // This should be set to false for Windows, because there are license
@@ -150,7 +150,7 @@ func (s server) Drives() []ServerDrive {
 }
 
 // Mem capacity in bytes
-func (s server) Mem() int64 { return s.obj.Mem }
+func (s server) Mem() uint64 { return s.obj.Mem }
 
 // Name of server instance
 func (s server) Name() string { return s.obj.Name }
@@ -166,7 +166,7 @@ func (s server) NICs() []NIC {
 }
 
 // Symmetric Multiprocessing (SMP) i.e. number of CPU cores
-func (s server) SMP() int { return s.obj.SMP }
+func (s server) SMP() uint { return s.obj.SMP }
 
 // Status of server instance
 func (s server) Status() string { return s.obj.Status }

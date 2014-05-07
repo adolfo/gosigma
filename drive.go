@@ -44,7 +44,7 @@ type Drive interface {
 	Name() string
 
 	// Size of drive in bytes
-	Size() int64
+	Size() uint64
 
 	// Status of drive instance
 	Status() string
@@ -127,7 +127,7 @@ func (d drive) Media() string { return d.obj.Media }
 func (d drive) Name() string { return d.obj.Name }
 
 // Size of drive in bytes
-func (d drive) Size() int64 { return d.obj.Size }
+func (d drive) Size() uint64 { return d.obj.Size }
 
 // Status of drive instance
 func (d drive) Status() string { return d.obj.Status }

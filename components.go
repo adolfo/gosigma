@@ -37,13 +37,13 @@ func (c *Components) SetName(name string) {
 }
 
 // SetCPU sets CPU frequency for new server. To unset CPU frequency, call this function with zero in the frequency parameter.
-func (c *Components) SetCPU(frequency int64) {
+func (c *Components) SetCPU(frequency uint64) {
 	c.init()
 	c.data.CPU = frequency
 }
 
 // SetMem sets memory size for new server. To unset this value, call function with zero in the bytes parameter.
-func (c *Components) SetMem(bytes int64) {
+func (c *Components) SetMem(bytes uint64) {
 	c.init()
 	c.data.Mem = bytes
 }

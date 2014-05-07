@@ -17,15 +17,15 @@ type ServerDrive struct {
 type Server struct {
 	Resource
 	Context               bool              `json:"context,omitempty"`
-	CPU                   int64             `json:"cpu,omitempty"`
+	CPU                   uint64            `json:"cpu,omitempty"`
 	CPUs_instead_of_cores bool              `json:"cpus_instead_of_cores,omitempty"`
 	CPUModel              string            `json:"cpu_model,omitempty"`
 	Drives                []ServerDrive     `json:"drives,omitempty"`
-	Mem                   int64             `json:"mem,omitempty"`
+	Mem                   uint64            `json:"mem,omitempty"`
 	Meta                  map[string]string `json:"meta,omitempty"`
 	Name                  string            `json:"name,omitempty"`
 	NICs                  []NIC             `json:"nics,omitempty"`
-	SMP                   int               `json:"smp,omitempty"`
+	SMP                   uint              `json:"smp,omitempty"`
 	Status                string            `json:"status,omitempty"`
 	VNCPassword           string            `json:"vnc_password,omitempty"`
 }
