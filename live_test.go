@@ -18,6 +18,7 @@ var vlan = flag.String("vlan", "", "uuid of vlan at CloudSigma to run server spe
 var sshkey = flag.String("sshkey", "", "public ssh key to run server specific tests")
 var force = flag.Bool("force", false, "force start/stop live tests")
 var lib = flag.Bool("lib", false, "duid is library drive")
+var size = flag.Uint64("size", 0, "size for operations: TestLiveDriveResize")
 
 func libFlag() LibrarySpec {
 	if *lib {
@@ -427,4 +428,46 @@ func TestLiveServerRemove(t *testing.T) {
 	}
 
 	t.Log("Server deleted")
+}
+
+func TestLiveDriveResize(t *testing.T) {
+	u, p, err := parseCredentials()
+	if u == "" {
+		skipTest(t, err)
+		return
+	}
+
+	if *duid == "" {
+		t.Skip("-duid=<drive-uuid> must be specified")
+		return
+	}
+
+	if *size == 0 {
+		t.Skip("-size=<drive-size> must be specified")
+		return
+	}
+
+	cli, err := NewClient(DefaultRegion, u, p, nil)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	if *trace {
+		cli.Logger(t)
+	}
+
+	d, err := cli.Drive(*duid, libFlag())
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	t.Logf("Current drive size: %d", d.Size())
+	if err := d.ResizeWait(*size); err != nil {
+		t.Error(err)
+		return
+	}
+	t.Logf("Resulting drive size: %d", d.Size())
+	t.Logf("%v", d)
 }

@@ -4,6 +4,7 @@
 package data
 
 import (
+	"bytes"
 	"encoding/json"
 	"io"
 )
@@ -59,15 +60,9 @@ func ReadDrive(r io.Reader) (*Drive, error) {
 
 // WriteDrive marshals single drive object to JSON stream
 func WriteDrive(obj *Drive) (io.Reader, error) {
-	r, w := io.Pipe()
-
-	e := json.NewEncoder(w)
-	defer w.Close()
-
-	if err := e.Encode(obj); err != nil {
-		r.Close()
+	if bb, err := json.Marshal(obj); err != nil {
 		return nil, err
+	} else {
+		return bytes.NewReader(bb), nil
 	}
-
-	return r, nil
 }
