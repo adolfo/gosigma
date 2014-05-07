@@ -86,6 +86,9 @@ type Drive interface {
 
 	// Resize drive instance, wait for operation finished
 	ResizeWait(newSize uint64) error
+
+	// Wait for user-defined event
+	Wait(stop func(Drive) bool) error
 }
 
 // A drive implements drive instance in CloudSigma account
@@ -227,5 +230,10 @@ func (d *drive) Resize(newSize uint64) error {
 
 // Resize drive instance, wait for operation finished
 func (d *drive) ResizeWait(newSize uint64) error {
+	return nil
+}
+
+// Wait for user-defined event
+func (d *drive) Wait(stop func(Drive) bool) error {
 	return nil
 }
