@@ -4,10 +4,7 @@
 package gosigma
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
-	"io"
 
 	"github.com/Altoros/gosigma/data"
 )
@@ -69,6 +66,12 @@ type Drive interface {
 	// ImageType returns type of drive image (defined for library drives)
 	ImageType() string
 
+	// Clone drive instance
+	Clone(params CloneParams, avoid []string) (Drive, error)
+
+	// Clone drive instance, wait for operation finished
+	CloneWait(params CloneParams, avoid []string) (Drive, error)
+
 	// Jobs for this drive instance.
 	// Every job object in resulting slice carries only UUID and URI.
 	// To obtain additional information for job, one should use Job.Refresh() method
@@ -78,11 +81,11 @@ type Drive interface {
 	// Refresh information about drive instance
 	Refresh() error
 
-	// Clone drive instance.
-	Clone(params CloneParams, avoid []string) (Drive, error)
+	// Resize drive instance
+	Resize(newSize uint64) error
 
-	// Clone drive instance, wait for operation finished.
-	CloneWait(params CloneParams, avoid []string) (Drive, error)
+	// Resize drive instance, wait for operation finished
+	ResizeWait(newSize uint64) error
 }
 
 // A drive implements drive instance in CloudSigma account
@@ -143,73 +146,6 @@ func (d drive) Paid() bool { return d.obj.Paid }
 // ImageType returns type of drive image (defined for library drives)
 func (d drive) ImageType() string { return d.obj.ImageType }
 
-// Jobs for this drive instance.
-// Every job object in resulting slice carries only UUID and URI.
-// To obtain additional information for job, one should use Job.Refresh() method
-// to query cloud for detailed job information.
-func (d drive) Jobs() []Job {
-	r := make([]Job, 0, len(d.obj.Jobs))
-	for _, j := range d.obj.Jobs {
-		j := &job{d.client, &data.Job{Resource: j}}
-		r = append(r, j)
-	}
-	return r
-}
-
-// Refresh information about drive instance
-func (d *drive) Refresh() error {
-	obj, err := d.client.getDrive(d.UUID(), d.Library())
-	if err != nil {
-		return err
-	}
-	d.obj = obj
-	return nil
-}
-
-// CloneParams defines attributes for drive cloning operation
-type CloneParams struct {
-	Affinities []string
-	Media      string
-	Name       string
-}
-
-func (c *CloneParams) makeJsonReader() (io.Reader, error) {
-	if c == nil {
-		return nil, nil
-	}
-
-	var m = make(map[string]interface{})
-	if len(c.Affinities) > 0 {
-		m["affinities"] = c.Affinities
-	}
-	if c.Media != "" {
-		m["media"] = c.Media
-	}
-	if c.Name != "" {
-		m["name"] = c.Name
-	}
-
-	bb, err := json.Marshal(m)
-	if err != nil {
-		return nil, err
-	}
-
-	return bytes.NewReader(bb), nil
-}
-
-func (d drive) clone(params CloneParams, avoid []string) (*data.Drive, error) {
-	obj, err := d.client.cloneDrive(d.UUID(), d.Library(), params, avoid)
-	if err != nil {
-		return nil, err
-	}
-
-	if d.Library() == LibraryMedia {
-		obj.LibraryDrive = d.obj.LibraryDrive
-	}
-
-	return obj, nil
-}
-
 // Clone drive instance.
 func (d drive) Clone(params CloneParams, avoid []string) (Drive, error) {
 	obj, err := d.clone(params, avoid)
@@ -259,4 +195,37 @@ func (d drive) CloneWait(params CloneParams, avoid []string) (Drive, error) {
 	}
 
 	return newDrive, nil
+}
+
+// Jobs for this drive instance.
+// Every job object in resulting slice carries only UUID and URI.
+// To obtain additional information for job, one should use Job.Refresh() method
+// to query cloud for detailed job information.
+func (d drive) Jobs() []Job {
+	r := make([]Job, 0, len(d.obj.Jobs))
+	for _, j := range d.obj.Jobs {
+		j := &job{d.client, &data.Job{Resource: j}}
+		r = append(r, j)
+	}
+	return r
+}
+
+// Refresh information about drive instance
+func (d *drive) Refresh() error {
+	obj, err := d.client.getDrive(d.UUID(), d.Library())
+	if err != nil {
+		return err
+	}
+	d.obj = obj
+	return nil
+}
+
+// Resize drive instance
+func (d *drive) Resize(newSize uint64) error {
+	return nil
+}
+
+// Resize drive instance, wait for operation finished
+func (d *drive) ResizeWait(newSize uint64) error {
+	return nil
 }
