@@ -182,10 +182,6 @@ func (c Client) do(r *http.Request) (*Response, error) {
 		if r, err := c.protocol.Do(r); err == nil {
 			resp = r
 			break
-		} else if e, ok := err.(*url.Error); !ok {
-			return nil, err
-		} else if e.Err.Error() != "http: can't write HTTP request on broken connection" {
-			return nil, err
 		}
 		logger.Logf("broken persistent connection, try [%d], closing idle conns and retry...")
 		c.transport.CloseIdleConnections()
