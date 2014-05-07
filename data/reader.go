@@ -12,15 +12,11 @@ import (
 // ReadJson from io.Reader to the interface
 func ReadJson(r io.Reader, v interface{}) error {
 	dec := json.NewDecoder(r)
-	for {
-		err := dec.Decode(v)
-		if err == io.EOF {
-			return nil
-		}
-		if err != nil {
-			return err
-		}
+	err := dec.Decode(v)
+	if err == io.EOF {
+		return nil
 	}
+	return err
 }
 
 type failReader struct{}
