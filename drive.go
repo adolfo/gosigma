@@ -5,6 +5,7 @@ package gosigma
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/Altoros/gosigma/data"
 )
@@ -225,15 +226,40 @@ func (d *drive) Refresh() error {
 
 // Resize drive instance
 func (d *drive) Resize(newSize uint64) error {
-	return nil
+	return d.resize(newSize)
 }
 
 // Resize drive instance, wait for operation finished
 func (d *drive) ResizeWait(newSize uint64) error {
-	return nil
+	// try to resize drive
+	if err := d.resize(newSize); err != nil {
+		return err
+	}
+
+	// wait for status 'resizing' changes back to 'unmounted'
+	return d.Wait(func(d Drive) bool {
+		return d.Status() == DriveUnmounted
+	})
 }
 
 // Wait for user-defined event
 func (d *drive) Wait(stop func(Drive) bool) error {
+	var timedout = false
+
+	timeout := d.client.GetOperationTimeout()
+	if timeout > 0 {
+		timer := time.AfterFunc(timeout, func() { timedout = true })
+		defer timer.Stop()
+	}
+
+	for !stop(d) {
+		if err := d.Refresh(); err != nil {
+			return err
+		}
+		if timedout {
+			return ErrOperationTimeout
+		}
+	}
+
 	return nil
 }

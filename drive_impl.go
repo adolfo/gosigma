@@ -17,3 +17,7 @@ func (d drive) clone(params CloneParams, avoid []string) (*data.Drive, error) {
 
 	return obj, nil
 }
+
+func (d *drive) resize(newSize uint64) error {
+	return nil
+}
