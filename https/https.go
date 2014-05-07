@@ -161,6 +161,7 @@ func (c Client) perform(request, url string, query url.Values, body io.Reader) (
 
 func (c Client) do(r *http.Request) (*Response, error) {
 	logger := c.logger
+
 	if logger != nil {
 		if buf, err := httputil.DumpRequest(r, true); err == nil {
 			logger.Logf("%s", string(buf))
@@ -176,9 +177,18 @@ func (c Client) do(r *http.Request) (*Response, error) {
 		defer timer.Stop()
 	}
 
-	resp, err := c.protocol.Do(r)
-	if err != nil {
-		return nil, err
+	var resp *http.Response
+	for i := 0; i < 3; i++ {
+		if r, err := c.protocol.Do(r); err == nil {
+			resp = r
+			break
+		} else if e, ok := err.(*url.Error); !ok {
+			return nil, err
+		} else if e.Err.Error() != "http: can't write HTTP request on broken connection" {
+			return nil, err
+		}
+		logger.Logf("broken persistent connection, try [%d], closing idle conns and retry...")
+		c.transport.CloseIdleConnections()
 	}
 
 	if logger != nil {
