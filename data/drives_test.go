@@ -89,6 +89,22 @@ func compareDrives(t *testing.T, i int, value, wants *Drive) {
 		t.Errorf("Drive.Resource error [%d]: found %#v, wants %#v", i, value.Resource, wants.Resource)
 	}
 
+	if len(value.Affinities) != len(wants.Affinities) {
+		t.Errorf("Drive.Affinities error [%d]: found %#v, wants %#v", i, value.Affinities, wants.Affinities)
+	} else {
+		for j := 0; j < len(value.Affinities); j++ {
+			v := value.Affinities[j]
+			w := wants.Affinities[j]
+			if v != w {
+				t.Errorf("Drive.Affinities error [%d]: at %d found %#v, wants %#v", i, j, v, w)
+			}
+		}
+	}
+
+	if value.AllowMultimount != wants.AllowMultimount {
+		t.Errorf("Drive.AllowMultimount error [%d]: found %#v, wants %#v", i, value.AllowMultimount, wants.AllowMultimount)
+	}
+
 	if len(value.Jobs) != len(wants.Jobs) {
 		t.Errorf("Drive.Jobs error [%d]: found %#v, wants %#v", i, value.Jobs, wants.Jobs)
 	} else {

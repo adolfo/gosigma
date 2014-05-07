@@ -18,14 +18,16 @@ type LibraryDrive struct {
 type Drive struct {
 	Resource
 	LibraryDrive
-	Jobs        []Resource        `json:"jobs,omitempty"`
-	Media       string            `json:"media,omitempty"`
-	Meta        map[string]string `json:"meta,omitempty"`
-	Name        string            `json:"name,omitempty"`
-	Owner       *Resource         `json:"owner,omitempty"`
-	Size        int64             `json:"size,omitempty"`
-	Status      string            `json:"status,omitempty"`
-	StorageType string            `json:"storage_type,omitempty"`
+	Affinities      []string          `json:"affinities,omitempty"`
+	AllowMultimount bool              `json:"allow_multimount,omitempty"`
+	Jobs            []Resource        `json:"jobs,omitempty"`
+	Media           string            `json:"media,omitempty"`
+	Meta            map[string]string `json:"meta,omitempty"`
+	Name            string            `json:"name,omitempty"`
+	Owner           *Resource         `json:"owner,omitempty"`
+	Size            int64             `json:"size,omitempty"`
+	Status          string            `json:"status,omitempty"`
+	StorageType     string            `json:"storage_type,omitempty"`
 }
 
 // Drives holds collection of Drive objects
