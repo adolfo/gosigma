@@ -352,3 +352,7 @@ func (c Client) readContext() (*data.Context, error) {
 	// parse server context JSON to the data.Context object
 	return data.ReadContext(rr)
 }
+
+func (c Client) resizeDrive(uuid string, newSize uint64) (*data.Drive, error) {
+	return nil, nil
+}

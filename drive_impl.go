@@ -3,7 +3,11 @@
 
 package gosigma
 
-import "github.com/Altoros/gosigma/data"
+import (
+	"errors"
+
+	"github.com/Altoros/gosigma/data"
+)
 
 func (d drive) clone(params CloneParams, avoid []string) (*data.Drive, error) {
 	obj, err := d.client.cloneDrive(d.UUID(), d.Library(), params, avoid)
@@ -19,5 +23,29 @@ func (d drive) clone(params CloneParams, avoid []string) (*data.Drive, error) {
 }
 
 func (d *drive) resize(newSize uint64) error {
+	// if drive object contains only UUID, we need to refresh it
+	if d.Status() == "" {
+		if err := d.Refresh(); err != nil {
+			return err
+		}
+	}
+
+	// check the current drive size
+	if uint64(d.Size()) == newSize {
+		return nil
+	}
+
+	// check the drive status
+	if d.Status() != DriveUnmounted {
+		return errors.New("drive size can be changed only for unmounted drives")
+	}
+
+	obj, err := d.client.resizeDrive(d.UUID(), newSize)
+	if err != nil {
+		return err
+	}
+
+	d.obj = obj
+
 	return nil
 }
