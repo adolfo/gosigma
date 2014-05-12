@@ -183,7 +183,7 @@ func (c Client) do(r *http.Request) (*Response, error) {
 			resp = r
 			break
 		}
-		logger.Logf("broken persistent connection, try [%d], closing idle conns and retry...")
+		logger.Logf("broken persistent connection, try [%d], closing idle conns and retry...", i)
 		c.transport.CloseIdleConnections()
 	}
 
