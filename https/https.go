@@ -7,6 +7,7 @@ import (
 	"bytes"
 	"crypto/tls"
 	"errors"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net"
@@ -183,8 +184,14 @@ func (c Client) do(r *http.Request) (*Response, error) {
 			resp = r
 			break
 		}
-		logger.Logf("broken persistent connection, try [%d], closing idle conns and retry...", i)
+		if logger != nil {
+			logger.Logf("broken persistent connection, try [%d], closing idle conns and retry...", i)
+		}
 		c.transport.CloseIdleConnections()
+	}
+
+	if resp == nil {
+		return nil, fmt.Errorf("broken connection")
 	}
 
 	if logger != nil {
