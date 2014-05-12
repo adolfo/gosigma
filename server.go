@@ -101,6 +101,9 @@ type Server interface {
 
 	// Wait for user-defined event
 	Wait(stop func(Server) bool) error
+
+	// IPv4 finds all assigned IPv4 addresses at runtime
+	IPv4() []string
 }
 
 // A server implements server instance in CloudSigma account
@@ -247,4 +250,21 @@ func (s *server) Wait(stop func(srv Server) bool) error {
 	}
 
 	return nil
+}
+
+// IPv4 finds all assigned IPv4 addresses at runtime
+func (s server) IPv4() []string {
+	var result []string
+	for _, n := range s.obj.NICs {
+		if n.Runtime == nil {
+			continue
+		}
+		if n.Runtime.IPv4 == nil {
+			continue
+		}
+		if n.Runtime.IPv4.UUID != "" {
+			result = append(result, n.Runtime.IPv4.UUID)
+		}
+	}
+	return result
 }
