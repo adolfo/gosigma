@@ -35,7 +35,7 @@ type Client struct {
 
 var errEmptyUsername = errors.New("username is not allowed to be empty")
 var errEmptyPassword = errors.New("password is not allowed to be empty")
-var errEmptyUUID = errors.New("password is not allowed to be empty")
+var errEmptyUUID = errors.New("uuid is not allowed to be empty")
 
 // NewClient returns new CloudSigma client object
 func NewClient(endpoint string, username, password string,
