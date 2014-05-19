@@ -42,6 +42,12 @@ func (c *Components) SetCPU(frequency uint64) {
 	c.data.CPU = frequency
 }
 
+// SetSMP sets number of CPU cores for new server. To unset CPU cores, call this function with zero in the cores parameter.
+func (c *Components) SetSMP(cores uint64) {
+	c.init()
+	c.data.SMP = cores
+}
+
 // SetMem sets memory size for new server. To unset this value, call function with zero in the bytes parameter.
 func (c *Components) SetMem(bytes uint64) {
 	c.init()

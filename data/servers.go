@@ -25,7 +25,7 @@ type Server struct {
 	Meta                  map[string]string `json:"meta,omitempty"`
 	Name                  string            `json:"name,omitempty"`
 	NICs                  []NIC             `json:"nics,omitempty"`
-	SMP                   uint              `json:"smp,omitempty"`
+	SMP                   uint64            `json:"smp,omitempty"`
 	Status                string            `json:"status,omitempty"`
 	VNCPassword           string            `json:"vnc_password,omitempty"`
 }

@@ -68,7 +68,7 @@ type Server interface {
 	NICs() []NIC
 
 	// Symmetric Multiprocessing (SMP) i.e. number of CPU cores
-	SMP() uint
+	SMP() uint64
 
 	// Status of server instance
 	Status() string
@@ -169,7 +169,7 @@ func (s server) NICs() []NIC {
 }
 
 // Symmetric Multiprocessing (SMP) i.e. number of CPU cores
-func (s server) SMP() uint { return s.obj.SMP }
+func (s server) SMP() uint64 { return s.obj.SMP }
 
 // Status of server instance
 func (s server) Status() string { return s.obj.Status }
