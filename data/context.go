@@ -5,14 +5,14 @@ package data
 
 import "io"
 
-// ContextDrive describe properties of disk drive in server context
+// ContextDrive describes properties of disk drive in server context
 type ContextDrive struct {
 	BootOrder int    `json:"boot_order,omitempty"`
 	Channel   string `json:"dev_channel,omitempty"`
 	Device    string `json:"device,omitempty"`
 }
 
-// ContextIPv4_ describe network interface setup for IPv4 in server context
+// ContextIPv4_ describes IPv4 parameters in server context
 type ContextIPv4_ struct {
 	Gateway     string            `json:"gateway"`
 	Meta        map[string]string `json:"meta"`
@@ -21,18 +21,20 @@ type ContextIPv4_ struct {
 	UUID        string            `json:"uuid"`
 }
 
-// ContextIPv4 describe network interface properties for IPv4 in server context
+// ContextIPv4 describes IPv4 configuration in server context
 type ContextIPv4 struct {
 	Conf string       `json:"conf"`
 	IP   ContextIPv4_ `json:"ip"`
 }
 
-// ContextVLan describe network interface properties for VLan in server context
+// ContextVLan describes network interface properties for VLan in server context
 type ContextVLan struct {
-	UUID string `json:"uuid"`
+	Meta map[string]string `json:"meta,omitempty"`
+	Tags []string          `json:"tags,omitempty"`
+	UUID string            `json:"uuid"`
 }
 
-// ContextNIC describe network interface properties in server context
+// ContextNIC describes network interface properties in server context
 type ContextNIC struct {
 	IPv4  *ContextIPv4 `json:"ip_v4_conf"`
 	Mac   string       `json:"mac"`
