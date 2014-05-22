@@ -12,7 +12,9 @@ import (
 // A ContextNIC interface represents network interface card for server instance context
 type ContextNIC interface {
 	fmt.Stringer
+	// Mac address of network interface card
 	Mac() string
+	// Model of network interface card
 	Model() string
 }
 
@@ -28,7 +30,12 @@ type ContextIPv4 interface {
 // A ContextVLan interface represents VLan information for server instance context
 type ContextVLan interface {
 	fmt.Stringer
+	// UUID of VLan
 	UUID() string
+	// Tags returns VLan tags
+	Tags() []string
+	// Get meta-information value associated with VLan
+	Get(key string) (string, bool)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////
@@ -90,6 +97,13 @@ type contextVLan struct {
 var _ ContextVLan = contextVLan{}
 
 func (cv contextVLan) UUID() string { return cv.obj.UUID }
+
+func (cv contextVLan) Tags() []string { return cv.obj.Tags }
+
+func (cv contextVLan) Get(key string) (v string, ok bool) {
+	v, ok = cv.obj.Meta[key]
+	return
+}
 
 func (cv contextVLan) String() string {
 	return fmt.Sprintf("{UUID: %q}", cv.UUID())
