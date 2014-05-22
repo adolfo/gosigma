@@ -122,3 +122,12 @@ func TestNIC_DataVLan(t *testing.T) {
 		}
 	}
 }
+
+func TestNIC_Runtime(t *testing.T) {
+	var n NIC = nic{client: nil, obj: &data.NIC{
+		Runtime: &data.RuntimeNetwork{},
+	}}
+	if v := n.Runtime(); v == nil {
+		t.Errorf("invalid NIC.Runtime, must be not nil")
+	}
+}

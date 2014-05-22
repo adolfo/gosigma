@@ -88,6 +88,10 @@ func TestClientServers(t *testing.T) {
 	ds.Meta["key1"] = "value11"
 	ds.Meta["key2"] = "value22"
 	ds.Meta["key3"] = "value33"
+	ds.Context = true
+	ds.CPU = 100
+	ds.CPUs_instead_of_cores = true
+	ds.CPUModel = "cpu_model"
 	if err := s.Refresh(); err != nil {
 		t.Error(err)
 		return
@@ -98,6 +102,18 @@ func TestClientServers(t *testing.T) {
 	checkg(s, "key1", "value11")
 	checkg(s, "key2", "value22")
 	checkg(s, "key3", "value33")
+	if v := s.Context(); v != true {
+		t.Errorf("Server.Context() failed")
+	}
+	if v := s.CPU(); v != 100 {
+		t.Errorf("Server.CPU() failed")
+	}
+	if v := s.CPUs_instead_of_cores(); v != true {
+		t.Errorf("Server.CPUs_instead_of_cores() failed")
+	}
+	if v := s.CPU_Model(); v != "cpu_model" {
+		t.Errorf("Server.CPU_Model() failed")
+	}
 
 	// failed refresh
 	mock.ResetServers()
@@ -352,6 +368,7 @@ func TestClientCreateServer(t *testing.T) {
 	c.SetName("test")
 	c.SetCPU(2000)
 	c.SetMem(2147483648)
+	c.SetSMP(20)
 	c.SetVNCPassword("testserver")
 	c.NetworkDHCP4("virtio")
 	c.NetworkManual4("virtio")
@@ -374,11 +391,17 @@ func TestClientCreateServer(t *testing.T) {
 	if s.Mem() != 2147483648 {
 		t.Error("Invalid mem")
 	}
+	if s.SMP() != 20 {
+		t.Error("Invalid mem")
+	}
 	if s.Status() != ServerStopped {
 		t.Error("Server status must be stopped")
 	}
 	if s.VNCPassword() != "testserver" {
 		t.Error("VNCPassword invalid")
+	}
+	if v := s.IPv4(); len(v) != 0 {
+		t.Error("IPv4 invalid:", v)
 	}
 
 	nics := s.NICs()
@@ -440,6 +463,8 @@ func TestClientCreateServer(t *testing.T) {
 	}
 	if v := n.VLAN(); v == nil {
 		t.Error("NIC.VLAN [3] must be not nil")
+	} else if vv := v.UUID(); vv != "vlanid" {
+		t.Error("NIC.VLAN [3]: %q", vv)
 	}
 
 	drives := s.Drives()
@@ -459,6 +484,12 @@ func TestClientCreateServer(t *testing.T) {
 	}
 	if v := dd.UUID(); v != "uuid" {
 		t.Errorf("ServerDrive.UUID: %#v", v)
+	}
+	if v := dd.URI(); v != "/api/2.0/drives/uuid/" {
+		t.Errorf("ServerDrive.URI: %#v", v)
+	}
+	if v := dd.String(); v != `{BootOrder: 1, Channel: "0:0", Device: "virtio", UUID: "uuid"}` {
+		t.Errorf("ServerDrive.String: %#v", v)
 	}
 
 	ddd := dd.Drive()
