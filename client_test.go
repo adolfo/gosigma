@@ -52,9 +52,9 @@ func TestClientCreate(t *testing.T) {
 	// endpoint
 	check("", "1234", "1234")
 	check("1234", "1234", "1234")
-	check("https://1234:1234@endpoint.com", "1234", "1234")
-	check("https://endpoint.com?xxx", "1234", "1234")
-	check("://endpoint.com?xxx", "1234", "1234")
+	check("https://1234:1234@testing.invalid", "1234", "1234")
+	check("https://testing.invalid?xxx", "1234", "1234")
+	check("://testing.invalid?xxx", "1234", "1234")
 
 	// auth
 	check(mockEndpoint, "", "")
@@ -74,7 +74,7 @@ func (l *testLog) Log(args ...interface{})                 { l.written += 1 }
 func (l *testLog) Logf(format string, args ...interface{}) { l.written += 1 }
 
 func TestClientLogger(t *testing.T) {
-	cli, err := NewClient("https://1.0.0.0:2000/api/2.0/", mock.TestUser, mock.TestPassword, nil)
+	cli, err := NewClient("https://0.1.2.3:2000/api/2.0/", mock.TestUser, mock.TestPassword, nil)
 	if err != nil || cli == nil {
 		t.Error("NewClient() failed:", err, cli)
 		return
@@ -238,7 +238,7 @@ func TestClientEndpointUnavailableSoft(t *testing.T) {
 }
 
 func TestClientEndpointUnavailableHard(t *testing.T) {
-	cli, err := NewClient("https://1.0.0.0:2000/api/2.0/", mock.TestUser, mock.TestPassword, nil)
+	cli, err := NewClient("https://0.1.2.3:2000/api/2.0/", mock.TestUser, mock.TestPassword, nil)
 	if err != nil || cli == nil {
 		t.Error("NewClient() failed:", err, cli)
 		return
