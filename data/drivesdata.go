@@ -421,6 +421,7 @@ const jsonDrivesDetailData = `{
 
 var driveData = Drive{
 	Resource:    *MakeDriveResource("2ef7b7c7-7ec4-47a7-9b69-087c9417c0ff"),
+	Affinities:  []string{"123", "321"},
 	Jobs:        nil,
 	Media:       "disk",
 	Meta:        nil,
@@ -432,7 +433,7 @@ var driveData = Drive{
 }
 
 const jsonDriveData = `{
-    "affinities": [],
+    "affinities": ["123","321"],
     "allow_multimount": false,
     "jobs": [],
     "licenses": [],

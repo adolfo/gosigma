@@ -34,6 +34,12 @@ type Drive interface {
 	// CloudSigma resource
 	Resource
 
+	// Affinities
+	Affinities() []string
+
+	// AllowMultimount
+	AllowMultimount() bool
+
 	// Get meta-information value stored in the drive instance
 	Get(key string) (v string, ok bool)
 
@@ -42,6 +48,9 @@ type Drive interface {
 
 	// Name of drive instance
 	Name() string
+
+	// Owner of drive instance
+	Owner() Resource
 
 	// Size of drive in bytes
 	Size() uint64
@@ -114,6 +123,12 @@ func (d drive) URI() string { return d.obj.URI }
 // UUID of drive instance
 func (d drive) UUID() string { return d.obj.UUID }
 
+// Affinities
+func (d drive) Affinities() []string { return d.obj.Affinities }
+
+// AllowMultimount
+func (d drive) AllowMultimount() bool { return d.obj.AllowMultimount }
+
 // Get meta-information value stored in the drive instance
 func (d drive) Get(key string) (v string, ok bool) {
 	v, ok = d.obj.Meta[key]
@@ -125,6 +140,14 @@ func (d drive) Media() string { return d.obj.Media }
 
 // Name of drive instance
 func (d drive) Name() string { return d.obj.Name }
+
+// Owner of drive instance
+func (d drive) Owner() Resource {
+	if d.obj.Owner == nil {
+		return nil
+	}
+	return &resource{d.obj.Owner}
+}
 
 // Size of drive in bytes
 func (d drive) Size() uint64 { return d.obj.Size }
