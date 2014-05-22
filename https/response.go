@@ -4,7 +4,6 @@
 package https
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 	"strings"
@@ -49,8 +48,7 @@ func (r Response) VerifyContentType(contentType string) error {
 
 	vv, ok := r.Header["Content-Type"]
 	if !ok {
-		msg := fmt.Sprintf("Content-Type header not found in response, expected \"%s\"", contentType)
-		return errors.New(msg)
+		return fmt.Errorf("Content-Type header not found in response, expected \"%s\"", contentType)
 	}
 
 	for _, v := range vv {
@@ -60,5 +58,5 @@ func (r Response) VerifyContentType(contentType string) error {
 		}
 	}
 
-	return errors.New(fmt.Sprintf("expected Content-Type: \"%s\", received \"%v\"", contentType, vv))
+	return fmt.Errorf("expected Content-Type: \"%s\", received \"%v\"", contentType, vv)
 }

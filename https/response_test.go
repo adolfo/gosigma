@@ -22,28 +22,28 @@ func TestHttpsResponseVerifyNoContentType(t *testing.T) {
 		t.Error(err)
 	}
 	if err := r.VerifyCode(201); err == nil {
-		t.Error("expects no error, received:", err)
+		t.Error("expected an error, got nil")
 	}
 
 	if err := r.VerifyContentType(""); err != nil {
-		t.Error("expects no error, received:", err)
+		t.Error("expected no error, got:", err)
 	}
 	if err := r.VerifyContentType("application/binary"); err == nil {
-		t.Error("expects error, received no error")
+		t.Error("expected an error, got nil")
 	}
 
 	if err := r.Verify(200, ""); err != nil {
-		t.Error("expects no error, received:", err)
+		t.Error("expected no error, got:", err)
 	}
 	if err := r.Verify(201, ""); err == nil {
-		t.Error("expects error, received no error")
+		t.Error("expected an error, got nil")
 	}
 
 	if err := r.VerifyJSON(200); err == nil {
-		t.Error("expects error, received no error")
+		t.Error("expected an error, got nil")
 	}
 	if err := r.VerifyJSON(201); err == nil {
-		t.Error("expects error, received no error")
+		t.Error("expected an error, got nil")
 	}
 }
 
@@ -60,28 +60,28 @@ func TestHttpsResponseVerifyEmptyContentType(t *testing.T) {
 		t.Error(err)
 	}
 	if err := r.VerifyCode(201); err == nil {
-		t.Error("expects no error, received:", err)
+		t.Error("expected an error, got nil")
 	}
 
 	if err := r.VerifyContentType(""); err != nil {
-		t.Error("expects no error, received:", err)
+		t.Error("expected no error, got:", err)
 	}
 	if err := r.VerifyContentType("application/binary"); err == nil {
-		t.Error("expects error, received no error")
+		t.Error("expected an error, got nil")
 	}
 
 	if err := r.Verify(200, ""); err != nil {
-		t.Error("expects no error, received:", err)
+		t.Error("expected no error, got:", err)
 	}
 	if err := r.Verify(201, ""); err == nil {
-		t.Error("expects error, received no error")
+		t.Error("expected an error, got nil")
 	}
 
 	if err := r.VerifyJSON(200); err == nil {
-		t.Error("expects error, received no error")
+		t.Error("expected an error, got nil")
 	}
 	if err := r.VerifyJSON(201); err == nil {
-		t.Error("expects error, received no error")
+		t.Error("expected an error, got nil")
 	}
 }
 
@@ -98,28 +98,28 @@ func TestHttpsResponseContentType1(t *testing.T) {
 		t.Error(err)
 	}
 	if err := r.VerifyCode(201); err == nil {
-		t.Error("expects no error, received:", err)
+		t.Error("expected an error, got nil")
 	}
 
 	if err := r.VerifyContentType(""); err != nil {
-		t.Error("expects no error, received:", err)
+		t.Error("expected no error, got:", err)
 	}
 	if err := r.VerifyContentType("application/binary"); err == nil {
-		t.Error("expects error, received no error")
+		t.Error("expected an error, got nil")
 	}
 
 	if err := r.Verify(200, ""); err != nil {
-		t.Error("expects no error, received:", err)
+		t.Error("expected no error, got:", err)
 	}
 	if err := r.Verify(201, ""); err == nil {
-		t.Error("expects error, received no error")
+		t.Error("expected an error, got nil")
 	}
 
 	if err := r.VerifyJSON(200); err != nil {
-		t.Error("expects no error, received:", err)
+		t.Error("expected no error, got:", err)
 	}
 	if err := r.VerifyJSON(201); err == nil {
-		t.Error("expects error, received no error")
+		t.Error("expected an error, got nil")
 	}
 }
 
@@ -136,27 +136,27 @@ func TestHttpsResponseContentType2(t *testing.T) {
 		t.Error(err)
 	}
 	if err := r.VerifyCode(201); err == nil {
-		t.Error("expects no error, received:", err)
+		t.Error("expected an error, got nil")
 	}
 
 	if err := r.VerifyContentType(""); err != nil {
-		t.Error("expects no error, received:", err)
+		t.Error("expected no error, got:", err)
 	}
 	if err := r.VerifyContentType("application/binary"); err == nil {
-		t.Error("expects error, received no error")
+		t.Error("expected an error, got nil")
 	}
 
 	if err := r.Verify(200, ""); err != nil {
-		t.Error("expects no error, received:", err)
+		t.Error("expected no error, got:", err)
 	}
 	if err := r.Verify(201, ""); err == nil {
-		t.Error("expects error, received no error")
+		t.Error("expected an error, got nil")
 	}
 
 	if err := r.VerifyJSON(200); err != nil {
-		t.Error("expects no error, received:", err)
+		t.Error("expected no error, got:", err)
 	}
 	if err := r.VerifyJSON(201); err == nil {
-		t.Error("expects error, received no error")
+		t.Error("expected an error, got nil")
 	}
 }
