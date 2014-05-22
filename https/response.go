@@ -34,7 +34,7 @@ func (r Response) Verify(code int, contentType string) error {
 // VerifyCode checks the response has specified code
 func (r Response) VerifyCode(code int) error {
 	if r.StatusCode != code {
-		return errors.New(r.Status)
+		return fmt.Errorf("expected HTTP code: %d, got code: %d, %s", code, r.StatusCode, r.Status)
 	}
 	return nil
 }
