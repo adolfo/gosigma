@@ -40,7 +40,8 @@ func Start() {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc(makeHandler("capabilities", capsHandler))
-	mux.HandleFunc(makeHandler("drives", drivesHandler))
+	mux.HandleFunc(makeHandler("drives", Drives.handleRequest))
+	mux.HandleFunc(makeHandler("libdrives", LibDrives.handleRequest))
 	mux.HandleFunc(makeHandler("servers", serversHandler))
 
 	pServer = httptest.NewUnstartedServer(mux)

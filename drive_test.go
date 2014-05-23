@@ -111,7 +111,7 @@ func TestClientDriveEmpty(t *testing.T) {
 }
 
 func TestClientDrivesEmpty(t *testing.T) {
-	mock.ResetDrives()
+	mock.Drives.ResetDrives()
 
 	cli, err := createTestClient(t)
 	if err != nil || cli == nil {
@@ -134,10 +134,10 @@ func TestClientDrivesEmpty(t *testing.T) {
 }
 
 func TestClientDrives(t *testing.T) {
-	mock.ResetDrives()
+	mock.Drives.ResetDrives()
 
-	mock.AddDrive(newDataDrive("uuid-0"))
-	mock.AddDrive(newDataDrive("uuid-1"))
+	mock.Drives.AddDrive(newDataDrive("uuid-0"))
+	mock.Drives.AddDrive(newDataDrive("uuid-1"))
 
 	cli, err := createTestClient(t)
 	if err != nil {
@@ -186,13 +186,13 @@ func TestClientDrives(t *testing.T) {
 		}
 	}
 
-	mock.ResetDrives()
+	mock.Drives.ResetDrives()
 }
 
 func TestClientDrive(t *testing.T) {
-	mock.ResetDrives()
+	mock.Drives.ResetDrives()
 
-	mock.AddDrive(newDataDrive("uuid"))
+	mock.Drives.AddDrive(newDataDrive("uuid"))
 
 	cli, err := createTestClient(t)
 	if err != nil {
@@ -224,5 +224,5 @@ func TestClientDrive(t *testing.T) {
 		return
 	}
 
-	mock.ResetDrives()
+	mock.Drives.ResetDrives()
 }

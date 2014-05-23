@@ -13,10 +13,22 @@ import (
 	"github.com/Altoros/gosigma/data"
 )
 
-var syncDrives sync.Mutex
-var drives = make(map[string]*data.Drive)
+type DriveLibrary struct {
+	s sync.Mutex
+	m map[string]*data.Drive
+	p string
+}
 
-func initDrive(d *data.Drive) (*data.Drive, error) {
+var Drives = &DriveLibrary{
+	m: make(map[string]*data.Drive),
+	p: "/api/2.0/drives",
+}
+var LibDrives = &DriveLibrary{
+	m: make(map[string]*data.Drive),
+	p: "/api/2.0/libdrives",
+}
+
+func InitDrive(d *data.Drive) (*data.Drive, error) {
 	if d.UUID == "" {
 		uuid, err := GenerateUUID()
 		if err != nil {
@@ -31,73 +43,68 @@ func initDrive(d *data.Drive) (*data.Drive, error) {
 	return d, nil
 }
 
-// AddDrive adds drive instance record under the mock
-func AddDrive(d *data.Drive) error {
-	d, err := initDrive(d)
+func (d *DriveLibrary) AddDrive(drv *data.Drive) error {
+	drv, err := InitDrive(drv)
 	if err != nil {
 		return err
 	}
 
-	syncDrives.Lock()
-	defer syncDrives.Unlock()
+	d.s.Lock()
+	defer d.s.Unlock()
 
-	drives[d.UUID] = d
+	d.m[drv.UUID] = drv
 
 	return nil
 }
 
-// AddDrives adds drive instance records under the mock
-func AddDrives(dd []data.Drive) []string {
-	syncDrives.Lock()
-	defer syncDrives.Unlock()
+func (d *DriveLibrary) AddDrives(dd []data.Drive) []string {
+	d.s.Lock()
+	defer d.s.Unlock()
 
 	var result []string
-	for _, d := range dd {
-		d, err := initDrive(&d)
+	for _, drv := range dd {
+		drv, err := InitDrive(&drv)
 		if err != nil {
-			drives[d.UUID] = d
-			result = append(result, d.UUID)
+			d.m[drv.UUID] = drv
+			result = append(result, drv.UUID)
 		}
 	}
 	return result
 }
 
-// RemoveDrive removes drive instance record from the mock
-func RemoveDrive(uuid string) bool {
-	syncDrives.Lock()
-	defer syncDrives.Unlock()
+func (d *DriveLibrary) RemoveDrive(uuid string) bool {
+	d.s.Lock()
+	defer d.s.Unlock()
 
-	_, ok := drives[uuid]
-	delete(drives, uuid)
+	_, ok := d.m[uuid]
+	delete(d.m, uuid)
+
 	return ok
 }
 
-// ResetDrives removes all drive instance records from the mock
-func ResetDrives() {
-	syncDrives.Lock()
-	defer syncDrives.Unlock()
-	drives = make(map[string]*data.Drive)
+func (d *DriveLibrary) ResetDrives() {
+	d.s.Lock()
+	defer d.s.Unlock()
+	d.m = make(map[string]*data.Drive)
 }
 
-// SetDriveStatus changes status of server instance in the mock
-func SetDriveStatus(uuid, status string) {
-	syncDrives.Lock()
-	defer syncDrives.Unlock()
+func (d *DriveLibrary) SetDriveStatus(uuid, status string) {
+	d.s.Lock()
+	defer d.s.Unlock()
 
-	d, ok := drives[uuid]
+	drv, ok := d.m[uuid]
 	if ok {
-		d.Status = status
+		drv.Status = status
 	}
 }
 
-// CloneDrive clones specified drive
 var ErrNotFound = errors.New("not found")
 
-func CloneDrive(uuid string) (string, error) {
-	syncDrives.Lock()
-	defer syncDrives.Unlock()
+func (d *DriveLibrary) CloneDrive(uuid string) (string, error) {
+	d.s.Lock()
+	defer d.s.Unlock()
 
-	d, ok := drives[uuid]
+	drv, ok := d.m[uuid]
 	if !ok {
 		return "", ErrNotFound
 	}
@@ -107,47 +114,52 @@ func CloneDrive(uuid string) (string, error) {
 		return "", err
 	}
 
-	var newDrive data.Drive = *d
+	var newDrive data.Drive = *drv
 	newDrive.Resource = *data.MakeDriveResource(newUUID)
-	drives[newUUID] = &newDrive
+	newDrive.Status = "unmounted"
+
+	if d == LibDrives {
+		Drives.AddDrive(&newDrive)
+	} else {
+		d.m[newUUID] = &newDrive
+	}
 
 	return newUUID, nil
 }
 
-func drivesHandler(w http.ResponseWriter, r *http.Request) {
+func (d *DriveLibrary) handleRequest(w http.ResponseWriter, r *http.Request) {
+	path := strings.TrimSuffix(r.URL.Path, "/")
+	path = strings.TrimPrefix(path, d.p)
+	path = strings.TrimPrefix(path, "/")
+
 	switch r.Method {
 	case "GET":
-		drivesHandlerGet(w, r)
+		d.handleGet(w, r, path)
 	case "POST":
-		drivesHandlerPost(w, r)
+		d.handlePost(w, r, path)
 	case "DELETE":
-		drivesHandlerDelete(w, r)
+		d.handleDelete(w, r, path)
 	}
 }
 
-func drivesHandlerGet(w http.ResponseWriter, r *http.Request) {
-	path := strings.TrimSuffix(r.URL.Path, "/")
+func (d *DriveLibrary) handleGet(w http.ResponseWriter, r *http.Request, path string) {
 	switch path {
-	case "/api/2.0/drives":
-		handleDrives(w, r)
-	case "/api/2.0/drives/detail":
-		handleDrivesDetail(w, r, 200, nil)
+	case "":
+		d.handleDrives(w, r)
+	case "detail":
+		d.handleDrivesDetail(w, r, 200, nil)
 	default:
-		uuid := strings.TrimPrefix(path, "/api/2.0/drives/")
-		handleDrive(w, r, 200, uuid)
+		d.handleDrive(w, r, 200, path)
 	}
 }
 
-func drivesHandlerPost(w http.ResponseWriter, r *http.Request) {
-	path := strings.TrimSuffix(r.URL.Path, "/action/")
-	uuid := strings.TrimPrefix(path, "/api/2.0/drives/")
-	handleDriveAction(w, r, uuid)
+func (d *DriveLibrary) handlePost(w http.ResponseWriter, r *http.Request, path string) {
+	uuid := strings.TrimSuffix(path, "/action")
+	d.handleAction(w, r, uuid)
 }
 
-func drivesHandlerDelete(w http.ResponseWriter, r *http.Request) {
-	path := strings.TrimSuffix(r.URL.Path, "/")
-	uuid := strings.TrimPrefix(path, "/api/2.0/drives/")
-	if ok := RemoveDrive(uuid); !ok {
+func (d *DriveLibrary) handleDelete(w http.ResponseWriter, r *http.Request, uuid string) {
+	if ok := d.RemoveDrive(uuid); !ok {
 		h := w.Header()
 		h.Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(404)
@@ -157,19 +169,19 @@ func drivesHandlerDelete(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(204)
 }
 
-func handleDrives(w http.ResponseWriter, r *http.Request) {
-	syncDrives.Lock()
-	defer syncDrives.Unlock()
+func (d *DriveLibrary) handleDrives(w http.ResponseWriter, r *http.Request) {
+	d.s.Lock()
+	defer d.s.Unlock()
 
 	var dd data.Drives
-	dd.Meta.TotalCount = len(drives)
-	dd.Objects = make([]data.Drive, 0, len(drives))
-	for _, d := range drives {
-		var drv data.Drive
-		drv.Resource = d.Resource
-		drv.Owner = d.Owner
-		drv.Status = d.Status
-		dd.Objects = append(dd.Objects, drv)
+	dd.Meta.TotalCount = len(d.m)
+	dd.Objects = make([]data.Drive, 0, len(d.m))
+	for _, drv := range d.m {
+		var drv0 data.Drive
+		drv0.Resource = drv.Resource
+		drv0.Owner = drv.Owner
+		drv0.Status = drv.Status
+		dd.Objects = append(dd.Objects, drv0)
 	}
 
 	data, err := json.Marshal(&dd)
@@ -184,24 +196,24 @@ func handleDrives(w http.ResponseWriter, r *http.Request) {
 	w.Write(data)
 }
 
-func handleDrivesDetail(w http.ResponseWriter, r *http.Request, okcode int, filter []string) {
-	syncDrives.Lock()
-	defer syncDrives.Unlock()
+func (d *DriveLibrary) handleDrivesDetail(w http.ResponseWriter, r *http.Request, okcode int, filter []string) {
+	d.s.Lock()
+	defer d.s.Unlock()
 
 	var dd data.Drives
 
 	if len(filter) == 0 {
-		dd.Meta.TotalCount = len(drives)
-		dd.Objects = make([]data.Drive, 0, len(drives))
-		for _, d := range drives {
-			dd.Objects = append(dd.Objects, *d)
+		dd.Meta.TotalCount = len(d.m)
+		dd.Objects = make([]data.Drive, 0, len(d.m))
+		for _, drv := range d.m {
+			dd.Objects = append(dd.Objects, *drv)
 		}
 	} else {
 		dd.Meta.TotalCount = len(filter)
 		dd.Objects = make([]data.Drive, 0, len(filter))
 		for _, uuid := range filter {
-			if d, ok := drives[uuid]; ok {
-				dd.Objects = append(dd.Objects, *d)
+			if drv, ok := d.m[uuid]; ok {
+				dd.Objects = append(dd.Objects, *drv)
 			}
 		}
 	}
@@ -219,13 +231,13 @@ func handleDrivesDetail(w http.ResponseWriter, r *http.Request, okcode int, filt
 	w.Write(data)
 }
 
-func handleDrive(w http.ResponseWriter, r *http.Request, okcode int, uuid string) {
-	syncDrives.Lock()
-	defer syncDrives.Unlock()
+func (d *DriveLibrary) handleDrive(w http.ResponseWriter, r *http.Request, okcode int, uuid string) {
+	d.s.Lock()
+	defer d.s.Unlock()
 
 	h := w.Header()
 
-	d, ok := drives[uuid]
+	drv, ok := d.m[uuid]
 	if !ok {
 		h.Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(404)
@@ -233,7 +245,7 @@ func handleDrive(w http.ResponseWriter, r *http.Request, okcode int, uuid string
 		return
 	}
 
-	data, err := json.Marshal(&d)
+	data, err := json.Marshal(&drv)
 	if err != nil {
 		w.WriteHeader(500)
 		w.Write([]byte("500 " + err.Error()))
@@ -245,7 +257,7 @@ func handleDrive(w http.ResponseWriter, r *http.Request, okcode int, uuid string
 	w.Write(data)
 }
 
-func handleDriveAction(w http.ResponseWriter, r *http.Request, uuid string) {
+func (d *DriveLibrary) handleAction(w http.ResponseWriter, r *http.Request, uuid string) {
 	vv := r.URL.Query()
 
 	v, ok := vv["do"]
@@ -257,14 +269,14 @@ func handleDriveAction(w http.ResponseWriter, r *http.Request, uuid string) {
 	action := v[0]
 	switch action {
 	case "clone":
-		handleDriveClone(w, r, uuid)
+		d.handleClone(w, r, uuid)
 	default:
 		w.WriteHeader(400)
 	}
 }
 
-func handleDriveClone(w http.ResponseWriter, r *http.Request, uuid string) {
-	newUUID, err := CloneDrive(uuid)
+func (d *DriveLibrary) handleClone(w http.ResponseWriter, r *http.Request, uuid string) {
+	newUUID, err := d.CloneDrive(uuid)
 	if err == ErrNotFound {
 		h := w.Header()
 		h.Set("Content-Type", "application/json; charset=utf-8")
@@ -276,5 +288,5 @@ func handleDriveClone(w http.ResponseWriter, r *http.Request, uuid string) {
 		w.Write([]byte("500 " + err.Error()))
 		return
 	}
-	handleDrivesDetail(w, r, 202, []string{newUUID})
+	Drives.handleDrivesDetail(w, r, 202, []string{newUUID})
 }
