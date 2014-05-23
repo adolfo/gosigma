@@ -4,8 +4,10 @@
 package mock
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
+	"io/ioutil"
 	"net/http"
 	"strings"
 	"sync"
@@ -130,6 +132,20 @@ func (d *DriveLibrary) Clone(uuid string) (string, error) {
 	}
 
 	return newUUID, nil
+}
+
+func (d *DriveLibrary) Resize(uuid string, size uint64) error {
+	d.s.Lock()
+	defer d.s.Unlock()
+
+	drv, ok := d.m[uuid]
+	if !ok {
+		return ErrNotFound
+	}
+
+	drv.Size = size
+
+	return nil
 }
 
 func (d *DriveLibrary) handleRequest(w http.ResponseWriter, r *http.Request) {
@@ -275,6 +291,8 @@ func (d *DriveLibrary) handleAction(w http.ResponseWriter, r *http.Request, uuid
 	switch action {
 	case "clone":
 		d.handleClone(w, r, uuid)
+	case "resize":
+		d.handleResize(w, r, uuid)
 	default:
 		w.WriteHeader(400)
 	}
@@ -294,4 +312,35 @@ func (d *DriveLibrary) handleClone(w http.ResponseWriter, r *http.Request, uuid 
 		return
 	}
 	Drives.handleDrivesDetail(w, r, 202, []string{newUUID})
+}
+
+func (d *DriveLibrary) handleResize(w http.ResponseWriter, r *http.Request, uuid string) {
+	bb, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		w.WriteHeader(500)
+		w.Write([]byte("500 " + err.Error()))
+		return
+	}
+
+	drv, err := data.ReadDrive(bytes.NewReader(bb))
+	if err != nil {
+		w.WriteHeader(500)
+		w.Write([]byte("500 " + err.Error()))
+		return
+	}
+
+	err = d.Resize(uuid, drv.Size)
+	if err == ErrNotFound {
+		h := w.Header()
+		h.Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(404)
+		w.Write([]byte(jsonNotFound))
+		return
+	} else if err != nil {
+		w.WriteHeader(500)
+		w.Write([]byte("500 " + err.Error()))
+		return
+	}
+
+	d.handleDrivesDetail(w, r, 202, []string{uuid})
 }
