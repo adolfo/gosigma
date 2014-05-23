@@ -10,9 +10,9 @@ import (
 	"github.com/Altoros/gosigma/mock"
 )
 
-func newDataDrive() *data.Drive {
+func newDataDrive(uuid string) *data.Drive {
 	result := &data.Drive{
-		Resource: data.Resource{URI: "uri", UUID: "uuid"},
+		Resource: data.Resource{URI: "uri", UUID: uuid},
 		LibraryDrive: data.LibraryDrive{
 			Arch:      "arch",
 			ImageType: "image-type",
@@ -36,7 +36,7 @@ func newDataDrive() *data.Drive {
 	return result
 }
 
-func testDrive(t *testing.T, d Drive, short bool) {
+func testDrive(t *testing.T, d Drive, uuid string, short bool) {
 	checkv := func(v, wants string) {
 		if v != wants {
 			t.Errorf("value %q, wants %q", v, wants)
@@ -59,7 +59,7 @@ func testDrive(t *testing.T, d Drive, short bool) {
 	}
 
 	checkv(d.URI(), "uri")
-	checkv(d.UUID(), "uuid")
+	checkv(d.UUID(), uuid)
 	checkv(d.Owner().URI(), "owner-uri")
 	checkv(d.Owner().UUID(), "owner-uuid")
 	checkv(d.Status(), "status")
@@ -136,8 +136,8 @@ func TestClientDrivesEmpty(t *testing.T) {
 func TestClientDrives(t *testing.T) {
 	mock.ResetDrives()
 
-	drv := newDataDrive()
-	mock.AddDrive(drv)
+	mock.AddDrive(newDataDrive("uuid-0"))
+	mock.AddDrive(newDataDrive("uuid-1"))
 
 	cli, err := createTestClient(t)
 	if err != nil {
@@ -151,33 +151,39 @@ func TestClientDrives(t *testing.T) {
 		return
 	}
 
-	if len(drives) != 1 {
+	if len(drives) != 2 {
 		t.Errorf("invalid len: %v", drives)
 		return
 	}
 
-	d := drives[0]
+	for i, uuid := range []string{"uuid-0", "uuid-1"} {
+		d := drives[i]
 
-	if d.String() == "" {
-		t.Error("Empty string representation")
-		return
-	}
+		if d.String() == "" {
+			t.Error("Empty string representation")
+			return
+		}
 
-	testDrive(t, d, true)
+		testDrive(t, d, uuid, true)
 
-	// refresh
-	if err := d.Refresh(); err != nil {
-		t.Error(err)
-		return
-	}
+		// refresh
+		if err := d.Refresh(); err != nil {
+			t.Error(err)
+			return
+		}
 
-	testDrive(t, d, false)
+		testDrive(t, d, uuid, false)
 
-	// failed refresh
-	mock.ResetDrives()
-	if err := d.Refresh(); err == nil {
-		t.Error("Drive refresh must fail")
-		return
+		if err := d.Remove(); err != nil {
+			t.Error("Drive remove fail:", err)
+			return
+		}
+
+		// failed refresh
+		if err := d.Refresh(); err == nil {
+			t.Error("Drive refresh must fail")
+			return
+		}
 	}
 
 	mock.ResetDrives()
@@ -186,8 +192,7 @@ func TestClientDrives(t *testing.T) {
 func TestClientDrive(t *testing.T) {
 	mock.ResetDrives()
 
-	drv := newDataDrive()
-	mock.AddDrive(drv)
+	mock.AddDrive(newDataDrive("uuid"))
 
 	cli, err := createTestClient(t)
 	if err != nil {
@@ -195,7 +200,7 @@ func TestClientDrive(t *testing.T) {
 		return
 	}
 
-	d, err := cli.Drive(drv.UUID, LibraryAccount)
+	d, err := cli.Drive("uuid", LibraryAccount)
 	if err != nil {
 		t.Error(err)
 		return
@@ -206,10 +211,14 @@ func TestClientDrive(t *testing.T) {
 		return
 	}
 
-	testDrive(t, d, false)
+	testDrive(t, d, "uuid", false)
+
+	if err := d.Remove(); err != nil {
+		t.Error("Drive remove fail:", err)
+		return
+	}
 
 	// failed refresh
-	mock.ResetDrives()
 	if err := d.Refresh(); err == nil {
 		t.Error("Drive refresh must fail")
 		return

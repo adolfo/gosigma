@@ -148,6 +148,9 @@ func TestClientEmptyUUID(t *testing.T) {
 	if _, err := cli.CloneDrive("", false, CloneParams{}, nil); err != errEmptyUUID {
 		t.Error("CloneDrive('') must fail with errEmptyUUID")
 	}
+	if err := cli.RemoveDrive("", false); err != errEmptyUUID {
+		t.Error("RemoveDrive('') must fail with errEmptyUUID")
+	}
 }
 
 func TestClientEndpointUnavailableSoft(t *testing.T) {
@@ -226,6 +229,12 @@ func TestClientEndpointUnavailableSoft(t *testing.T) {
 	cd, err := cli.CloneDrive("uuid", false, CloneParams{}, nil)
 	if err == nil {
 		t.Error("CloneDrive() returned valid result for unavailable endpoint: %#v", cd)
+		return
+	}
+
+	err = cli.RemoveDrive("uuid", false)
+	if err == nil {
+		t.Error("RemoveDrive() returned valid result for unavailable endpoint")
 		return
 	}
 
@@ -316,6 +325,12 @@ func TestClientEndpointUnavailableHard(t *testing.T) {
 	cd, err := cli.CloneDrive("uuid", false, CloneParams{}, nil)
 	if err == nil {
 		t.Error("CloneDrive() returned valid result for unavailable endpoint: %#v", cd)
+		return
+	}
+
+	err = cli.RemoveDrive("uuid", false)
+	if err == nil {
+		t.Error("RemoveDrive() returned valid result for unavailable endpoint")
 		return
 	}
 

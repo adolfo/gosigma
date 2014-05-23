@@ -265,6 +265,33 @@ func (c Client) cloneDrive(uuid string, libspec LibrarySpec, params CloneParams,
 	return &objs[0], nil
 }
 
+func (c *Client) removeDrive(uuid string, libspec LibrarySpec) error {
+	uuid = strings.TrimSpace(uuid)
+	if uuid == "" {
+		return errEmptyUUID
+	}
+
+	u := c.endpoint
+	if libspec == LibraryMedia {
+		u += "libdrives/"
+	} else {
+		u += "drives/"
+	}
+	u += uuid + "/"
+
+	r, err := c.https.Delete(u, nil, nil)
+	if err != nil {
+		return err
+	}
+	defer r.Body.Close()
+
+	if err := r.VerifyCode(204); err != nil {
+		return NewError(r, err)
+	}
+
+	return nil
+}
+
 func (c Client) getJob(uuid string) (*data.Job, error) {
 	uuid = strings.TrimSpace(uuid)
 	if uuid == "" {

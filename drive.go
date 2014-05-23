@@ -99,6 +99,9 @@ type Drive interface {
 
 	// Wait for user-defined event
 	Wait(stop func(Drive) bool) error
+
+	// Remove drive
+	Remove() error
 }
 
 // A drive implements drive instance in CloudSigma account
@@ -285,4 +288,9 @@ func (d *drive) Wait(stop func(Drive) bool) error {
 	}
 
 	return nil
+}
+
+// Remove drive
+func (d *drive) Remove() error {
+	return d.client.RemoveDrive(d.UUID(), d.Library())
 }

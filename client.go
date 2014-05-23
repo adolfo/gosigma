@@ -238,6 +238,11 @@ func (c *Client) CloneDrive(uuid string, libspec LibrarySpec, params CloneParams
 	return drv, nil
 }
 
+// RemoveDrive removes given drive by uuid
+func (c *Client) RemoveDrive(uuid string, libspec LibrarySpec) error {
+	return c.removeDrive(uuid, libspec)
+}
+
 // Job returns job object by uuid
 func (c *Client) Job(uuid string) (Job, error) {
 	obj, err := c.getJob(uuid)

@@ -63,11 +63,13 @@ func AddDrives(dd []data.Drive) []string {
 }
 
 // RemoveDrive removes drive instance record from the mock
-func RemoveDrive(uuid string) {
+func RemoveDrive(uuid string) bool {
 	syncDrives.Lock()
 	defer syncDrives.Unlock()
 
+	_, ok := drives[uuid]
 	delete(drives, uuid)
+	return ok
 }
 
 // ResetDrives removes all drive instance records from the mock
@@ -118,6 +120,8 @@ func drivesHandler(w http.ResponseWriter, r *http.Request) {
 		drivesHandlerGet(w, r)
 	case "POST":
 		drivesHandlerPost(w, r)
+	case "DELETE":
+		drivesHandlerDelete(w, r)
 	}
 }
 
@@ -138,6 +142,19 @@ func drivesHandlerPost(w http.ResponseWriter, r *http.Request) {
 	path := strings.TrimSuffix(r.URL.Path, "/action/")
 	uuid := strings.TrimPrefix(path, "/api/2.0/drives/")
 	handleDriveAction(w, r, uuid)
+}
+
+func drivesHandlerDelete(w http.ResponseWriter, r *http.Request) {
+	path := strings.TrimSuffix(r.URL.Path, "/")
+	uuid := strings.TrimPrefix(path, "/api/2.0/drives/")
+	if ok := RemoveDrive(uuid); !ok {
+		h := w.Header()
+		h.Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(404)
+		w.Write([]byte(jsonNotFound))
+		return
+	}
+	w.WriteHeader(204)
 }
 
 func handleDrives(w http.ResponseWriter, r *http.Request) {
