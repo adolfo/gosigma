@@ -301,6 +301,14 @@ func handleServerStart(w http.ResponseWriter, r *http.Request, uuid string) {
 		defer syncServers.Unlock()
 		<-time.After(300 * time.Millisecond)
 		s.Status = "running"
+		for i, n := range s.NICs {
+			if n.IPv4 != nil && n.IPv4.Conf == "dhcp" {
+				s.NICs[i].Runtime = &data.RuntimeNetwork{
+					InterfaceType: "public",
+					IPv4:          data.MakeIPResource("0.1.2.3"),
+				}
+			}
+		}
 	}()
 
 	w.WriteHeader(202)
@@ -333,6 +341,9 @@ func handleServerStop(w http.ResponseWriter, r *http.Request, uuid string) {
 		defer syncServers.Unlock()
 		<-time.After(300 * time.Millisecond)
 		s.Status = "stopped"
+		for i := range s.NICs {
+			s.NICs[i].Runtime = nil
+		}
 	}()
 
 	w.WriteHeader(202)
