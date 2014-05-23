@@ -28,6 +28,11 @@ var LibDrives = &DriveLibrary{
 	p: "/api/2.0/libdrives",
 }
 
+func ResetDrives() {
+	Drives.Reset()
+	LibDrives.Reset()
+}
+
 func InitDrive(d *data.Drive) (*data.Drive, error) {
 	if d.UUID == "" {
 		uuid, err := GenerateUUID()
@@ -43,7 +48,7 @@ func InitDrive(d *data.Drive) (*data.Drive, error) {
 	return d, nil
 }
 
-func (d *DriveLibrary) AddDrive(drv *data.Drive) error {
+func (d *DriveLibrary) Add(drv *data.Drive) error {
 	drv, err := InitDrive(drv)
 	if err != nil {
 		return err
@@ -72,7 +77,7 @@ func (d *DriveLibrary) AddDrives(dd []data.Drive) []string {
 	return result
 }
 
-func (d *DriveLibrary) RemoveDrive(uuid string) bool {
+func (d *DriveLibrary) Remove(uuid string) bool {
 	d.s.Lock()
 	defer d.s.Unlock()
 
@@ -82,13 +87,13 @@ func (d *DriveLibrary) RemoveDrive(uuid string) bool {
 	return ok
 }
 
-func (d *DriveLibrary) ResetDrives() {
+func (d *DriveLibrary) Reset() {
 	d.s.Lock()
 	defer d.s.Unlock()
 	d.m = make(map[string]*data.Drive)
 }
 
-func (d *DriveLibrary) SetDriveStatus(uuid, status string) {
+func (d *DriveLibrary) SetStatus(uuid, status string) {
 	d.s.Lock()
 	defer d.s.Unlock()
 
@@ -100,7 +105,7 @@ func (d *DriveLibrary) SetDriveStatus(uuid, status string) {
 
 var ErrNotFound = errors.New("not found")
 
-func (d *DriveLibrary) CloneDrive(uuid string) (string, error) {
+func (d *DriveLibrary) Clone(uuid string) (string, error) {
 	d.s.Lock()
 	defer d.s.Unlock()
 
@@ -119,7 +124,7 @@ func (d *DriveLibrary) CloneDrive(uuid string) (string, error) {
 	newDrive.Status = "unmounted"
 
 	if d == LibDrives {
-		Drives.AddDrive(&newDrive)
+		Drives.Add(&newDrive)
 	} else {
 		d.m[newUUID] = &newDrive
 	}
@@ -159,7 +164,7 @@ func (d *DriveLibrary) handlePost(w http.ResponseWriter, r *http.Request, path s
 }
 
 func (d *DriveLibrary) handleDelete(w http.ResponseWriter, r *http.Request, uuid string) {
-	if ok := d.RemoveDrive(uuid); !ok {
+	if ok := d.Remove(uuid); !ok {
 		h := w.Header()
 		h.Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(404)
@@ -276,7 +281,7 @@ func (d *DriveLibrary) handleAction(w http.ResponseWriter, r *http.Request, uuid
 }
 
 func (d *DriveLibrary) handleClone(w http.ResponseWriter, r *http.Request, uuid string) {
-	newUUID, err := d.CloneDrive(uuid)
+	newUUID, err := d.Clone(uuid)
 	if err == ErrNotFound {
 		h := w.Header()
 		h.Set("Content-Type", "application/json; charset=utf-8")
