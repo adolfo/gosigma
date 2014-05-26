@@ -131,6 +131,14 @@ func Stop() {
 	pServer = nil
 }
 
+// Reset mock server
+func Reset() {
+	Jobs.Reset()
+	Drives.Reset()
+	LibDrives.Reset()
+	ResetServers()
+}
+
 // Endpoint of mock server, represented as string in form
 // 'https://host:port/api/{version}/{section}'. Panic if server is not started.
 func Endpoint(section string) string {

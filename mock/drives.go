@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/Altoros/gosigma/data"
 )
@@ -107,7 +108,7 @@ func (d *DriveLibrary) SetStatus(uuid, status string) {
 
 var ErrNotFound = errors.New("not found")
 
-func (d *DriveLibrary) Clone(uuid string) (string, error) {
+func (d *DriveLibrary) Clone(uuid string, params map[string]interface{}) (string, error) {
 	d.s.Lock()
 	defer d.s.Unlock()
 
@@ -123,7 +124,29 @@ func (d *DriveLibrary) Clone(uuid string) (string, error) {
 
 	var newDrive data.Drive = *drv
 	newDrive.Resource = *data.MakeDriveResource(newUUID)
-	newDrive.Status = "unmounted"
+	newDrive.Status = "cloning_dst"
+	newDrive.Jobs = nil
+
+	job := &data.Job{}
+	Jobs.Add(job)
+
+	newDrive.Jobs = append(newDrive.Jobs, *data.MakeJobResource(job.UUID))
+
+	cloning := func() {
+		<-time.After(10 * time.Millisecond)
+		Jobs.s.Lock()
+		defer Jobs.s.Unlock()
+		job.Data.Progress = 100
+		job.State = "success"
+	}
+	go cloning()
+
+	if s, ok := params["name"].(string); ok {
+		newDrive.Name = s
+	}
+	if s, ok := params["media"].(string); ok {
+		newDrive.Media = s
+	}
 
 	if d == LibDrives {
 		Drives.Add(&newDrive)
@@ -299,7 +322,20 @@ func (d *DriveLibrary) handleAction(w http.ResponseWriter, r *http.Request, uuid
 }
 
 func (d *DriveLibrary) handleClone(w http.ResponseWriter, r *http.Request, uuid string) {
-	newUUID, err := d.Clone(uuid)
+	var params map[string]interface{}
+
+	bb, err := ioutil.ReadAll(r.Body)
+	if err == nil {
+		err = json.Unmarshal(bb, &params)
+	}
+
+	if err != nil {
+		w.WriteHeader(500)
+		w.Write([]byte("500 " + err.Error()))
+		return
+	}
+
+	newUUID, err := d.Clone(uuid, params)
 	if err == ErrNotFound {
 		h := w.Header()
 		h.Set("Content-Type", "application/json; charset=utf-8")

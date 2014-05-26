@@ -226,3 +226,120 @@ func TestClientDrive(t *testing.T) {
 
 	mock.ResetDrives()
 }
+
+func TestDriveClone(t *testing.T) {
+	mock.ResetDrives()
+
+	mock.LibDrives.Add(newDataDrive("uuid"))
+
+	cli, err := createTestClient(t)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	d, err := cli.Drive("uuid", LibraryMedia)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	params := CloneParams{Name: "test-name", Media: "ssd"}
+	newDrive, err := d.Clone(params, []string{"avoid-uuid-0", "avoid-uuid-1"})
+	if err != nil {
+		t.Error("Drive clone fail:", err)
+		return
+	}
+
+	if newDrive.UUID() == d.UUID() {
+		t.Errorf("Drive.Clone(), invalid new drive UUID %s", newDrive.UUID())
+	}
+	if newDrive.Size() != d.Size() {
+		t.Errorf("Drive.Clone(), invalid size %d, should be %d", newDrive.Size(), d.Size())
+	}
+	if newDrive.Library() != LibraryAccount {
+		t.Errorf("Drive.Clone(), invalid library spec %v", newDrive.Library())
+	}
+	if newDrive.Name() != "test-name" {
+		t.Errorf("Drive.Clone(), invalid name %q", newDrive.Name())
+	}
+	if newDrive.Media() != "ssd" {
+		t.Errorf("Drive.Clone(), invalid media %q", newDrive.Media())
+	}
+
+	mock.ResetDrives()
+}
+
+func TestDriveCloneWait(t *testing.T) {
+	mock.ResetDrives()
+
+	mock.Drives.Add(newDataDrive("uuid"))
+
+	cli, err := createTestClient(t)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	d, err := cli.Drive("uuid", LibraryAccount)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	params := CloneParams{Name: "test-name", Media: "ssd"}
+	newDrive, err := d.CloneWait(params, nil)
+	if err != nil {
+		t.Error("Drive clone fail:", err)
+		return
+	}
+
+	if newDrive.UUID() == d.UUID() {
+		t.Errorf("Drive.Clone(), invalid new drive UUID %s", newDrive.UUID())
+	}
+	if newDrive.Size() != d.Size() {
+		t.Errorf("Drive.Clone(), invalid size %d, should be %d", newDrive.Size(), d.Size())
+	}
+	if newDrive.Library() != LibraryAccount {
+		t.Errorf("Drive.Clone(), invalid library spec %v", newDrive.Library())
+	}
+	if newDrive.Name() != "test-name" {
+		t.Errorf("Drive.Clone(), invalid name %q", newDrive.Name())
+	}
+	if newDrive.Media() != "ssd" {
+		t.Errorf("Drive.Clone(), invalid media %q", newDrive.Media())
+	}
+
+	mock.ResetDrives()
+}
+
+func TestDriveCloneFail(t *testing.T) {
+	mock.ResetDrives()
+
+	mock.LibDrives.Add(newDataDrive("uuid"))
+
+	cli, err := createTestClient(t)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	d, err := cli.Drive("uuid", LibraryMedia)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	mock.ResetDrives()
+
+	params := CloneParams{Name: "test-name", Media: "ssd"}
+	newDrive, err := d.Clone(params, nil)
+	if err == nil || newDrive != nil {
+		t.Error("Drive clone must fail err=%v, rc=%v", err, newDrive)
+		return
+	}
+
+	t.Logf("OK. Drive.Clone(), err = %v", err)
+
+	mock.ResetDrives()
+}
