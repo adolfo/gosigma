@@ -43,6 +43,7 @@ func Start() {
 	mux.HandleFunc(makeHandler("drives", Drives.handleRequest))
 	mux.HandleFunc(makeHandler("libdrives", LibDrives.handleRequest))
 	mux.HandleFunc(makeHandler("servers", serversHandler))
+	mux.HandleFunc(makeHandler("jobs", Jobs.handleRequest))
 
 	pServer = httptest.NewUnstartedServer(mux)
 	pServer.StartTLS()

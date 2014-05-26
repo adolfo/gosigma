@@ -72,10 +72,12 @@ func TestMockSections(t *testing.T) {
 		ch <- 1
 	}
 
-	const sectionCount = 3
+	const sectionCount = 5
 	go check("capabilities")
 	go check("drives")
-	go check("servers")
+	go check("libdrives")
+	go check("drives")
+	go check("jobs")
 
 	var s int
 	for s < sectionCount {

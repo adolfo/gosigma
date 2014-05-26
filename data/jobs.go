@@ -25,6 +25,12 @@ type Job struct {
 	State        string    `json:"state"`
 }
 
+// Jobs holds collection of Job objects
+type Jobs struct {
+	Meta    Meta  `json:"meta"`
+	Objects []Job `json:"objects"`
+}
+
 // ReadJob reads and unmarshalls information about job instance from JSON stream
 func ReadJob(r io.Reader) (*Job, error) {
 	var job Job
