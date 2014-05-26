@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/Altoros/gosigma/data"
+	"github.com/Altoros/gosigma/mock"
 )
 
 func TestJobString(t *testing.T) {
@@ -78,6 +79,132 @@ func TestJobLastModified(t *testing.T) {
 	}
 }
 
-func TestJobRefresh(t *testing.T) {
-	//mock.ResetJobs()
+func TestJobProgress(t *testing.T) {
+	mock.Jobs.Reset()
+
+	const uuid = "305867d6-5652-41d2-be5c-bbae1eed5676"
+
+	jd := &data.Job{
+		Resource:     *data.MakeJobResource(uuid),
+		Created:      time.Date(2014, time.January, 30, 15, 24, 42, 205092, time.UTC),
+		Data:         data.JobData{97},
+		LastModified: time.Date(2014, time.January, 30, 15, 24, 42, 937432, time.UTC),
+		Operation:    "drive_clone",
+		Resources: []string{
+			"/api/2.0/drives/df05497c-1504-4fea-af24-2825fc5133cf/",
+			"/api/2.0/drives/db7a095c-622d-4b98-88fd-25a7e34d402e/",
+		},
+		State: "success",
+	}
+
+	mock.Jobs.Add(jd)
+
+	cli, err := createTestClient(t)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	j := &job{
+		client: cli,
+		obj:    &data.Job{Resource: *data.MakeJobResource(uuid)},
+	}
+
+	if err := j.Refresh(); err != nil {
+		t.Error(err)
+		return
+	}
+
+	if p := j.Progress(); p != 97 {
+		t.Error("invalid Refresh progress")
+	}
+
+	set_job_progress := func() {
+		jd.Data.Progress = 100
+	}
+	go set_job_progress()
+
+	if err := j.Wait(); err != nil {
+		t.Error(err)
+		return
+	}
+}
+
+func TestJobProgressError(t *testing.T) {
+	cli, err := NewClient("https://0.1.2.3:2000/api/2.0/", mock.TestUser, mock.TestPassword, nil)
+	if err != nil || cli == nil {
+		t.Error("NewClient() failed:", err, cli)
+		return
+	}
+
+	if *trace {
+		cli.Logger(t)
+	}
+
+	cli.ConnectTimeout(100 * time.Millisecond)
+	cli.ReadWriteTimeout(100 * time.Millisecond)
+
+	const uuid = "305867d6-5652-41d2-be5c-bbae1eed5676"
+	j := &job{
+		client: cli,
+		obj:    &data.Job{Resource: *data.MakeJobResource(uuid)},
+	}
+
+	if err := j.Refresh(); err == nil {
+		t.Error("Job.Refresh returned valid result for unavailable endpoint")
+	} else {
+		t.Log("OK: Job.Refresh()", err)
+	}
+
+	if err := j.Wait(); err == nil {
+		t.Error("Job.Wait returned valid result for unavailable endpoint")
+	} else {
+		t.Log("OK: Job.Wait()", err)
+	}
+}
+
+func TestJobWaitTimeout(t *testing.T) {
+	cli, err := createTestClient(t)
+	if err != nil || cli == nil {
+		t.Error("NewClient() failed:", err, cli)
+		return
+	}
+
+	if *trace {
+		cli.Logger(t)
+	}
+
+	cli.ConnectTimeout(100 * time.Millisecond)
+	cli.ReadWriteTimeout(100 * time.Millisecond)
+	cli.OperationTimeout(1 * time.Millisecond)
+
+	mock.Jobs.Reset()
+
+	const uuid = "305867d6-5652-41d2-be5c-bbae1eed5676"
+
+	jd := &data.Job{
+		Resource:     *data.MakeJobResource(uuid),
+		Created:      time.Date(2014, time.January, 30, 15, 24, 42, 205092, time.UTC),
+		Data:         data.JobData{97},
+		LastModified: time.Date(2014, time.January, 30, 15, 24, 42, 937432, time.UTC),
+		Operation:    "drive_clone",
+		Resources: []string{
+			"/api/2.0/drives/df05497c-1504-4fea-af24-2825fc5133cf/",
+			"/api/2.0/drives/db7a095c-622d-4b98-88fd-25a7e34d402e/",
+		},
+		State: "started",
+	}
+
+	mock.Jobs.Add(jd)
+
+	j := &job{
+		client: cli,
+		obj:    &data.Job{Resource: *data.MakeJobResource(uuid)},
+	}
+
+	if err := j.Wait(); err != ErrOperationTimeout {
+		t.Log("invalid Job.Wait()", err)
+	} else {
+		t.Log("OK: Job.Wait()", err)
+	}
 }
