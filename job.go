@@ -61,11 +61,7 @@ var _ Job = (*job)(nil)
 // String method is used to print values passed as an operand to any format that
 // accepts a string or to an unformatted printer such as Print.
 func (j job) String() string {
-	return fmt.Sprintf(`{UUID: %q
-Operation: %s
-State: %s
-Progress: %d,
-Resources: %v}`,
+	return fmt.Sprintf(`{UUID: %q, Operation: %s, State: %s, Progress: %d, Resources: %v}`,
 		j.UUID(),
 		j.Operation(),
 		j.State(),
