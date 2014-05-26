@@ -515,3 +515,34 @@ func TestClientCreateServer(t *testing.T) {
 		t.Errorf("Drive.Size: %#v", v)
 	}
 }
+
+func TestServerIPv4(t *testing.T) {
+	s := &server{obj: &data.Server{
+		NICs: []data.NIC{
+			data.NIC{},
+			data.NIC{Runtime: &data.RuntimeNetwork{}},
+		},
+	}}
+
+	if ips := s.IPv4(); len(ips) != 0 {
+		t.Errorf("invalid Server.IPv4(): %v", ips)
+	}
+
+	nic0 := data.NIC{Runtime: &data.RuntimeNetwork{
+		IPv4: data.MakeIPResource("0.1.2.3"),
+	}}
+	s.obj.NICs = append(s.obj.NICs, nic0)
+
+	if ips := s.IPv4(); len(ips) != 1 || ips[0] != "0.1.2.3" {
+		t.Errorf("invalid Server.IPv4(): %v", ips)
+	}
+
+	nic1 := data.NIC{Runtime: &data.RuntimeNetwork{
+		IPv4: data.MakeIPResource("0.2.3.4"),
+	}}
+	s.obj.NICs = append(s.obj.NICs, nic1)
+
+	if ips := s.IPv4(); len(ips) != 2 || ips[0] != "0.1.2.3" || ips[1] != "0.2.3.4" {
+		t.Errorf("invalid Server.IPv4(): %v", ips)
+	}
+}
