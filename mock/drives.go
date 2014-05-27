@@ -138,6 +138,7 @@ func (d *DriveLibrary) Clone(uuid string, params map[string]interface{}) (string
 		defer Jobs.s.Unlock()
 		job.Data.Progress = 100
 		job.State = "success"
+		newDrive.Status = "unmounted"
 	}
 	go cloning()
 
