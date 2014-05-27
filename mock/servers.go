@@ -86,11 +86,14 @@ func AddServers(ss []data.Server) []string {
 }
 
 // RemoveServer removes server instance record from the mock
-func RemoveServer(uuid string) {
+func RemoveServer(uuid string) bool {
 	syncServers.Lock()
 	defer syncServers.Unlock()
 
+	_, ok := servers[uuid]
 	delete(servers, uuid)
+
+	return ok
 }
 
 // ResetServers removes all server instance records from the mock
@@ -145,6 +148,8 @@ func serversHandler(w http.ResponseWriter, r *http.Request) {
 		serversHandlerGet(w, r)
 	case "POST":
 		serversHandlerPost(w, r)
+	case "DELETE":
+		serversHandlerDelete(w, r)
 	}
 }
 
@@ -165,6 +170,19 @@ func serversHandlerPost(w http.ResponseWriter, r *http.Request) {
 	path := strings.TrimSuffix(r.URL.Path, "/action/")
 	uuid := strings.TrimPrefix(path, "/api/2.0/servers/")
 	handleServerAction(w, r, uuid)
+}
+
+func serversHandlerDelete(w http.ResponseWriter, r *http.Request) {
+	path := strings.TrimSuffix(r.URL.Path, "/")
+	uuid := strings.TrimPrefix(path, "/api/2.0/servers/")
+	if RemoveServer(uuid) {
+		w.WriteHeader(204)
+	} else {
+		h := w.Header()
+		h.Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(404)
+		w.Write([]byte(jsonNotFound))
+	}
 }
 
 func handleServers(w http.ResponseWriter, r *http.Request) {
