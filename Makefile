@@ -22,8 +22,12 @@ ifeq ($(CURDIR),$(PROJECT_DIR))
 build:
 	go build $(PROJECT)/...
 
-check test:
+check test: check-license
 	go test $(PROJECT)/...
+
+check-license:
+	@(fgrep "Copyright 2014 ALTOROS" -rl | grep -v Makefile ; \
+	 find -name "*.go" | cut -b3-) | sort | uniq -u | xargs -I {} echo FAIL: license missed: {}
 
 install:
 	go install $(INSTALL_FLAGS) -v $(PROJECT)/...
@@ -51,7 +55,7 @@ format:
 lc:
 	find -name "*.go" | xargs cat | wc -l
 
-.PHONY: build check test install clean
+.PHONY: build check test check-license install clean
 .PHONY: format
 
 
