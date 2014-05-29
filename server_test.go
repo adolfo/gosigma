@@ -420,7 +420,7 @@ func TestClientCreateServer(t *testing.T) {
 		t.Errorf("NIC.MAC [0]: %q", n.MAC())
 	}
 	if v := n.VLAN(); v != nil {
-		t.Error("NIC.VLAN [0] must be nil, %v", v)
+		t.Errorf("NIC.VLAN [0] must be nil, %v", v)
 	}
 
 	n = nics[1]
@@ -434,7 +434,7 @@ func TestClientCreateServer(t *testing.T) {
 		t.Errorf("NIC.MAC [1]: %q", n.MAC())
 	}
 	if v := n.VLAN(); v != nil {
-		t.Error("NIC.VLAN [1] must be nil, %v", v)
+		t.Errorf("NIC.VLAN [1] must be nil, %v", v)
 	}
 
 	n = nics[2]
@@ -448,7 +448,7 @@ func TestClientCreateServer(t *testing.T) {
 		t.Errorf("NIC.MAC [2]: %q", n.MAC())
 	}
 	if v := n.VLAN(); v != nil {
-		t.Error("NIC.VLAN [2] must be nil, %v", v)
+		t.Errorf("NIC.VLAN [2] must be nil, %v", v)
 	}
 
 	n = nics[3]
@@ -464,7 +464,7 @@ func TestClientCreateServer(t *testing.T) {
 	if v := n.VLAN(); v == nil {
 		t.Error("NIC.VLAN [3] must be not nil")
 	} else if vv := v.UUID(); vv != "vlanid" {
-		t.Error("NIC.VLAN [3]: %q", vv)
+		t.Errorf("NIC.VLAN [3]: %q", vv)
 	}
 
 	drives := s.Drives()

@@ -185,7 +185,7 @@ func TestClientEndpointUnavailableSoft(t *testing.T) {
 	}
 	t.Log("OK, Server():", err)
 
-	if _, err := cli.CreateServer(Components{}); err == nil {
+	if _, err = cli.CreateServer(Components{}); err == nil {
 		t.Error("CreateServer() returned valid result for unavailable endpoint")
 		return
 	}
@@ -214,21 +214,21 @@ func TestClientEndpointUnavailableSoft(t *testing.T) {
 
 	dd, err := cli.Drives(false, false)
 	if err == nil {
-		t.Error("Drives(false) returned valid result for unavailable endpoint: %#v", dd)
+		t.Errorf("Drives(false) returned valid result for unavailable endpoint: %#v", dd)
 		return
 	}
 	t.Log("OK, Drives(false):", err)
 
 	d, err := cli.Drive("uuid", false)
 	if err == nil {
-		t.Error("Drive(false) returned valid result for unavailable endpoint: %#v", d)
+		t.Errorf("Drive(false) returned valid result for unavailable endpoint: %#v", d)
 		return
 	}
 	t.Log("OK, Drive(false):", err)
 
 	cd, err := cli.CloneDrive("uuid", false, CloneParams{}, nil)
 	if err == nil {
-		t.Error("CloneDrive() returned valid result for unavailable endpoint: %#v", cd)
+		t.Errorf("CloneDrive() returned valid result for unavailable endpoint: %#v", cd)
 		return
 	}
 
@@ -240,7 +240,7 @@ func TestClientEndpointUnavailableSoft(t *testing.T) {
 
 	j, err := cli.Job("uuid")
 	if err == nil {
-		t.Error("Job() returned valid result for unavailable endpoint: %#v", j)
+		t.Errorf("Job() returned valid result for unavailable endpoint: %#v", j)
 		return
 	}
 	t.Log("OK, Job():", err)
@@ -276,12 +276,12 @@ func TestClientEndpointUnavailableHard(t *testing.T) {
 
 	s, err := cli.Server("uuid")
 	if err == nil {
-		t.Error("Server() returned valid result for unavailable endpoint: %#v", s)
+		t.Errorf("Server() returned valid result for unavailable endpoint: %#v", s)
 		return
 	}
 	t.Log("OK, Server():", err)
 
-	if _, err := cli.CreateServer(Components{}); err == nil {
+	if _, err = cli.CreateServer(Components{}); err == nil {
 		t.Error("CreateServer() returned valid result for unavailable endpoint")
 		return
 	}
@@ -310,21 +310,21 @@ func TestClientEndpointUnavailableHard(t *testing.T) {
 
 	dd, err := cli.Drives(false, false)
 	if err == nil {
-		t.Error("Drives(false) returned valid result for unavailable endpoint: %#v", dd)
+		t.Errorf("Drives(false) returned valid result for unavailable endpoint: %#v", dd)
 		return
 	}
 	t.Log("OK, Drives(false):", err)
 
 	d, err := cli.Drive("uuid", false)
 	if err == nil {
-		t.Error("Drive(false) returned valid result for unavailable endpoint: %#v", d)
+		t.Errorf("Drive(false) returned valid result for unavailable endpoint: %#v", d)
 		return
 	}
 	t.Log("OK, Drive(false):", err)
 
 	cd, err := cli.CloneDrive("uuid", false, CloneParams{}, nil)
 	if err == nil {
-		t.Error("CloneDrive() returned valid result for unavailable endpoint: %#v", cd)
+		t.Errorf("CloneDrive() returned valid result for unavailable endpoint: %#v", cd)
 		return
 	}
 
@@ -336,7 +336,7 @@ func TestClientEndpointUnavailableHard(t *testing.T) {
 
 	j, err := cli.Job("uuid")
 	if err == nil {
-		t.Error("Job() returned valid result for unavailable endpoint: %#v", j)
+		t.Errorf("Job() returned valid result for unavailable endpoint: %#v", j)
 		return
 	}
 	t.Log("OK, Job():", err)

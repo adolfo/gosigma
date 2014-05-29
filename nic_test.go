@@ -51,7 +51,7 @@ func TestNIC_DataIP(t *testing.T) {
 			t.Errorf("invalid NIC.IPv4.Conf %q, must be static", c)
 		}
 		if r := v.Resource(); r == nil {
-			t.Errorf("invalid NIC.IPv4.Resource, must be not nil", r)
+			t.Error("invalid NIC.IPv4.Resource, must be not nil")
 		} else {
 			if uuid := r.UUID(); uuid != "31.171.246.37" {
 				t.Errorf("invalid NIC.IPv4.Resource.UUID %q", uuid)
@@ -86,10 +86,7 @@ func TestNIC_DataVLan(t *testing.T) {
 	var d = data.NIC{
 		Model: "virtio",
 		MAC:   "22:40:85:4f:d3:ce",
-		VLAN: &data.Resource{
-			"/api/2.0/vlans/5bc05e7e-6555-4f40-add8-3b8e91447702/",
-			"5bc05e7e-6555-4f40-add8-3b8e91447702",
-		},
+		VLAN:  data.MakeVLanResource("5bc05e7e-6555-4f40-add8-3b8e91447702"),
 	}
 	var n = nic{obj: &d}
 

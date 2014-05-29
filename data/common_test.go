@@ -36,7 +36,7 @@ func compareMeta(t *testing.T, prefix string, value, wants map[string]string) {
 				t.Errorf(prefix+": [%q] found %#v, wants %#v", k, v, w)
 			}
 		} else {
-			t.Errorf(": [%q] not found in values")
+			t.Errorf(": [%q] not found in values", k)
 		}
 	}
 }

@@ -34,12 +34,12 @@ func TestErrorNilResponse(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	ee := NewError(&https.Response{r}, nil)
+	ee := NewError(&https.Response{Response: r}, nil)
 	if ee == nil {
 		t.Error("Error must not be nil")
 	}
 	if ee.Error() != "" {
-		t.Error("Error message must be empty, returned: %s", ee.Error())
+		t.Errorf("Error message must be empty, returned: %s", ee.Error())
 	}
 }
 
@@ -50,15 +50,15 @@ func TestErrorStatusCode(t *testing.T) {
 		return
 	}
 
-	e := NewError(&https.Response{r}, nil)
+	e := NewError(&https.Response{Response: r}, nil)
 	if e.SystemError != nil {
 		t.Error("e.SystemError must be nil")
 	}
 	if e.StatusCode != 200 {
-		t.Error("e.StatusCode == %d, wants 200", e.StatusCode)
+		t.Errorf("e.StatusCode == %d, wants 200", e.StatusCode)
 	}
 	if e.StatusMessage != "200 OK" {
-		t.Error("e.StatusCode == %s, wants \"200 OK\"", e.StatusMessage)
+		t.Errorf("e.StatusCode == %s, wants \"200 OK\"", e.StatusMessage)
 	}
 	if e.ServiceError != nil {
 		t.Error("e.ServiceError must be nil")
@@ -76,15 +76,15 @@ func TestErrorSystemError(t *testing.T) {
 		return
 	}
 
-	e := NewError(&https.Response{r}, errors.New("test"))
+	e := NewError(&https.Response{Response: r}, errors.New("test"))
 	if e.SystemError == nil {
 		t.Error("e.SystemError must not be nil")
 	}
 	if e.StatusCode != 200 {
-		t.Error("e.StatusCode == %d, wants 200", e.StatusCode)
+		t.Errorf("e.StatusCode == %d, wants 200", e.StatusCode)
 	}
 	if e.StatusMessage != "200 OK" {
-		t.Error("e.StatusCode == %s, wants \"200 OK\"", e.StatusMessage)
+		t.Errorf("e.StatusCode == %s, wants \"200 OK\"", e.StatusMessage)
 	}
 	if e.ServiceError != nil {
 		t.Error("e.ServiceError must be nil")
@@ -102,17 +102,17 @@ func TestErrorSystemErrorHTTPError(t *testing.T) {
 		return
 	}
 
-	e := NewError(&https.Response{r}, errors.New("test"))
+	e := NewError(&https.Response{Response: r}, errors.New("test"))
 	if e.SystemError == nil {
 		t.Error("e.SystemError must not be nil")
 	}
 	if e.StatusCode != 404 {
-		t.Error("e.StatusCode == %d, wants 404", e.StatusCode)
+		t.Errorf("e.StatusCode == %d, wants 404", e.StatusCode)
 	}
 
 	msg := "404 " + http.StatusText(404)
 	if e.StatusMessage != msg {
-		t.Error("e.StatusCode == %s, wants \"%s\"", e.StatusMessage, msg)
+		t.Errorf("e.StatusCode == %s, wants \"%s\"", e.StatusMessage, msg)
 	}
 	if e.ServiceError != nil {
 		t.Error("e.ServiceError must be nil")
@@ -131,17 +131,17 @@ func TestErrorHTTPServiceError(t *testing.T) {
 		return
 	}
 
-	e := NewError(&https.Response{r}, errors.New("test"))
+	e := NewError(&https.Response{Response: r}, errors.New("test"))
 	if e.SystemError == nil {
 		t.Error("e.SystemError must not be nil")
 	}
 	if e.StatusCode != 404 {
-		t.Error("e.StatusCode == %d, wants 404", e.StatusCode)
+		t.Errorf("e.StatusCode == %d, wants 404", e.StatusCode)
 	}
 
 	msg := "404 " + http.StatusText(404)
 	if e.StatusMessage != msg {
-		t.Error("e.StatusCode == %s, wants \"%s\"", e.StatusMessage, msg)
+		t.Errorf("e.StatusCode == %s, wants \"%s\"", e.StatusMessage, msg)
 	}
 	if e.ServiceError == nil {
 		t.Error("e.ServiceError must not be nil")

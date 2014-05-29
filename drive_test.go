@@ -44,12 +44,12 @@ func testDrive(t *testing.T, d Drive, uuid string, short bool) {
 	}
 	checkb := func(v, wants bool) {
 		if v != wants {
-			t.Errorf("value %s, wants %s", v, wants)
+			t.Errorf("value %v, wants %v", v, wants)
 		}
 	}
 	checki := func(v, wants uint64) {
 		if v != wants {
-			t.Errorf("value %s, wants %s", v, wants)
+			t.Errorf("value %d, wants %d", v, wants)
 		}
 	}
 	checkg := func(d Drive, k, wants string) {
@@ -335,7 +335,7 @@ func TestDriveCloneFail(t *testing.T) {
 	params := CloneParams{Name: "test-name", Media: "ssd"}
 	newDrive, err := d.Clone(params, nil)
 	if err == nil || newDrive != nil {
-		t.Error("Drive clone must fail err=%v, rc=%v", err, newDrive)
+		t.Errorf("Drive clone must fail err=%v, rc=%v", err, newDrive)
 		return
 	}
 

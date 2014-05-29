@@ -87,7 +87,7 @@ func TestJobProgress(t *testing.T) {
 	jd := &data.Job{
 		Resource:     *data.MakeJobResource(uuid),
 		Created:      time.Date(2014, time.January, 30, 15, 24, 42, 205092, time.UTC),
-		Data:         data.JobData{97},
+		Data:         data.JobData{Progress: 97},
 		LastModified: time.Date(2014, time.January, 30, 15, 24, 42, 937432, time.UTC),
 		Operation:    "drive_clone",
 		Resources: []string{
@@ -185,7 +185,7 @@ func TestJobWaitTimeout(t *testing.T) {
 	jd := &data.Job{
 		Resource:     *data.MakeJobResource(uuid),
 		Created:      time.Date(2014, time.January, 30, 15, 24, 42, 205092, time.UTC),
-		Data:         data.JobData{97},
+		Data:         data.JobData{Progress: 97},
 		LastModified: time.Date(2014, time.January, 30, 15, 24, 42, 937432, time.UTC),
 		Operation:    "drive_clone",
 		Resources: []string{
