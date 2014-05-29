@@ -1,2 +1,2 @@
 *.test
-cover.out
+*cover*.out

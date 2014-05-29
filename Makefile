@@ -37,6 +37,23 @@ clean:
 	find -name "*.test" | xargs rm -f
 	find -name "*.out" | xargs rm -f
 
+coverage.out: *.go data/*.go https/*.go
+	-rm -rf *cover.out
+	go test -coverprofile=data.cover.out -coverpkg=./,./data,./https ./data
+	go test -coverprofile=https.cover.out -coverpkg=./,./data,./https ./https
+	go test -coverprofile=gosigma.cover.out -coverpkg=./,./data,./https ./
+	echo "mode: set" > coverage.out && cat *.cover.out | grep -v mode: | sort -r | \
+		awk '{if($$1 != last) {print $$0;last=$$1}}' >> coverage.out
+	rm data.cover.out
+	rm https.cover.out
+	rm gosigma.cover.out
+
+cover-html: coverage.out
+	go tool cover -html=$<
+
+cover: coverage.out
+	go tool cover -func=$<
+
 update:
 	go get -u -v ./...
 
@@ -55,7 +72,7 @@ format:
 lc:
 	find -name "*.go" | xargs cat | wc -l
 
-.PHONY: build check test check-license install clean
+.PHONY: build check test check-license install clean cover-html cover update
 .PHONY: format
 
 
