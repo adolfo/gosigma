@@ -38,9 +38,8 @@ func (r runtimeNIC) String() string {
 func (r runtimeNIC) IPv4() Resource {
 	if r.obj.IPv4 != nil {
 		return resource{r.obj.IPv4}
-	} else {
-		return nil
 	}
+	return nil
 }
 
 // Type of network interface card (public, private, etc)

@@ -16,7 +16,7 @@ type CloneParams struct {
 	Name       string
 }
 
-func (c *CloneParams) makeJsonReader() (io.Reader, error) {
+func (c *CloneParams) makeJSONReader() (io.Reader, error) {
 	if c == nil {
 		return nil, nil
 	}

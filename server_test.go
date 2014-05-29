@@ -90,7 +90,7 @@ func TestClientServers(t *testing.T) {
 	ds.Meta["key3"] = "value33"
 	ds.Context = true
 	ds.CPU = 100
-	ds.CPUs_instead_of_cores = true
+	ds.CPUsInsteadOfCores = true
 	ds.CPUModel = "cpu_model"
 	if err := s.Refresh(); err != nil {
 		t.Error(err)
@@ -108,11 +108,11 @@ func TestClientServers(t *testing.T) {
 	if v := s.CPU(); v != 100 {
 		t.Errorf("Server.CPU() failed")
 	}
-	if v := s.CPUs_instead_of_cores(); v != true {
-		t.Errorf("Server.CPUs_instead_of_cores() failed")
+	if v := s.CPUsInsteadOfCores(); v != true {
+		t.Errorf("Server.CPUsInsteadOfCores() failed")
 	}
-	if v := s.CPU_Model(); v != "cpu_model" {
-		t.Errorf("Server.CPU_Model() failed")
+	if v := s.CPUModel(); v != "cpu_model" {
+		t.Errorf("Server.CPUModel() failed")
 	}
 
 	// failed refresh

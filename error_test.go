@@ -124,7 +124,7 @@ func TestErrorSystemErrorHTTPError(t *testing.T) {
 }
 
 func TestErrorHTTPServiceError(t *testing.T) {
-	var s string = `[{"error_point": null, "error_type": "notexist", "error_message": "Object with uuid 472835d5-2bbb-4d87-9d08-7364bc373692 does not exist"}]`
+	var s = `[{"error_point": null, "error_type": "notexist", "error_message": "Object with uuid 472835d5-2bbb-4d87-9d08-7364bc373692 does not exist"}]`
 	r, err := httpstest.CreateResponseWithBody(404, "application/json; charset=utf-8", s)
 	if err != nil {
 		t.Error(err)

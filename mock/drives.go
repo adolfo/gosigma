@@ -16,26 +16,32 @@ import (
 	"github.com/Altoros/gosigma/data"
 )
 
+// DriveLibrary defines type for mock drive library
 type DriveLibrary struct {
 	s sync.Mutex
 	m map[string]*data.Drive
 	p string
 }
 
+// Drives defines user account drives
 var Drives = &DriveLibrary{
 	m: make(map[string]*data.Drive),
 	p: "/api/2.0/drives",
 }
+
+// LibDrives defines public drives
 var LibDrives = &DriveLibrary{
 	m: make(map[string]*data.Drive),
 	p: "/api/2.0/libdrives",
 }
 
+// ResetDrives clean-up all drive libraries
 func ResetDrives() {
 	Drives.Reset()
 	LibDrives.Reset()
 }
 
+// InitDrive initializes drive
 func InitDrive(d *data.Drive) (*data.Drive, error) {
 	if d.UUID == "" {
 		uuid, err := GenerateUUID()
@@ -51,6 +57,7 @@ func InitDrive(d *data.Drive) (*data.Drive, error) {
 	return d, nil
 }
 
+// Add drive to the library
 func (d *DriveLibrary) Add(drv *data.Drive) error {
 	drv, err := InitDrive(drv)
 	if err != nil {
@@ -65,6 +72,7 @@ func (d *DriveLibrary) Add(drv *data.Drive) error {
 	return nil
 }
 
+// AddDrives adds drive collection to the library
 func (d *DriveLibrary) AddDrives(dd []data.Drive) []string {
 	d.s.Lock()
 	defer d.s.Unlock()
@@ -80,6 +88,7 @@ func (d *DriveLibrary) AddDrives(dd []data.Drive) []string {
 	return result
 }
 
+// Remove drive from the library
 func (d *DriveLibrary) Remove(uuid string) bool {
 	d.s.Lock()
 	defer d.s.Unlock()
@@ -90,12 +99,14 @@ func (d *DriveLibrary) Remove(uuid string) bool {
 	return ok
 }
 
+// Reset drive library
 func (d *DriveLibrary) Reset() {
 	d.s.Lock()
 	defer d.s.Unlock()
 	d.m = make(map[string]*data.Drive)
 }
 
+// SetStatus sets drive status in the library
 func (d *DriveLibrary) SetStatus(uuid, status string) {
 	d.s.Lock()
 	defer d.s.Unlock()
@@ -106,8 +117,10 @@ func (d *DriveLibrary) SetStatus(uuid, status string) {
 	}
 }
 
+// ErrNotFound - drive not found in library error
 var ErrNotFound = errors.New("not found")
 
+// Clone drive in the library
 func (d *DriveLibrary) Clone(uuid string, params map[string]interface{}) (string, error) {
 	d.s.Lock()
 	defer d.s.Unlock()
@@ -122,7 +135,7 @@ func (d *DriveLibrary) Clone(uuid string, params map[string]interface{}) (string
 		return "", err
 	}
 
-	var newDrive data.Drive = *drv
+	newDrive := *drv
 	newDrive.Resource = *data.MakeDriveResource(newUUID)
 	newDrive.Status = "cloning_dst"
 	newDrive.Jobs = nil
@@ -158,6 +171,7 @@ func (d *DriveLibrary) Clone(uuid string, params map[string]interface{}) (string
 	return newUUID, nil
 }
 
+// Resize drive in the library
 func (d *DriveLibrary) Resize(uuid string, size uint64) error {
 	d.s.Lock()
 	defer d.s.Unlock()

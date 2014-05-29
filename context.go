@@ -14,8 +14,8 @@ type Context interface {
 	// CloudSigma resource
 	Resource
 
-	// Cpu frequency in MHz
-	Cpu() int64
+	// CPU frequency in MHz
+	CPU() int64
 
 	// Get meta-information value stored in the server instance
 	Get(key string) (string, bool)
@@ -52,8 +52,8 @@ func (c context) URI() string { return fmt.Sprintf("/api/2.0/servers/%s/", c.UUI
 // UUID of server instance
 func (c context) UUID() string { return c.obj.UUID }
 
-// Cpu frequency in MHz
-func (c context) Cpu() int64 { return c.obj.CPU }
+// CPU frequency in MHz
+func (c context) CPU() int64 { return c.obj.CPU }
 
 // Get meta-information value stored in the server instance
 func (c context) Get(key string) (v string, ok bool) {

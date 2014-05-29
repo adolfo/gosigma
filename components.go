@@ -14,15 +14,21 @@ import (
 )
 
 const (
+	// Kilobyte defines constant for specifying kilobytes
 	Kilobyte = 1024
+	// Megabyte defines constant for specifying megabytes
 	Megabyte = 1024 * 1024
+	// Gigabyte defines constant for specifying gigabytes
 	Gigabyte = 1024 * 1024 * 1024
+	// Terabyte defines constant for specifying terabytes
 	Terabyte = 1024 * 1024 * 1024 * 1024
 )
 
 const (
+	// ModelVirtio defines constant for "virtio" driver model
 	ModelVirtio = "virtio"
-	ModelE1000  = "e1000"
+	// ModelE1000 defines constant for "e1000" driver model
+	ModelE1000 = "e1000"
 )
 
 // A Components contains information to create new server
@@ -79,12 +85,12 @@ func (c *Components) SetDescription(description string) {
 	c.SetMeta("description", description)
 }
 
-// SetPublicSSHKey sets public SSH key for new server. To unset, call this function with empty string.
+// SetSSHPublicKey sets public SSH key for new server. To unset, call this function with empty string.
 func (c *Components) SetSSHPublicKey(description string) {
 	c.SetMeta("ssh_public_key", description)
 }
 
-// AttachDriveData attaches drive to components from drive data.
+// AttachDrive attaches drive to components from drive data.
 func (c *Components) AttachDrive(bootOrder int, channel, device, uuid string) {
 	c.init()
 
@@ -102,7 +108,7 @@ func (c *Components) NetworkDHCP4(model string) {
 	c.network4(model, "dhcp", "")
 }
 
-// NetworkDHCP4 attaches NIC, configured with IPv4 static address
+// NetworkStatic4 attaches NIC, configured with IPv4 static address
 func (c *Components) NetworkStatic4(model, address string) {
 	c.network4(model, "static", address)
 }
@@ -112,7 +118,7 @@ func (c *Components) NetworkManual4(model string) {
 	c.network4(model, "manual", "")
 }
 
-// NetworkManual4 attaches NIC, configured with private VLan
+// NetworkVLan attaches NIC, configured with private VLan
 func (c *Components) NetworkVLan(model, uuid string) {
 	c.init()
 

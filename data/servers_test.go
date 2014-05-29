@@ -129,8 +129,8 @@ func compareServers(t *testing.T, i int, value, wants *Server) {
 	if value.CPU != wants.CPU {
 		t.Errorf("Server.CPU error [%d]: found %#v, wants %#v", i, value.CPU, wants.CPU)
 	}
-	if value.CPUs_instead_of_cores != wants.CPUs_instead_of_cores {
-		t.Errorf("Server.CPUs_instead_of_cores error [%d]: found %#v, wants %#v", i, value.CPUs_instead_of_cores, wants.CPUs_instead_of_cores)
+	if value.CPUsInsteadOfCores != wants.CPUsInsteadOfCores {
+		t.Errorf("Server.CPUsInsteadOfCores error [%d]: found %#v, wants %#v", i, value.CPUsInsteadOfCores, wants.CPUsInsteadOfCores)
 	}
 	if value.CPUModel != wants.CPUModel {
 		t.Errorf("Server.CPUModel error [%d]: found %#v, wants %#v", i, value.CPUModel, wants.CPUModel)

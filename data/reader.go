@@ -9,8 +9,8 @@ import (
 	"io"
 )
 
-// ReadJson from io.Reader to the interface
-func ReadJson(r io.Reader, v interface{}) error {
+// ReadJSON from io.Reader to the interface
+func ReadJSON(r io.Reader, v interface{}) error {
 	dec := json.NewDecoder(r)
 	err := dec.Decode(v)
 	if err == io.EOF {

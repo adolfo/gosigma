@@ -231,7 +231,7 @@ func (c Client) cloneDrive(uuid string, libspec LibrarySpec, params CloneParams,
 		qq["avoid"] = []string{strings.Join(avoid, ",")}
 	}
 
-	rr, err := params.makeJsonReader()
+	rr, err := params.makeJSONReader()
 	if err != nil {
 		return nil, err
 	}
@@ -326,7 +326,7 @@ func (c Client) readContext() (*data.Context, error) {
 	// open server ctx device
 	f, err := os.OpenFile(DEVICE, os.O_RDWR, 0)
 	if err != nil {
-		return nil, fmt.Errorf("OpenFile: %s", err)
+		return nil, fmt.Errorf("error OpenFile: %s", err)
 	}
 	defer f.Close()
 
@@ -342,7 +342,7 @@ func (c Client) readContext() (*data.Context, error) {
 	// writing request to service
 	n, err := f.WriteString(REQUEST)
 	if err != nil {
-		return nil, fmt.Errorf("WriteString: %s", err)
+		return nil, fmt.Errorf("error WriteString: %s", err)
 	}
 
 	// check the request was written
@@ -356,7 +356,7 @@ func (c Client) readContext() (*data.Context, error) {
 	// read until End-Of-Transfer (EOT) symbol or EOF
 	bb, err := r.ReadBytes(EOT)
 	if err != nil && err != io.EOF {
-		return nil, fmt.Errorf("ReadBytes: %s", err)
+		return nil, fmt.Errorf("error ReadBytes: %s", err)
 	}
 
 	// if EOT was read, truncate it

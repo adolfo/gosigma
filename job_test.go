@@ -119,10 +119,10 @@ func TestJobProgress(t *testing.T) {
 		t.Error("invalid Refresh progress")
 	}
 
-	set_job_progress := func() {
+	setJobProgress := func() {
 		jd.Data.Progress = 100
 	}
-	go set_job_progress()
+	go setJobProgress()
 
 	if err := j.Wait(); err != nil {
 		t.Error(err)

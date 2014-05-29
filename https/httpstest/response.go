@@ -11,6 +11,7 @@ import (
 	"time"
 )
 
+// CreateResponse creates test response from HTTP code
 func CreateResponse(code int) (*http.Response, error) {
 	dateTime := time.Now().UTC().Format(time.RFC1123)
 	msg := fmt.Sprintf(`HTTP/1.1 %d %s
@@ -26,6 +27,7 @@ CF-RAY: 11cf706acb32088d-FRA
 	return CreateResponseFromString(msg)
 }
 
+// CreateResponseWithType creates test response from HTTP code and content type
 func CreateResponseWithType(code int, contentType string) (*http.Response, error) {
 	dateTime := time.Now().UTC().Format(time.RFC1123)
 	msg := fmt.Sprintf(`HTTP/1.1 %d %s
@@ -42,6 +44,7 @@ CF-RAY: 11cf706acb32088d-FRA
 	return CreateResponseFromString(msg)
 }
 
+// CreateResponseWithBody creates test response from HTTP code, content type and body content
 func CreateResponseWithBody(code int, contentType string, data string) (*http.Response, error) {
 	dateTime := time.Now().UTC().Format(time.RFC1123)
 	ds := fmt.Sprintf("%x\r\n%s\r\n0\r\n\r\n", len(data), data)
@@ -59,6 +62,7 @@ CF-RAY: 11cf706acb32088d-FRA
 	return CreateResponseFromString(msg)
 }
 
+// CreateResponseFromString creates test response from string
 func CreateResponseFromString(s string) (*http.Response, error) {
 	r := bufio.NewReader(strings.NewReader(s))
 	return http.ReadResponse(r, nil)

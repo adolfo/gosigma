@@ -10,7 +10,8 @@ import (
 )
 
 func TestNIC_Empty(t *testing.T) {
-	var n NIC = nic{client: nil, obj: &data.NIC{}}
+	var n NIC
+	n = nic{client: nil, obj: &data.NIC{}}
 	if v := n.IPv4(); v != nil {
 		t.Errorf("invalid NIC.IPv4 %v, must be nil", v)
 	}
@@ -121,7 +122,8 @@ func TestNIC_DataVLan(t *testing.T) {
 }
 
 func TestNIC_Runtime(t *testing.T) {
-	var n NIC = nic{client: nil, obj: &data.NIC{
+	var n NIC
+	n = nic{client: nil, obj: &data.NIC{
 		Runtime: &data.RuntimeNetwork{},
 	}}
 	if v := n.Runtime(); v == nil {

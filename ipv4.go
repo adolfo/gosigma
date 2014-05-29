@@ -41,7 +41,6 @@ func (i ipv4) Conf() string { return i.obj.Conf }
 func (i ipv4) Resource() Resource {
 	if i.obj.IP != nil {
 		return resource{i.obj.IP}
-	} else {
-		return nil
 	}
+	return nil
 }

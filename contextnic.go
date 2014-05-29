@@ -52,16 +52,14 @@ func (c contextNIC) Model() string { return c.obj.Model }
 func (c contextNIC) IPv4() ContextIPv4 {
 	if c.obj.IPv4 != nil {
 		return contextIPv4{c.obj.IPv4}
-	} else {
-		return nil
 	}
+	return nil
 }
 func (c contextNIC) VLAN() ContextVLan {
 	if c.obj.VLan != nil {
 		return contextVLan{c.obj.VLan}
-	} else {
-		return nil
 	}
+	return nil
 }
 
 func (c contextNIC) String() string {

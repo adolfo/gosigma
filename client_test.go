@@ -70,8 +70,8 @@ func TestClientCreate(t *testing.T) {
 
 type testLog struct{ written int }
 
-func (l *testLog) Log(args ...interface{})                 { l.written += 1 }
-func (l *testLog) Logf(format string, args ...interface{}) { l.written += 1 }
+func (l *testLog) Log(args ...interface{})                 { l.written++ }
+func (l *testLog) Logf(format string, args ...interface{}) { l.written++ }
 
 func TestClientLogger(t *testing.T) {
 	cli, err := NewClient("https://0.1.2.3:2000/api/2.0/", mock.TestUser, mock.TestPassword, nil)

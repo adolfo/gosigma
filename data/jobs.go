@@ -34,7 +34,7 @@ type Jobs struct {
 // ReadJob reads and unmarshalls information about job instance from JSON stream
 func ReadJob(r io.Reader) (*Job, error) {
 	var job Job
-	if err := ReadJson(r, &job); err != nil {
+	if err := ReadJSON(r, &job); err != nil {
 		return nil, err
 	}
 	return &job, nil

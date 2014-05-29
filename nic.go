@@ -49,9 +49,8 @@ func (n nic) String() string {
 func (n nic) IPv4() IPv4 {
 	if n.obj.IPv4 != nil {
 		return ipv4{n.client, n.obj.IPv4}
-	} else {
-		return nil
 	}
+	return nil
 }
 
 // MAC address
@@ -64,16 +63,14 @@ func (n nic) Model() string { return n.obj.Model }
 func (n nic) Runtime() RuntimeNIC {
 	if n.obj.Runtime != nil {
 		return runtimeNIC{n.obj.Runtime}
-	} else {
-		return nil
 	}
+	return nil
 }
 
 // Virtual LAN resource
 func (n nic) VLAN() Resource {
 	if n.obj.VLAN != nil {
 		return resource{n.obj.VLAN}
-	} else {
-		return nil
 	}
+	return nil
 }

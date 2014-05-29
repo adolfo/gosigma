@@ -12,17 +12,20 @@ import (
 	"github.com/Altoros/gosigma/data"
 )
 
+// JobLibrary type to store all jobs in the mock
 type JobLibrary struct {
 	s sync.Mutex
 	m map[string]*data.Job
 	p string
 }
 
+// Jobs defines library of all jobs in the mock
 var Jobs = &JobLibrary{
 	m: make(map[string]*data.Job),
 	p: "/api/2.0/jobs",
 }
 
+// InitJob initializes the job
 func InitJob(j *data.Job) (*data.Job, error) {
 	if j.UUID == "" {
 		uuid, err := GenerateUUID()
@@ -38,6 +41,7 @@ func InitJob(j *data.Job) (*data.Job, error) {
 	return j, nil
 }
 
+// Add job to the library
 func (j *JobLibrary) Add(job *data.Job) error {
 	job, err := InitJob(job)
 	if err != nil {
@@ -52,6 +56,7 @@ func (j *JobLibrary) Add(job *data.Job) error {
 	return nil
 }
 
+// AddJobs adds job collection to the libraryh
 func (j *JobLibrary) AddJobs(jj []data.Job) []string {
 	j.s.Lock()
 	defer j.s.Unlock()
@@ -67,6 +72,7 @@ func (j *JobLibrary) AddJobs(jj []data.Job) []string {
 	return result
 }
 
+// Remove job from the library
 func (j *JobLibrary) Remove(uuid string) bool {
 	j.s.Lock()
 	defer j.s.Unlock()
@@ -77,12 +83,14 @@ func (j *JobLibrary) Remove(uuid string) bool {
 	return ok
 }
 
+// Reset the library
 func (j *JobLibrary) Reset() {
 	j.s.Lock()
 	defer j.s.Unlock()
 	j.m = make(map[string]*data.Job)
 }
 
+// SetState for the job in the library
 func (j *JobLibrary) SetState(uuid, state string) {
 	j.s.Lock()
 	defer j.s.Unlock()

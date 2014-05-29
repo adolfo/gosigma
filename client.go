@@ -11,18 +11,24 @@ import (
 	"github.com/Altoros/gosigma/https"
 )
 
+// A RequestSpec defines the type of client request
 type RequestSpec bool
 
 const (
-	RequestShort  RequestSpec = false
+	// RequestShort requests server to return short object representation
+	RequestShort RequestSpec = false
+	// RequestDetail requests server to return detail object representation
 	RequestDetail RequestSpec = true
 )
 
+// A LibrarySpec defines the type of drive library to use
 type LibrarySpec bool
 
 const (
+	// LibraryAccount requests server to use user account drive library
 	LibraryAccount LibrarySpec = false
-	LibraryMedia   LibrarySpec = true
+	// LibraryMedia requests server to use public drive library
+	LibraryMedia LibrarySpec = true
 )
 
 // A Client sends and receives requests to CloudSigma endpoint

@@ -33,9 +33,8 @@ func ResolveEndpoint(endpoint string) (string, error) {
 		}
 		if err := VerifyEndpoint(endpoint); err != nil {
 			return "", err
-		} else {
-			return endpoint, nil
 		}
+		return endpoint, nil
 	}
 }
 

@@ -18,34 +18,31 @@ type Error struct {
 
 var _ error = Error{}
 
+// NewError creates new Error object
 func NewError(r *https.Response, e error) *Error {
 	if r == nil {
 		if e == nil {
 			return nil
 		}
-		err := &Error{
-			SystemError: e,
-		}
-		return err
-	} else {
-		err := &Error{
-			SystemError:   e,
-			StatusCode:    r.StatusCode,
-			StatusMessage: r.Status,
-		}
-		if dee, e := data.ReadError(r.Body); e == nil {
-			if len(dee) > 0 {
-				err.ServiceError = &dee[0]
-			}
-		}
-		return err
+		return &Error{SystemError: e}
 	}
+	err := &Error{
+		SystemError:   e,
+		StatusCode:    r.StatusCode,
+		StatusMessage: r.Status,
+	}
+	if dee, e := data.ReadError(r.Body); e == nil {
+		if len(dee) > 0 {
+			err.ServiceError = &dee[0]
+		}
+	}
+	return err
 }
 
 // Error implements error interface
 func (s Error) Error() string {
 	if s.ServiceError != nil && s.ServiceError.Message != "" {
-		var str string = ""
+		var str string
 		if s.StatusCode > 0 {
 			str = s.StatusMessage + ", "
 		}

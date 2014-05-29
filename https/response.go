@@ -38,7 +38,7 @@ func (r Response) VerifyCode(code int) error {
 	return nil
 }
 
-// VerifyCode checks the response has specified content type
+// VerifyContentType checks the response has specified content type
 func (r Response) VerifyContentType(contentType string) error {
 	if contentType == "" {
 		return nil
@@ -48,7 +48,7 @@ func (r Response) VerifyContentType(contentType string) error {
 
 	vv, ok := r.Header["Content-Type"]
 	if !ok {
-		return fmt.Errorf("Content-Type header not found in response, expected \"%s\"", contentType)
+		return fmt.Errorf("header Content-Type not found in response, expected \"%s\"", contentType)
 	}
 
 	for _, v := range vv {

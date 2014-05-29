@@ -12,8 +12,8 @@ type ContextDrive struct {
 	Device    string `json:"device,omitempty"`
 }
 
-// ContextIPv4_ describes IPv4 parameters in server context
-type ContextIPv4_ struct {
+// ContextIPv4Config describes IPv4 parameters in server context
+type ContextIPv4Config struct {
 	Gateway     string            `json:"gateway"`
 	Meta        map[string]string `json:"meta"`
 	Nameservers []string          `json:"nameservers"`
@@ -23,8 +23,8 @@ type ContextIPv4_ struct {
 
 // ContextIPv4 describes IPv4 configuration in server context
 type ContextIPv4 struct {
-	Conf string       `json:"conf"`
-	IP   ContextIPv4_ `json:"ip"`
+	Conf string            `json:"conf"`
+	IP   ContextIPv4Config `json:"ip"`
 }
 
 // ContextVLan describes network interface properties for VLan in server context
@@ -58,7 +58,7 @@ type Context struct {
 // ReadContext reads and unmarshalls server instance context from JSON stream
 func ReadContext(r io.Reader) (*Context, error) {
 	var c Context
-	if err := ReadJson(r, &c); err != nil {
+	if err := ReadJSON(r, &c); err != nil {
 		return nil, err
 	}
 	return &c, nil

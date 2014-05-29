@@ -23,9 +23,8 @@ var size = flag.Uint64("size", 0, "size for operations: TestLiveDriveResize")
 func libFlag() LibrarySpec {
 	if *lib {
 		return LibraryMedia
-	} else {
-		return LibraryAccount
 	}
+	return LibraryAccount
 }
 
 func parseCredentials() (u string, p string, e error) {

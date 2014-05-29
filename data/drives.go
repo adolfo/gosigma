@@ -43,7 +43,7 @@ type Drives struct {
 // ReadDrives reads and unmarshalls information about cloud drive instances from JSON stream
 func ReadDrives(r io.Reader) ([]Drive, error) {
 	var drives Drives
-	if err := ReadJson(r, &drives); err != nil {
+	if err := ReadJSON(r, &drives); err != nil {
 		return nil, err
 	}
 	return drives.Objects, nil
@@ -52,7 +52,7 @@ func ReadDrives(r io.Reader) ([]Drive, error) {
 // ReadDrive reads and unmarshalls information about single cloud drive instance from JSON stream
 func ReadDrive(r io.Reader) (*Drive, error) {
 	var drive Drive
-	if err := ReadJson(r, &drive); err != nil {
+	if err := ReadJSON(r, &drive); err != nil {
 		return nil, err
 	}
 	return &drive, nil
@@ -60,9 +60,9 @@ func ReadDrive(r io.Reader) (*Drive, error) {
 
 // WriteDrive marshals single drive object to JSON stream
 func WriteDrive(obj *Drive) (io.Reader, error) {
-	if bb, err := json.Marshal(obj); err != nil {
+	bb, err := json.Marshal(obj)
+	if err != nil {
 		return nil, err
-	} else {
-		return bytes.NewReader(bb), nil
 	}
+	return bytes.NewReader(bb), nil
 }

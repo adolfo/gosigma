@@ -48,12 +48,12 @@ type Server interface {
 	// Selects whether the SMP is exposed as cores of a single CPU or separate CPUs.
 	// This should be set to false for Windows, because there are license
 	// requirements for multiple CPUs.
-	CPUs_instead_of_cores() bool
+	CPUsInsteadOfCores() bool
 
 	// Virtual CPU model, for mitigating compatibility issues between the guest operating system
 	// and the underlying host's CPU. If not specified, all of the hypervisor's CPUs
 	// capabilities are passed directly to the virtual machine.
-	CPU_Model() string
+	CPUModel() string
 
 	// Drives for this server instance
 	Drives() []ServerDrive
@@ -135,12 +135,12 @@ func (s server) CPU() uint64 { return s.obj.CPU }
 // Selects whether the SMP is exposed as cores of a single CPU or separate CPUs.
 // This should be set to false for Windows, because there are license
 // requirements for multiple CPUs.
-func (s server) CPUs_instead_of_cores() bool { return s.obj.CPUs_instead_of_cores }
+func (s server) CPUsInsteadOfCores() bool { return s.obj.CPUsInsteadOfCores }
 
 // Virtual CPU model, for mitigating compatibility issues between the guest operating system
 // and the underlying host's CPU. If not specified, all of the hypervisor's CPUs
 // capabilities are passed directly to the virtual machine.
-func (s server) CPU_Model() string { return s.obj.CPUModel }
+func (s server) CPUModel() string { return s.obj.CPUModel }
 
 // Drives for this server instance
 func (s server) Drives() []ServerDrive {
