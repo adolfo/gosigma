@@ -6,7 +6,7 @@ package gosigma
 import (
 	"fmt"
 
-	"github.com/Altoros/gosigma/data"
+	"github.com/altoros/gosigma/data"
 )
 
 // A Context interface represents server instance context in CloudSigma account

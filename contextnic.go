@@ -6,7 +6,7 @@ package gosigma
 import (
 	"fmt"
 
-	"github.com/Altoros/gosigma/data"
+	"github.com/altoros/gosigma/data"
 )
 
 // A ContextNIC interface represents network interface card for server instance context

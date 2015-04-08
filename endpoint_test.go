@@ -7,10 +7,7 @@ import "testing"
 
 func TestResolveEndpoint(t *testing.T) {
 	check := func(ep string, url string) {
-		ep, err := ResolveEndpoint(ep)
-		if err != nil {
-			t.Error(err)
-		}
+		ep = ResolveEndpoint(ep)
 		if ep != url {
 			t.Errorf("ep value = '%s', wants '%s'", ep, url)
 		}

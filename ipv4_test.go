@@ -6,7 +6,7 @@ package gosigma
 import (
 	"testing"
 
-	"github.com/Altoros/gosigma/data"
+	"github.com/altoros/gosigma/data"
 )
 
 func TestIPv4String(t *testing.T) {

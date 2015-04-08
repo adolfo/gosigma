@@ -6,7 +6,7 @@ package gosigma
 import (
 	"testing"
 
-	"github.com/Altoros/gosigma/data"
+	"github.com/altoros/gosigma/data"
 )
 
 func TestRuntimeNIC_Empty(t *testing.T) {

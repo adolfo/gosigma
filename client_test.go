@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Altoros/gosigma/data"
-	"github.com/Altoros/gosigma/mock"
+	"github.com/altoros/gosigma/data"
+	"github.com/altoros/gosigma/mock"
 )
 
 var mockEndpoint string
@@ -38,34 +38,6 @@ func createTestClient(t *testing.T) (*Client, error) {
 	}
 
 	return cli, nil
-}
-
-func TestClientCreate(t *testing.T) {
-	check := func(ep, u, p string) {
-		cli, err := NewClient(ep, u, p, nil)
-		if err == nil || cli != nil {
-			t.Errorf("NewClient(%q,%q,%q) must fail", ep, u, p)
-		}
-		t.Log("OK:", err)
-	}
-
-	// endpoint
-	check("", "1234", "1234")
-	check("1234", "1234", "1234")
-	check("https://1234:1234@testing.invalid", "1234", "1234")
-	check("https://testing.invalid?xxx", "1234", "1234")
-	check("://testing.invalid?xxx", "1234", "1234")
-
-	// auth
-	check(mockEndpoint, "", "")
-	check(mockEndpoint, "", "1234")
-	check(mockEndpoint, "1234", "")
-
-	// OK
-	cli, err := createTestClient(t)
-	if err != nil || cli == nil {
-		t.Error("NewClient() failed:", err, cli)
-	}
 }
 
 type testLog struct{ written int }

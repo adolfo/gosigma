@@ -14,7 +14,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Altoros/gosigma/data"
+	"github.com/altoros/gosigma/data"
 )
 
 func (c Client) getServers(rqspec RequestSpec) ([]data.Server, error) {

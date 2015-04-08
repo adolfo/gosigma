@@ -6,7 +6,7 @@ package gosigma
 import (
 	"fmt"
 
-	"github.com/Altoros/gosigma/data"
+	"github.com/altoros/gosigma/data"
 )
 
 // A IPv4 interface represents IPv4 configuration

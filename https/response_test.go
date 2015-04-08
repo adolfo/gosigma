@@ -6,7 +6,7 @@ package https
 import (
 	"testing"
 
-	"github.com/Altoros/gosigma/https/httpstest"
+	"github.com/altoros/gosigma/https/httpstest"
 )
 
 func TestHttpsResponseVerifyNoContentType(t *testing.T) {

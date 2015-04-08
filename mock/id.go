@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/Altoros/gosigma/https"
+	"github.com/altoros/gosigma/https"
 )
 
 var chID = make(chan int)

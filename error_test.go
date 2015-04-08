@@ -8,8 +8,8 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/Altoros/gosigma/https"
-	"github.com/Altoros/gosigma/https/httpstest"
+	"github.com/altoros/gosigma/https"
+	"github.com/altoros/gosigma/https/httpstest"
 )
 
 func TestErrorNilResponse(t *testing.T) {

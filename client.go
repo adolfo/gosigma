@@ -8,7 +8,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/Altoros/gosigma/https"
+	"github.com/altoros/gosigma/https"
 )
 
 // A RequestSpec defines the type of client request
@@ -47,10 +47,7 @@ var errEmptyUUID = errors.New("uuid is not allowed to be empty")
 func NewClient(endpoint string, username, password string,
 	tlsConfig *tls.Config) (*Client, error) {
 
-	endpoint, err := ResolveEndpoint(endpoint)
-	if err != nil {
-		return nil, err
-	}
+	endpoint = ResolveEndpoint(endpoint)
 
 	if len(username) == 0 {
 		return nil, errEmptyUsername

@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Altoros/gosigma/data"
-	"github.com/Altoros/gosigma/mock"
+	"github.com/altoros/gosigma/data"
+	"github.com/altoros/gosigma/mock"
 )
 
 func TestJobString(t *testing.T) {

@@ -13,7 +13,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/Altoros/gosigma/data"
+	"github.com/altoros/gosigma/data"
 )
 
 // DriveLibrary defines type for mock drive library

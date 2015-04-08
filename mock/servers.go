@@ -14,7 +14,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/Altoros/gosigma/data"
+	"github.com/altoros/gosigma/data"
 )
 
 var syncServers sync.Mutex

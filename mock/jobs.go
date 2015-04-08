@@ -9,7 +9,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/Altoros/gosigma/data"
+	"github.com/altoros/gosigma/data"
 )
 
 // JobLibrary type to store all jobs in the mock

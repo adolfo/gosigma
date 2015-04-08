@@ -5,8 +5,8 @@ package gosigma
 
 import (
 	"errors"
+	"fmt"
 	"net/url"
-	"strings"
 )
 
 // Default CloudSigma region
@@ -18,24 +18,11 @@ var errInvalidAuth = errors.New("auth information is not allowed in the endpoint
 var errEndpointWithQuery = errors.New("query information is not allowed in the endpoint string")
 
 // ResolveEndpoint returns endpoint for given region code
-func ResolveEndpoint(endpoint string) (string, error) {
-	switch endpoint {
-	case "zrh":
-		return "https://zrh.cloudsigma.com/api/2.0/", nil
-	case "lvs":
-		return "https://lvs.cloudsigma.com/api/2.0/", nil
-	default:
-		if length := len(endpoint); length > 0 {
-			endpoint := strings.TrimSpace(endpoint)
-			if endpoint[length-1] != '/' {
-				endpoint += "/"
-			}
-		}
-		if err := VerifyEndpoint(endpoint); err != nil {
-			return "", err
-		}
-		return endpoint, nil
+func ResolveEndpoint(endpoint string) string {
+	if err := VerifyEndpoint(endpoint); err == nil {
+		return endpoint
 	}
+	return fmt.Sprintf("https://%s.cloudsigma.com/api/2.0/", endpoint)
 }
 
 // VerifyEndpoint verifies CloudSigma endpoint URL

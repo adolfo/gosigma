@@ -2,7 +2,7 @@
 # Makefile for gosigma
 #
 
-PROJECT := github.com/Altoros/gosigma
+PROJECT := github.com/altoros/gosigma
 PROJECT_DIR := $(shell go list -e -f '{{.Dir}}' $(PROJECT))
 
 ifeq ($(shell uname -p | sed -r 's/.*(x86|armel|armhf).*/golang/'), golang)

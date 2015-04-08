@@ -6,7 +6,7 @@ package gosigma
 import (
 	"fmt"
 
-	"github.com/Altoros/gosigma/data"
+	"github.com/altoros/gosigma/data"
 )
 
 // A Resource interface represents abstract resource in CloudSigma account

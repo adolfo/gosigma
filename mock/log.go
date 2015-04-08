@@ -5,10 +5,10 @@ package mock
 
 import (
 	"flag"
+	"github.com/altoros/gosigma/https"
 	"net/http/httputil"
 	"strings"
 	"testing"
-	"github.com/Altoros/gosigma/https"
 )
 
 var logFlag = flag.String("log.mock", "n", "log mock server requests: none|n, url|u, detail|d")

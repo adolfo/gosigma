@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/Altoros/gosigma/data"
+	"github.com/altoros/gosigma/data"
 )
 
 const (

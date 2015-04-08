@@ -6,7 +6,7 @@ package gosigma
 import (
 	"errors"
 
-	"github.com/Altoros/gosigma/data"
+	"github.com/altoros/gosigma/data"
 )
 
 func (d drive) clone(params CloneParams, avoid []string) (*data.Drive, error) {

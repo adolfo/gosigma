@@ -9,7 +9,7 @@ import (
 	"net/http/httptest"
 	"strings"
 
-	"github.com/Altoros/gosigma/https"
+	"github.com/altoros/gosigma/https"
 )
 
 //

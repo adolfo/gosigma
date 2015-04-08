@@ -4,8 +4,8 @@
 package gosigma
 
 import (
-	"github.com/Altoros/gosigma/data"
-	"github.com/Altoros/gosigma/https"
+	"github.com/altoros/gosigma/data"
+	"github.com/altoros/gosigma/https"
 )
 
 // A Error implements library error
