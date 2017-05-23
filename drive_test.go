@@ -156,15 +156,15 @@ func TestClientDrives(t *testing.T) {
 		return
 	}
 
-	for i, uuid := range []string{"uuid-0", "uuid-1"} {
-		d := drives[i]
-
+	unprocessed := map[string]bool{"uuid-0": true, "uuid-1": true}
+	for _, d := range drives {
+		delete(unprocessed, d.UUID())
 		if d.String() == "" {
 			t.Error("Empty string representation")
 			return
 		}
 
-		testDrive(t, d, uuid, true)
+		testDrive(t, d, d.UUID(), true)
 
 		// refresh
 		if err := d.Refresh(); err != nil {
@@ -172,7 +172,7 @@ func TestClientDrives(t *testing.T) {
 			return
 		}
 
-		testDrive(t, d, uuid, false)
+		testDrive(t, d, d.UUID(), false)
 
 		if err := d.Remove(); err != nil {
 			t.Error("Drive remove fail:", err)
@@ -184,6 +184,9 @@ func TestClientDrives(t *testing.T) {
 			t.Error("Drive refresh must fail")
 			return
 		}
+	}
+	if len(unprocessed) > 0 {
+		t.Error("not all drives created")
 	}
 
 	mock.ResetDrives()

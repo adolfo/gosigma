@@ -101,6 +101,17 @@ func (j *JobLibrary) SetState(uuid, state string) {
 	}
 }
 
+// SetProgress for the job in the library
+func (j *JobLibrary) SetProgress(uuid string, progress int) {
+	j.s.Lock()
+	defer j.s.Unlock()
+
+	job, ok := j.m[uuid]
+	if ok {
+		job.Data.Progress = progress
+	}
+}
+
 func (j *JobLibrary) handleRequest(w http.ResponseWriter, r *http.Request) {
 	path := strings.TrimSuffix(r.URL.Path, "/")
 	path = strings.TrimPrefix(path, j.p)
