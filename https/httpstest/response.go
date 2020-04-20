@@ -11,9 +11,24 @@ import (
 	"time"
 )
 
+type readerCloser struct {
+	*strings.Reader
+}
+
+func (*readerCloser) Close() error {
+	return nil
+}
+
 // CreateResponse creates test response from HTTP code
 func CreateResponse(code int) (*http.Response, error) {
 	dateTime := time.Now().UTC().Format(time.RFC1123)
+	if code == 0 {
+		resp := &http.Response{
+			StatusCode: 0,
+			Body:       &readerCloser{strings.NewReader("")},
+		}
+		return resp, nil
+	}
 	msg := fmt.Sprintf(`HTTP/1.1 %d %s
 Server: cloudflare-nginx
 Date: %s

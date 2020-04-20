@@ -116,22 +116,21 @@ func (j job) State() string { return j.obj.State }
 
 // Wait job is finished
 func (j *job) Wait() error {
-	var stop = false
-
+	var timer <-chan time.Time
 	timeout := j.client.GetOperationTimeout()
 	if timeout > 0 {
-		timer := time.AfterFunc(timeout, func() { stop = true })
-		defer timer.Stop()
+		timer = time.After(timeout)
 	}
 
 	for j.Progress() < 100 {
-		if err := j.Refresh(); err != nil {
-			return err
-		}
-		if stop {
+		select {
+		case <-timer:
 			return ErrOperationTimeout
+		default:
+			if err := j.Refresh(); err != nil {
+				return err
+			}
 		}
 	}
-
 	return nil
 }

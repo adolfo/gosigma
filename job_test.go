@@ -120,7 +120,7 @@ func TestJobProgress(t *testing.T) {
 	}
 
 	setJobProgress := func() {
-		jd.Data.Progress = 100
+		mock.Jobs.SetProgress(jd.UUID, 100)
 	}
 	go setJobProgress()
 
